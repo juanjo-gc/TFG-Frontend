@@ -82,6 +82,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/timeline",
+    name: "timeline",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/TimelineView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 ];
 
 const router = createRouter({

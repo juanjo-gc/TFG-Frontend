@@ -15,7 +15,7 @@
             class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="#!">Sign Up</a></li>
+            <li class="nav-item"><router-link to="/register" class="nav-link">Registrarse</router-link></li>
             <li class="nav-item"><router-link to="/login" class="nav-link">Iniciar sesión</router-link></li>
           </ul>
         </div>
