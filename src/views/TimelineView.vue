@@ -22,19 +22,19 @@
           <div class="card">
             <div class="card-body">
               <ul class="list-unstyled">
-                <li v-for="tweet in tweets">
+                <li v-for="post in aPosts">
                   <div class="media post-border">
                     <div class="row">
                       <div class="col-md-1">
                         <img class="mr-3 avatar float-left" src="https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small/Basic_Ui__28186_29.jpg" alt="User avatar">
                       </div>
                       <div class="col-md-11">
-                        <h5 class="mt-0 mb-1">{{ person._sName }}</h5>
-                        <h6><p class="text-muted">@{{ person._sUsername }}</p></h6>
+                        <h5 class="mt-0 mb-1">{{ post._user._sName }}</h5>
+                        <h6><p class="text-muted">@{{ post._user._sUsername }}</p></h6>
                       </div>
                     </div>
                     <div class="media-body">
-                      <p>{{ tweet.text }}</p>
+                      <p>{{ post._sText }}</p>
                       <div class="row">
                         <div class="col-md-3">
                           <button class="btn float-end" style="background-color: transparent;">
@@ -66,7 +66,7 @@
   
   <script setup>
   
-  import { computed, ref } from "vue";
+  import { computed, onMounted, ref } from "vue";
   import HeaderComponent from "@/components/HeaderComponent.vue"
   import { useUserStore } from "@/store/UserStore";
   import axios from "axios";
@@ -76,14 +76,28 @@
   const userStore = useUserStore();
   let iRemainingCharacters = ref(255);
   let sPost = ref('');
+  let aPosts = ref([]);
 
   function newPost() {
     axios.post("http://localhost:8000/api/newPost", {
       sText: sPost.value,
       iUserId: userStore.person._iId
     }).then((response) => {
-      console.log(response.data)
+      aPosts.value.unshift(response.data);
+      sPost.value = '';
     }).catch(error => console.log(error))
+  }
+
+  onMounted(() => {
+    getTimelinePosts();
+  })
+
+  function getTimelinePosts() {
+    axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId)
+    .then(response => {
+      aPosts.value = response.data;
+      
+    }).catch(error => console.log(error));
   }
 
   function calculateCharacters() {
@@ -91,23 +105,6 @@
   }
 
   const person = userStore.person;
-
-      const tweets = ref([
-        {
-          user: {
-            name: 'John Doe'
-          },
-          text: 'This is my first tweet!',
-          created_at: '2023-05-22T08:13:01Z'
-        },
-        {
-          user: {
-            name: 'Jane Doe'
-          },
-          text: 'Hello world!',
-          created_at: '2023-05-21T08:13:01Z'
-        }
-      ])
       
     
   
