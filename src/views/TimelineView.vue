@@ -42,8 +42,8 @@
                           </button>
                         </div>
                         <div class="col-md-3">
-                          <button class="btn float-end" style="background-color: transparent;">
-                            <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> 0
+                          <button class="btn float-end" style="background-color: transparent;" @click="setLike(post._iId)">
+                            <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> {{ post.iNumLikes }}
                           </button>
                         </div>
                         <div class="col-md-6">
@@ -96,8 +96,21 @@
     axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId)
     .then(response => {
       aPosts.value = response.data;
-      
+      // aPosts.value.map( (data, index) => ({...data, iNumLikes: 0}))
+      aPosts.value.forEach(post => { 
+        if(typeof(post._setLikes.size) === 'undefined') {
+          post.iNumLikes = 0;
+        } else { 
+          post.iNumLikes = post._setLikes.size; }
+        })
+      aPosts.value.forEach(post => {
+        console.log("Texto: " + post._sText + " Likes: " + post.iNumLikes)
+        // console.log(typeof(post._setLikes.size))
+    })
     }).catch(error => console.log(error));
+
+    
+
   }
 
   function calculateCharacters() {
@@ -107,9 +120,11 @@
   function setLike(postId) {
     axios.post("http://localhost:8000/api/setLike/" + postId + "/" + userStore.person._iId)
     .then(response => {
+      let postIndex = aPosts.value.findIndex(post => post._iId === postId);
       if(response.data === true) {
-        let postIndex = aPosts.value.findIndex(post => post._iId === postId);
-        
+        aPosts.value[postIndex].iNumLikes++;
+      } else {
+        aPosts.value[postIndex].iNumLikes--;
       }
     })
   }
