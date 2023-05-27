@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-6">
                           <small class="text-muted float-end" style="margin-top: 10px;">
-                            Publicado en {{ moment() }}  
+                            Publicado el {{ moment(post._tCreatedAt).format('D-M-YYY') }}  
                           </small>
                         </div>
                       </div>
@@ -104,7 +104,17 @@
     iRemainingCharacters.value = 255 - sPost.value.length
   }
 
-  const person = userStore.person;
+  function setLike(postId) {
+    axios.post("http://localhost:8000/api/setLike/" + postId + "/" + userStore.person._iId)
+    .then(response => {
+      if(response.data === true) {
+        let postIndex = aPosts.value.findIndex(post => post._iId === postId);
+        
+      }
+    })
+  }
+
+  // const person = userStore.person;
       
     
   
