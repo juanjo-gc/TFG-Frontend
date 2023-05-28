@@ -98,11 +98,14 @@
       aPosts.value = response.data;
       // aPosts.value.map( (data, index) => ({...data, iNumLikes: 0}))
       aPosts.value.forEach(post => { 
-        if(typeof(post._setLikes.size) === 'undefined') {
-          post.iNumLikes = 0;
-        } else { 
-          post.iNumLikes = post._setLikes.size; }
+        // console.log(typeof(post._setLikes))
+        // if(typeof(post._setLikes.size) === 'undefined') {
+        //   post.iNumLikes = 0;
+        // } else { 
+        //   post.iNumLikes = post._setLikes.size; }
+        post.iNumLikes = Object.keys(post._setLikes).length;
         })
+      
       aPosts.value.forEach(post => {
         console.log("Texto: " + post._sText + " Likes: " + post.iNumLikes)
         // console.log(typeof(post._setLikes.size))
