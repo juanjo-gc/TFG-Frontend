@@ -5,28 +5,17 @@
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col col-lg-12 col-xl-10">
           <div class="card">
-            <div
-              class="rounded-top text-white d-flex flex-row"
-              style="background-color: #000; height: 200px"
-            >
+            <div class="rounded-top text-white d-flex flex-row" style="background-color: #000; height: 200px">
               <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px">
                 <!-- <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-1.webp" -->
-                <img
-                  :src="
-                    sProfileImageURL
-                    // 'http://localhost:8000/api/getProfileImage/' + person._iId
-                    // setProfileImageURL
-                  "
-                  alt="ProfileImg"
-                  class="img-thumbnail mt-4 mb-2"
-                  style="width: 150px; z-index: 1"
-                  v-if="person._iId != 0 && sProfileImageURL"
-                />
-                <img
-                  v-else
+                <img :src="sProfileImageURL
+                  // 'http://localhost:8000/api/getProfileImage/' + person._iId
+                  // setProfileImageURL
+                  " alt="ProfileImg" class="img-thumbnail mt-4 mb-2" style="width: 150px; z-index: 1"
+                  v-if="person._iId != 0 && sProfileImageURL" />
+                <img v-else
                   src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
-                  alt=""
-                />
+                  alt="" />
               </div>
               <div class="ms-3" style="margin-top: 130px">
                 <h5>{{ person._sName }}</h5>
@@ -34,15 +23,8 @@
                 <p v-else>@{{ route.params.username }}</p>
               </div>
               <div class="ms-auto mt-auto mb-2 me-2">
-                <ul
-                  class="list-group list-group-horizontal"
-                  style="list-style-type: none"
-                >
-                  <li
-                    class="litem"
-                    v-for="interest in person._setInterests"
-                    :key="interest._iId"
-                  >
+                <ul class="list-group list-group-horizontal" style="list-style-type: none">
+                  <li class="litem" v-for="interest in person._setInterests" :key="interest._iId">
                     {{ interest._sName }}
                   </li>
                   <!-- <li class="litem">Hola 1</li>
@@ -56,33 +38,20 @@
             </div>
             <div class="p-4 text-black" style="background-color: #f8f9fa">
               <div class="row">
-                <div class="col-2">
-                  <button
-                    type="button"
-                    class="btn btn-outline-dark"
-                    data-mdb-ripple-color="dark"
-                    style="margin-left: 10px; z-index: 1"
-                    @click="router.push('/editProfile')"
-                    v-if="person._iId === userStore.person._iId"
-                  >
+                <div class="col-2" v-if="person._iId != 0">
+                  <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                    style="margin-left: 10px; z-index: 1" @click="router.push('/editProfile')"
+                    v-if="person._iId === userStore.person._iId">
                     Modificar perfil
                   </button>
-                  <button
-                    type="button"
-                    class="btn btn-outline-dark"
-                    data-mdb-ripple-color="dark"
-                    style="margin-left: 10px; z-index: 1"
-                    @click="router.push('/photos/' +  person._sUsername)"
-                    v-else
-                    >
+                  <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                    style="margin-left: 10px; z-index: 1" @click="router.push('/photos/' + person._sUsername)" v-else>
                     Ver fotos
                   </button>
                 </div>
+                <div class="col-2" v-else></div>
                 <div class="col-7">
-                  <div
-                    class="d-flex justify-content-left text-left py-1"
-                    style="position: relative"
-                  >
+                  <div class="d-flex justify-content-left text-left py-1" style="position: relative">
                     <div class="description">
                       <p class="mb-1">{{ person._sDescription }}</p>
                       <p class="lead fw-formal" v-if="person._iId == 0">
@@ -94,19 +63,32 @@
                 <div class="col-3">
                   <div class="d-flex justify-content-end text-center py-1">
                     <div>
-                      <p class="mb-1 h5">253</p>
+                      <p class="mb-1 h5">{{ iNumPosts }}</p>
                       <p class="small text-muted mb-0">Publicaciones</p>
                     </div>
                     <div class="px-3">
-                      <p class="mb-1 h5">1026</p>
-                      <p class="small text-muted mb-0">Seguidos</p>
+                      <p class="mb-1 h5">{{ iNumFollowing }}</p>
+                      <p class="small text-muted mb-0">Siguiendo</p>
                     </div>
                     <div>
-                      <p class="mb-1 h5">478</p>
+                      <p class="mb-1 h5">{{ iNumFollowers }}</p>
                       <p class="small text-muted mb-0">Seguidores</p>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-9"></div>
+              <div class="col-md-3 d-flex flex-row-reverse">
+                <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed">
+                  Seguir
+                </button>
+                <button type="button" class="btn btn-dark" data-mdb-ripple-color="dark"
+                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-else>
+                  Siguiendo
+                </button>
               </div>
             </div>
             <div class="card-body p-4 text-black">
@@ -169,22 +151,62 @@ const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 let sProfileImageURL = ref("");
-let person = ref(userStore.person);
+const person = ref("");
+let bFollowed = ref(true);
+let aPosts = ref([]);
+let iNumPosts = ref(null);
+let iNumFollowing = ref(null);
+let iNumFollowers = ref(null);
 
 onMounted(() => {
-  if (route.params.username != person._sUsername) {
-    axios
-      .get(
-        "http://localhost:8000/api/getUserFromUsername/" + route.params.username
-      )
-      .then((response) => {
-        person.value = response.data;
-        sProfileImageURL.value =
-          "http://localhost:8000/api/getProfileImage/" + person.value._iId;
-      })
-      .catch((error) => console.log(error));
-  }
+  person.value = userStore.person;
+  axios
+    .get(
+      "http://localhost:8000/api/getUserFromUsername/" + route.params.username
+    )
+    .then((response) => {
+      person.value = response.data;
+      if (person.value._iId != 0) { //Usuario válido
+        if (person.value._iId != userStore.person._iId) {  //Ahorrar petición si el usuario es el mismo
+          axios.get("http://localhost:8000/api/checkFollow/" + userStore.person._iId + "/" + person.value._iId)
+            .then((response) => {
+              bFollowed.value = response.data;
+            })
+            .catch((error) => console.log(error));
+        }
+        axios.get("http://localhost:8000/api/getUserPosts/" + route.params.username)
+          .then(response => {
+            aPosts.value = response.data;
+            console.log(aPosts.value.length)
+            iNumPosts.value = aPosts.value.length;
+          })
+          .catch(error => console.log(error));
+        axios.get("http://localhost:8000/api/getNumFollows/" + person.value._iId)
+        .then(response => {
+          console.log(response.data)
+          iNumFollowing.value = response.data[0];
+          iNumFollowers.value = response.data[1];
+        })
+      }
+      sProfileImageURL.value =
+        "http://localhost:8000/api/getProfileImage/" + person.value._iId;
+    })
+    .catch((error) => console.log(error));
+
+
 });
+
+function setFollow() {
+  axios
+    .patch(
+      "http://localhost:8000/api/setFollow/" + userStore.person._iId + "/" + person.value._iId)
+    .then((response) => {
+      console.log(response.data);
+      bFollowed.value = response.data;
+      bFollowed.value === true ? iNumFollowers.value = iNumFollowers.value + 1 : iNumFollowers.value = iNumFollowers.value - 1;
+    })
+    .catch((error) => console.log(error));
+}
 </script>
 
 <style scoped>
@@ -234,12 +256,10 @@ onMounted(() => {
 
 /* CSS */
 .btnSwitch {
-  background-image: linear-gradient(
-    92.88deg,
-    #455eb5 9.16%,
-    #5643cc 43.89%,
-    #673fd7 64.72%
-  );
+  background-image: linear-gradient(92.88deg,
+      #455eb5 9.16%,
+      #5643cc 43.89%,
+      #673fd7 64.72%);
   border-radius: 8px;
   border-style: none;
   box-sizing: border-box;
