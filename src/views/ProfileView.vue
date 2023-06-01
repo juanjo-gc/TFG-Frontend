@@ -27,12 +27,6 @@
                   <li class="litem" v-for="interest in person._setInterests" :key="interest._iId">
                     {{ interest._sName }}
                   </li>
-                  <!-- <li class="litem">Hola 1</li>
-                  <li class="litem">Hola 2</li>
-                  <li class=" litem">Hola 1</li>
-                  <li class="litem">Hola 2</li> -->
-                  <!-- <li class="list-group-item">Hola 1</li>
-                  <li class="list-group-item">Hola 2</li> -->
                 </ul>
               </div>
             </div>

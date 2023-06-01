@@ -93,6 +93,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/post/:id",
+    name: "postDetail",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/PostDetailView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 ];
 
 const router = createRouter({

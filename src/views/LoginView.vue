@@ -64,7 +64,7 @@
                       </router-link>
                     </div>
                     <div v-if="formError" class="alert alert-danger">Error. Introduce tus datos de nuevo.</div>
-                    <p>{{ userStore.person }}</p>
+                    <!-- <p>{{ userStore.person }}</p> -->
                   </form>
                 </div>
               </div>
@@ -104,7 +104,7 @@
       .then( response => {
         console.log(response)
         userStore.person = response.data;
-        router.push("/profile/" + userStore.person._sUsername);
+        router.push("/timeline");
         if(userStore.person._iId === 0)
           formError.value = true;
       })

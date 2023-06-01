@@ -8,8 +8,8 @@
           <div class="card new-post">
             <div class="card-body">
               <h5 class="card-title">Nueva publicación</h5>
-              <textarea class="form-control" rows="2" maxlength="255" v-model="sPost" @keyup="calculateCharacters"></textarea>
-              <span>Caracteres restantes: {{ iRemainingCharacters }}</span>
+              <textarea class="form-control" rows="2" maxlength="255" v-model="sPost"></textarea>
+              <span>Caracteres restantes: {{ 255 - sPost.length }}</span>
               <button class="btn btn-primary mt-2 float-end" @click="newPost">Publicar</button>
             </div>
           </div>
@@ -26,15 +26,25 @@
                   <div class="media post-border">
                     <div class="row">
                       <div class="col-md-1">
-                        <img class="mr-3 avatar float-left" src="https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small/Basic_Ui__28186_29.jpg" alt="User avatar">
+                        <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
+                        <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"  alt="User avatar">
+                        </router-link>
                       </div>
                       <div class="col-md-11">
-                        <h5 class="mt-0 mb-1">{{ post._user._sName }}</h5>
+                        <h5 class="mt-0 mb-1">
+                          <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
+                          {{ post._user._sName }}
+                          </router-link>
+                        </h5>
                         <h6><p class="text-muted">@{{ post._user._sUsername }}</p></h6>
                       </div>
                     </div>
                     <div class="media-body">
-                      <p>{{ post._sText }}</p>
+                      <router-link :to="`/post/${post._iId}`" style="text-decoration: none; color: inherit;">
+                      <div>
+                        <p>{{ post._sText }}</p>
+                      </div>
+                    </router-link>
                       <div class="row">
                         <div class="col-md-3">
                           <button class="btn float-end" style="background-color: transparent;">
@@ -43,7 +53,7 @@
                         </div>
                         <div class="col-md-3">
                           <button class="btn float-end" style="background-color: transparent;" @click="setLike(post._iId)">
-                            <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> {{ post.iNumLikes }}
+                            <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> {{ post._iLikes }}
                           </button>
                         </div>
                         <div class="col-md-6">
@@ -74,7 +84,6 @@
 
 
   const userStore = useUserStore();
-  let iRemainingCharacters = ref(255);
   let sPost = ref('');
   let aPosts = ref([]);
 
@@ -116,18 +125,14 @@
 
   }
 
-  function calculateCharacters() {
-    iRemainingCharacters.value = 255 - sPost.value.length
-  }
-
   function setLike(postId) {
     axios.post("http://localhost:8000/api/setLike/" + postId + "/" + userStore.person._iId)
     .then(response => {
       let postIndex = aPosts.value.findIndex(post => post._iId === postId);
       if(response.data === true) {
-        aPosts.value[postIndex].iNumLikes++;
+        aPosts.value[postIndex]._iLikes++;
       } else {
-        aPosts.value[postIndex].iNumLikes--;
+        aPosts.value[postIndex]._iLikes--;
       }
     })
   }
