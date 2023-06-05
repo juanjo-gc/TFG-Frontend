@@ -1,6 +1,9 @@
 <script setup>
   import { ref } from 'vue';
-import HeaderComponent from './components/HeaderComponent.vue';
+  import { useRoute } from 'vue-router';
+  import HeaderComponent from './components/HeaderComponent.vue';
+
+  let route = useRoute();
   let auth = ref(false)
 
 </script>
@@ -8,7 +11,7 @@ import HeaderComponent from './components/HeaderComponent.vue';
 <template>
   <div class="main">
     <header-component v-if="auth"></header-component>
-    <RouterView />
+    <RouterView :key="route.fullPath" />
   </div>
 </template>
 

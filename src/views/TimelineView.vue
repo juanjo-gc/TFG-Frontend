@@ -7,7 +7,14 @@
         <div class="col-md-8">
           <div class="card new-post">
             <div class="card-body">
-              <h5 class="card-title">Nueva publicación</h5>
+              <div class="row d-flex justify-content-center">
+                <div class="col-md-1 align-items-center d-flex">
+                  <img class="mr-3 avatar" :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"  alt="User avatar">
+                </div>
+                <div class="col-md-11" style="margin: auto;">
+                  <h5 class="card-title">Nueva publicación</h5>
+                </div>
+              </div>
               <textarea class="form-control" rows="2" maxlength="255" v-model="sPost"></textarea>
               <span>Caracteres restantes: {{ 255 - sPost.length }}</span>
               <button class="btn btn-primary mt-2 float-end" @click="newPost">Publicar</button>
@@ -30,13 +37,16 @@
                         <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"  alt="User avatar">
                         </router-link>
                       </div>
-                      <div class="col-md-11">
+                      <div class="col-md-7">
                         <h5 class="mt-0 mb-1">
                           <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
                           {{ post._user._sName }}
                           </router-link>
                         </h5>
                         <h6><p class="text-muted">@{{ post._user._sUsername }}</p></h6>
+                      </div>
+                      <div class="col-md-4">
+                        <p class="small text-muted" v-if="post._repliesTo != null">Respondiendo a @{{ post._repliesTo._user._sUsername }}</p>
                       </div>
                     </div>
                     <div class="media-body">
@@ -105,16 +115,7 @@
     axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId)
     .then(response => {
       aPosts.value = response.data;
-      // aPosts.value.map( (data, index) => ({...data, iNumLikes: 0}))
-      aPosts.value.forEach(post => { 
-        // console.log(typeof(post._setLikes))
-        // if(typeof(post._setLikes.size) === 'undefined') {
-        //   post.iNumLikes = 0;
-        // } else { 
-        //   post.iNumLikes = post._setLikes.size; }
-        post.iNumLikes = Object.keys(post._setLikes).length;
-        })
-      
+      // aPosts.value.map( (data, index) => ({...data, iNumLikes: 0}))   
       aPosts.value.forEach(post => {
         console.log("Texto: " + post._sText + " Likes: " + post.iNumLikes)
         // console.log(typeof(post._setLikes.size))
@@ -186,7 +187,12 @@
     height: 50px;
   }
 
-
+  .centered-image {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    width: 40%;
+  }
 
 
 

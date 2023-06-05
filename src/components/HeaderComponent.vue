@@ -1,7 +1,7 @@
 <template>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-      <router-link to="/" class="navbar-brand">Navbar</router-link>
+      <router-link to="/timeline" class="navbar-brand">Inicio</router-link>
       <button
         class="navbar-toggler"
         type="button"
@@ -16,7 +16,7 @@
       <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <router-link class="nav-link active" to="/">Home</router-link>
+            <router-link class="nav-link active" :to="`/profile/${userStore.person._sUsername}`">Perfil</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link active" to="/about">About</router-link>
@@ -35,6 +35,7 @@
 import { useUserStore } from '@/store/UserStore.js';
 
 const userStore = useUserStore();
+
 </script>
 
 <style scoped>

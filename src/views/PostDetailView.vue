@@ -11,8 +11,9 @@
                     <div class="media post-border">
                       <div class="row">
                         <div class="col-md-1">
-                          <img class="mr-3 avatar float-left" src="https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small/Basic_Ui__28186_29.jpg" alt="User avatar">
-                        </div>
+                          <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
+                        <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"  alt="User avatar">
+                        </router-link>                        </div>
                         <div class="col-md-11">
                           <h5 class="mt-0 mb-1">{{ post._user._sName }}</h5>
                           <h6><p class="text-muted">@{{ post._user._sUsername }}</p></h6>
@@ -87,7 +88,7 @@
                       </div>
                     </div>
                     <div class="media-body">
-                      <router-link :to="`/post/${reply._iId}`" style="text-decoration: none; color: inherit;">
+                      <router-link :to="`/post/${reply._iId}`" :key="route.path" style="text-decoration: none; color: inherit;">
                       <div>
                         <p>{{ reply._sText }}</p>
                       </div>
@@ -165,10 +166,10 @@
           axios.get("http://localhost:8000/api/getReplies/" + post.value._iId)
           .then(response => {
             aReplies.value = response.data;
+            bIsFetching.value = false;
           })
           .catch(error => console.log(error));
         }
-        bIsFetching.value = false;
       }).catch(error => console.log(error));
     })
 
