@@ -104,6 +104,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/:username/:follow",
+    name: "showFollows",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/ShowFollowsView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 ];
 
 const router = createRouter({

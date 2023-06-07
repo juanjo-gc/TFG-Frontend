@@ -61,12 +61,16 @@
                       <p class="small text-muted mb-0">Publicaciones</p>
                     </div>
                     <div class="px-3">
+                      <router-link :to="`/${person._sUsername}/following`" style="text-decoration: none; color: inherit;">
                       <p class="mb-1 h5">{{ iNumFollowing }}</p>
                       <p class="small text-muted mb-0">Siguiendo</p>
+                      </router-link>
                     </div>
-                    <div>
+                    <div class="px-3">
+                      <router-link :to="`/${person._sUsername}/followers`" style="text-decoration: none; color: inherit;">
                       <p class="mb-1 h5">{{ iNumFollowers }}</p>
                       <p class="small text-muted mb-0">Seguidores</p>
+                      </router-link>
                     </div>
                   </div>
                 </div>
