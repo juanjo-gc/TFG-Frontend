@@ -115,6 +115,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/messages",
+    name: "messages",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/ChatsView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 ];
 
 const router = createRouter({
