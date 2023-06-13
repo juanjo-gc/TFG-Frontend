@@ -20,6 +20,7 @@
     "moment": "^2.29.4",
     "pinia": "^2.0.33",
     "pinia-plugin-persistedstate": "^3.1.0",
+    "pusher-js": "^8.1.0",
     "swiper": "^9.2.4",
     "vue": "^3.2.13",
     "vue-flickity": "^1.2.1",

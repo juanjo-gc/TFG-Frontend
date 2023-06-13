@@ -1,20 +1,41 @@
 <template>
     <HeaderComponent></HeaderComponent>
-    <div class="container">
-        <div class="bottom-line">
+    <div class="container" v-if="!bIsFetching">
+        <div class="row">
             <h2 class="mt-3">Mensajes privados</h2>
         </div>
         <div class="row">
             <div class="col-md-7">
                 <h4 class="mt-3">Mensajes recientes</h4>
-                <div v-if="aRecentMessages.length === 0">
+                <div v-if="aLastMessages.length === 0">
                     <p class="lead fw-formal mt-4">No hay mensajes recientes :&#40;</p>
                 </div>
-                <div v-else>
-                    <!-- TODO: Mostrar mensajes recientes con link a la conversación -->
+                <div class="pt-2 me-5" v-else>
+                    <ul class="list-unstyled">
+                        <li v-for="message in aLastMessages">
+                                <div class="row message-preview" :class="{newmessage: !message._bIsSeen}" @click="navigateToChat(message)">
+                                    <div class="col-sm-1">
+                                        <img v-if="message._issuer._iId != userStore.person._iId" class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${message._issuer._iId}`"  alt="User avatar">
+                                        <img v-else class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${message._recipient._iId}`"  alt="User avatar">
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <h6 v-if="message._issuer._iId != userStore.person._iId">{{ message._issuer._sName }}</h6>
+                                        <h6 v-else>{{ message._recipient._sName }}</h6>
+                                        <p class="small text-muted">{{ message._sText }}</p>
+                                    </div>
+                                    <div class="col-sm-4  align-self-center">
+                                        <div v-if="message._issuer._iId != userStore.person._iId" class="circle float-end"></div>
+                                    </div>
+                                </div>
+                            <!-- </router-link> -->
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-1">
+                <div class="vline"></div>
+            </div>
+            <div class="col-md-4">
                 <h4 class="mt-3">Nuevo mensaje</h4>
                 <div class="form-group field mt-3">
                     <div class="row">
@@ -66,19 +87,44 @@
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const router = useRouter();
 let sUsernameToMessage = ref("");
 let sNewMessage = ref("");
 let aUsers = ref([]);
-let aRecentMessages = ref([]);
 let selectedUser = ref(null);
 let bActivateAlert = ref(false);
+let bIsFetching = ref(true);
 let sErrorMessage = ref("");
+let aLastMessages = ref([]);
+let aiRecentMessagedUsers = ref([]);
+
+onMounted(() => {
+    axios.get("http://localhost:8000/api/getLastMessages/" + userStore.person._iId)
+    .then(response => {
+        aLastMessages.value = response.data;
+        bIsFetching.value = false;
+        aLastMessages.value.forEach(message => {
+            if(message._issuer._iId != userStore.person._iId) {
+                message._bIsSeen = false;
+                aiRecentMessagedUsers.value.push(message._issuer._iId);
+            } else {
+                message._bIsSeen = true;
+                aiRecentMessagedUsers.value.push(message._recipient._iId);
+            }
+        console.log(aiRecentMessagedUsers.value)
+        })
+    })
+    .catch(error => console.log(error));
+})
 
 function selectUser(user) {
     selectedUser.value = user;
+    if(aiRecentMessagedUsers.value.find(u => u === selectedUser.value._iId)) 
+        router.push("/messages/" + selectedUser.value._iId);
     sUsernameToMessage.value = "";
 }
 
@@ -108,19 +154,58 @@ function sendMessage() {
             sText: sNewMessage.value
         })
         .then(response => {
-            aRecentMessages.value.unshift(response.data)
+            aLastMessages.value.unshift(response.data)
         })
         .catch(error => console.log(error));
         sNewMessage.value = "";
     }
 }
 
+function navigateToChat(message) {
+    if(userStore.person._iId === message._issuer._iId) 
+        router.push("/messages/" + message._recipient._iId);
+    else
+        router.push("/messages/" + message._issuer._iId);
+
+}
+
 </script>
 
 <style scoped>
 
-.botton-line{
+.hline {
     border-bottom: solid 1px black;
+}
+
+.vline {
+    border-left: solid 1px black;
+    position: relative;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 100%;
+}
+
+.message-preview {
+    padding: 10px;
+    margin-top: 10px;
+    border: solid 1px #d5d5d5;
+}
+
+.message-preview:hover {
+    background-color: #e5e5e5;
+    cursor: pointer;
+}
+
+.newmessage h6 {
+    font-weight: bold;
+}
+
+
+.circle {
+    background: #3676d7;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
 }
 
 .avatar {
@@ -193,7 +278,6 @@ function sendMessage() {
     box-shadow: none;
 }
 
-/* demo */
 body {
     font-family: "Poppins", sans-serif;
     display: flex;

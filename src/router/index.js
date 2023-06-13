@@ -126,6 +126,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/messages/:targetId",
+    name: "privateMessages",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/PrivateChatView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 ];
 
 const router = createRouter({

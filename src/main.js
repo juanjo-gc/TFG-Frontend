@@ -13,7 +13,11 @@ import {
      faComment
 } from "@fortawesome/free-regular-svg-icons";
 
-library.add(faHeart, faComment);
+import {
+     faArrowLeft
+} from '@fortawesome/free-solid-svg-icons'
+
+library.add(faHeart, faComment, faArrowLeft);
 
 
 createApp(App)
