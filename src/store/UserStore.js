@@ -12,7 +12,7 @@ export const useUserStore = defineStore({
     // }),
     state: () => {
         return {
-            person: reactive({}),
+            person: {},
             profileImage: null
         };
       },

@@ -1,36 +1,57 @@
 <template>
     <HeaderComponent></HeaderComponent>
-    <div class="container" v-if="targetUser != null">
-        <router-link to="/messages" style="text-decoration: none; color: inherit;">
-            <div class="rounded col-1">
-                <font-awesome-icon icon="fa-solid fa-arrow-left" size="lg" />
+    <div class="container container-fluid vh-100 min-vh-100 mw-75 min-mw-75 d-flex flex-column" v-if="targetUser != null">
+        <div class="row">
+            <div class="col-md-5">
+                <router-link to="/messages" style="text-decoration: none; color: inherit;">
+                    <div class="rounded col-1">
+                        <font-awesome-icon icon="fa-solid fa-arrow-left" size="lg" />
+                    </div>
+                </router-link>
             </div>
-        </router-link>
-        <h5></h5>
-        <ul class="list-unstyled">
-            <li v-for="message in aMessages">
-                <div class="row" v-if="message._issuer._iId == targetUser._iId">
-                    <div class="col-sm-1">
-                        <img class="mr-3 avatar" :src="`http://localhost:8000/api/getProfileImage/${targetUser._iId}`"  alt="User avatar">
-                    </div>
-                    <div class="col-sm-10 recipient-message">
-                        <p class="float-start">{{ message._sText }}</p>
-                    </div>
-                </div>
-                <div class="row" v-else>
-                    <div class="col-sm-10 issuer-message">
-                        {{ message._sText }}
-                    </div>
-                    <div class="col-sm-1">
-                        <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"  alt="User avatar">
-                    </div>
-                </div>
-            </li>
-        </ul>
-        <form @submit.prevent="submitMessage">
-            <input type="text" v-model="sMessage">
-            <button type="submit" class="btn btn-primary">Enviar</button>
-        </form>
+            <div class="col-md-7 d-flex align-items-center">
+                <img class="mr-3 avatar"
+                                    :src="`http://localhost:8000/api/getProfileImage/${targetUser._iId}`" alt="User avatar">
+                <h4 class="name-display">{{ targetUser._sName }}</h4>
+            </div>
+        </div>
+        <div class="hline"></div>
+        <div class="row justify-content-center scroller h-75" ref="chatContainer">
+            <div class="chat">
+                <ul class="list-unstyled">
+                    <li v-for="message in aMessages">
+                        <div class="row" v-if="message._iIssuerId === targetUser._iId">
+                            <div class="col-sm-1 ">
+                                <img class="mr-3 avatar"
+                                    :src="`http://localhost:8000/api/getProfileImage/${targetUser._iId}`" alt="User avatar">
+                            </div>
+                            <div class="col-sm-10 recipient-message">
+                                <p class="float-start">{{ message._sText }}</p>
+                            </div>
+                        </div>
+                        <div class="row" v-else>
+                            <div class="col-sm-10 issuer-message">
+                                <p class="float-end">{{ message._sText }}</p>
+                            </div>
+                            <div class="col-sm-1">
+                                <img class="mr-3 avatar float-end"
+                                    :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"
+                                    alt="User avatar">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="hline"></div>
+        <div class="row new-message align-items-center d-flex">
+            <div class="col-sm-11">
+                <input type="text" class="w-100 message-box">
+            </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn btn-primary">Enviar</button>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -44,8 +65,8 @@ import { useRoute } from "vue-router";
 
 const userStore = useUserStore();
 const route = useRoute();
+let chatContainer = ref(null);
 let aMessages = ref([]);
-let aMessagesText = ref([]);
 let sMessage = ref('');
 let targetUser = ref(null);
 
@@ -57,10 +78,16 @@ onMounted(() => {
 
     axios.get("http://localhost:8000/api/getConversation/" + userStore.person._iId + "/" + route.params.targetId)
         .then(response => {
-            aMessages.value = response.data;
-            aMessagesText.value = aMessages.value.map(message => {
-                return message._sText;
-            })
+            aMessages.value = response.data.map(item => {
+                return {
+                    _sText: item._sText,
+                    _iIssuerId: item._issuer._iId,
+                    _iRecipientId: item._recipient._iId
+                }
+            });
+            // chatContainer = $refs.chatContainer;
+            // chatContainer.scrollTop = chatContainer.scrollHeight;
+            chatContainer.value.$el.scrollTop = chatContainer.value.scrollHeight;
         })
 
     const pusher = new Pusher('56c83b0b9e4a25060b44', {
@@ -70,7 +97,10 @@ onMounted(() => {
     const channel = pusher.subscribe('rt-chat');
     channel.bind('newMessage', (data) => {
         aMessages.value.push(data.message);
+        console.log(aMessages.value)
+        chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
     })
+
 })
 
 function submitMessage() {
@@ -79,6 +109,11 @@ function submitMessage() {
         iRecipientId: route.params.targetId,
         sText: sMessage.value
     })
+        .then(response => {
+
+        })
+        .catch(error => console.log(error));
+    sMessage.value = '';
 }
 
 
@@ -90,13 +125,49 @@ function submitMessage() {
     color: #777;
 }
 
+.hline {
+    border-bottom: solid 1px black;
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
 .avatar {
     border-radius: 50%;
     width: 50px;
     height: 50px;
-  }
+}
 
-  .recipient-message {
+.message-box {
+    border-radius: 5px;
+    border: solid 1px rgb(205, 205, 205);
+}
+
+.scroller {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+}
+
+.chat {
+    /* width: 80%;
+    height: 50%; */
+    /* border: solid 1px black; */
+    padding: 15px;
+    margin: 15px;
+}
+
+.new-message {
+    padding: 15px;
+    margin: 15px;
+}
+
+.name-display {
+    padding-left: 5px;
+    margin-top: 5px;
+}
+
+.recipient-message {
     background-color: rgb(226, 226, 226);
     margin: 7px;
     border-radius: 10px;
@@ -109,6 +180,7 @@ function submitMessage() {
     border-radius: 10px;
     padding: 5px;
 }
+
 .rounded {
     /* border: solid 1px #777; */
     padding: 5px;

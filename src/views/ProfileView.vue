@@ -62,14 +62,14 @@
                     </div>
                     <div class="px-3">
                       <router-link :to="`/${person._sUsername}/following`" style="text-decoration: none; color: inherit;">
-                      <p class="mb-1 h5">{{ iNumFollowing }}</p>
-                      <p class="small text-muted mb-0">Siguiendo</p>
+                        <p class="mb-1 h5">{{ iNumFollowing }}</p>
+                        <p class="small text-muted mb-0">Siguiendo</p>
                       </router-link>
                     </div>
                     <div class="px-3">
                       <router-link :to="`/${person._sUsername}/followers`" style="text-decoration: none; color: inherit;">
-                      <p class="mb-1 h5">{{ iNumFollowers }}</p>
-                      <p class="small text-muted mb-0">Seguidores</p>
+                        <p class="mb-1 h5">{{ iNumFollowers }}</p>
+                        <p class="small text-muted mb-0">Seguidores</p>
                       </router-link>
                     </div>
                   </div>
@@ -90,46 +90,97 @@
               </div>
             </div>
             <div class="card-body p-4 text-black">
-              <div class="row">
-                <!-- <p class="lead fw-normal mb-1">About</p> -->
-                <!-- <div class="p-4" style="background-color: #f8f9fa;"> -->
-                <div class="col-md colItem">
-                  <button class="btnSwitch">
-                    <p class="lead fw-normal mb-1">Publicaciones</p>
-                  </button>
+              <!-- Mostrar publicaciones y eventos -->
+              <div v-if="bShouldDisplayData">
+
+                <div class="row">
+                  <!-- <p class="lead fw-normal mb-1">About</p> -->
+                  <!-- <div class="p-4" style="background-color: #f8f9fa;"> -->
+                  <div class="col-md colItem">
+                    <button class="btnSwitch" @click="bShowPosts = true">
+                      <p class="lead fw-normal mb-1">Publicaciones</p>
+                    </button>
+                  </div>
+                  <div class="col-md colItem">
+                    <button class="btnSwitch" @click="bShowPosts = false">
+                      <p class="lead fw-normal mb-1">Eventos</p>
+                    </button>
+                  </div>
                 </div>
-                <div class="col-md colItem">
-                  <button class="btnSwitch">
-                    <p class="lead fw-normal mb-1">Eventos</p>
-                  </button>
+                <!-- Mostrar publicaciones -->
+                <div class="row" v-if="bShowPosts">
+
+                  <div class="col-md-12 mt-2">
+                    <div class="card">
+                      <div class="card-body">
+                        <ul class="list-unstyled">
+                          <li v-for="post in aPosts">
+                            <div class="media post-border m-2">
+                              <div class="row">
+                                <div class="col-md-1">
+                                  <router-link :to="`/profile/${post._user._sUsername}`"
+                                    style="text-decoration: none; color: inherit;">
+                                    <img class="mr-3 avatar float-left"
+                                      :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"
+                                      alt="User avatar">
+                                  </router-link>
+                                </div>
+                                <div class="col-md-7">
+                                  <h5 class="mt-0 mb-1">
+                                    <router-link :to="`/profile/${post._user._sUsername}`"
+                                      style="text-decoration: none; color: inherit;">
+                                      {{ post._user._sName }}
+                                    </router-link>
+                                  </h5>
+                                  <h6>
+                                    <p class="text-muted">@{{ post._user._sUsername }}</p>
+                                  </h6>
+                                </div>
+                                <div class="col-md-4">
+                                  <p class="small text-muted" v-if="post._repliesTo != null">Respondiendo a @{{
+                                    post._repliesTo._user._sUsername }}</p>
+                                </div>
+                              </div>
+                              <div class="media-body">
+                                <router-link :to="`/post/${post._iId}`" style="text-decoration: none; color: inherit;">
+                                  <div>
+                                    <p>{{ post._sText }}</p>
+                                  </div>
+                                </router-link>
+                                <div class="row">
+                                  <div class="col-md-3">
+                                    <button class="btn float-end" style="background-color: transparent;">
+                                      <font-awesome-icon icon="fa-regular fa-comment" size="sm" style="color: #1e3050;" />
+                                      0
+                                    </button>
+                                  </div>
+                                  <div class="col-md-3">
+                                    <button class="btn float-end" style="background-color: transparent;"
+                                      @click="setLike(post._iId)">
+                                      <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" />
+                                      {{ post._iLikes }}
+                                    </button>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <small class="text-muted float-end" style="margin-top: 10px;">
+                                      Publicado el {{ moment(post._tCreatedAt).format('D-M-YYYY') }}
+                                    </small>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <!-- </div> -->
+                <!-- Mostrar eventos -->
+                <div class="row" v-else></div>
               </div>
-              <p>{{ person }}</p>
-              <!-- <div class="d-flex justify-content-between align-items-center mb-4">
-                <p class="lead fw-normal mb-0">Recent photos</p>
-                <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
+              <div v-else>
+                <h5 class="lead fw-formal">Esta cuenta es privada</h5>
               </div>
-              <div class="row g-2 blueb">
-                <div class="col mb-2">
-                  <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp" alt="image 1"
-                    class="w-100 rounded-3">
-                </div>
-                <div class="col mb-2">
-                  <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp" alt="image 1"
-                    class="w-100 rounded-3">
-                </div>
-              </div>
-              <div class="row g-2">
-                <div class="col">
-                  <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp" alt="image 1"
-                    class="w-100 rounded-3">
-                </div>
-                <div class="col">
-                  <img src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp" alt="image 1"
-                    class="w-100 rounded-3">
-                </div>
-              </div> -->
             </div>
           </div>
         </div>
@@ -144,17 +195,21 @@ import { useUserStore } from "@/store/UserStore";
 import axios from "axios";
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import moment from "moment";
 
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 let sProfileImageURL = ref("");
 const person = ref("");
+let bIsFetching = ref(true);
 let bFollowed = ref(true);
+let bShowPosts = ref(true);
 let aPosts = ref([]);
 let iNumPosts = ref(null);
 let iNumFollowing = ref(null);
 let iNumFollowers = ref(null);
+let bShouldDisplayData = ref(false);
 
 onMounted(() => {
   person.value = userStore.person;
@@ -169,28 +224,34 @@ onMounted(() => {
           axios.get("http://localhost:8000/api/checkFollow/" + userStore.person._iId + "/" + person.value._iId)
             .then((response) => {
               bFollowed.value = response.data;
+              console.log("bFollowed: " + bFollowed.value)
+              //Mostrar datos
+              if (!person.value._bIsPrivate || (person.value._bIsPrivate && bFollowed.value)) { //Si la cuenta no es privada, o si es privada y el usuario le sigue, muestra datos
+                bShouldDisplayData.value = true;
+              }
             })
             .catch((error) => console.log(error));
+        } else {
+          if (userStore.person._iId === person.value._iId)    //Si el perfil es del propio usuario muestra datos
+            bShouldDisplayData.value = true;
         }
         axios.get("http://localhost:8000/api/getUserPosts/" + route.params.username)
           .then(response => {
             aPosts.value = response.data;
-            console.log(aPosts.value.length)
             iNumPosts.value = aPosts.value.length;
           })
           .catch(error => console.log(error));
         axios.get("http://localhost:8000/api/getNumFollows/" + person.value._iId)
-        .then(response => {
-          console.log(response.data)
-          iNumFollowing.value = response.data[0];
-          iNumFollowers.value = response.data[1];
-        })
+          .then(response => {
+            iNumFollowing.value = response.data[0];
+            iNumFollowers.value = response.data[1];
+          })
       }
       sProfileImageURL.value =
         "http://localhost:8000/api/getProfileImage/" + person.value._iId;
+      bIsFetching.value = false;
     })
     .catch((error) => console.log(error));
-
 
 });
 
@@ -199,7 +260,6 @@ function setFollow() {
     .patch(
       "http://localhost:8000/api/setFollow/" + userStore.person._iId + "/" + person.value._iId)
     .then((response) => {
-      console.log(response.data);
       bFollowed.value = response.data;
       bFollowed.value === true ? iNumFollowers.value = iNumFollowers.value + 1 : iNumFollowers.value = iNumFollowers.value - 1;
     })
@@ -231,6 +291,15 @@ function setFollow() {
   top: 0;
 }
 
+.post-border {
+    border: solid 1px #777;
+    padding: 10px;
+  }
+.avatar {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
 .colItem {
   justify-content: center;
   text-align: center;
@@ -289,5 +358,4 @@ function setFollow() {
   .btnSwitch {
     padding: 0 2.6rem;
   }
-}
-</style>
+}</style>
