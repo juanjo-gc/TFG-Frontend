@@ -68,7 +68,7 @@
                         </div>
                         <div class="col-md-6">
                           <small class="text-muted float-end" style="margin-top: 10px;">
-                            Publicado el {{ moment(post._tCreatedAt).format('D-M-YYY') }}  
+                            Publicado el {{ moment(post._tCreatedAt).format('D-M-YYYY') }}  
                           </small>
                         </div>
                       </div>

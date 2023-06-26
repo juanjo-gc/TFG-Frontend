@@ -33,11 +33,7 @@
         <div class="card h-100">
           <div class="card-body blackb">
             <MDBAccordion v-model="activeItem" borderless>
-              <MDBAccordionItem
-                icon="fas fa-1"
-                headerTitle="Datos personales"
-                collapseId="collapseOne"
-              >
+              <MDBAccordionItem icon="fas fa-1" headerTitle="Datos personales" collapseId="collapseOne">
                 <div class="row gutters">
                   <!-- <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 ">
                       <h6 class="mb-2 text-primary">Personal Details</h6>
@@ -45,118 +41,62 @@
                   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                     <div class="form-group">
                       <label for="name">Nombre</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="name"
-                        v-model="sName"
-                      />
+                      <input type="text" class="form-control" id="name" v-model="sName" />
                     </div>
                   </div>
                   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                     <div class="form-group">
                       <label for="email">Correo electrónico</label>
-                      <input
-                        type="email"
-                        class="form-control"
-                        id="email"
-                        v-model="sEmail"
-                      />
+                      <input type="email" class="form-control" id="email" v-model="sEmail" />
                     </div>
                   </div>
                   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                     <div class="form-group">
                       <label for="username">Nombre de usuario</label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="username"
-                        v-model="sUsername"
-                      />
+                      <input type="text" class="form-control" id="username" v-model="sUsername" />
                     </div>
                   </div>
                   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                     <div class="mb-3">
-                      <label for="description" class="form-label"
-                        >Descripción</label
-                      >
-                      <textarea
-                        class="form-control"
-                        name="sDescription"
-                        v-model="sDescription"
-                        id="description"
-                        rows="3"
-                      ></textarea>
+                      <label for="description" class="form-label">Descripción</label>
+                      <textarea class="form-control" name="sDescription" v-model="sDescription" id="description"
+                        rows="3"></textarea>
                     </div>
                   </div>
                 </div>
                 <div class="row-gutters">
-                  <input
-                    class="btn btn-primary"
-                    type="submit"
-                    value="Enviar"
-                    style="width: 100%"
-                    @click="updateUserDetails"
-                  />
+                  <input class="btn btn-primary" type="submit" value="Enviar" style="width: 100%"
+                    @click="updateUserDetails" />
                 </div>
               </MDBAccordionItem>
-              <MDBAccordionItem
-                icon="fas fa-question-circle fa-sm me-2 opacity-70"
-                headerTitle="Intereses"
-                collapseId="collapseTwo"
-              >
+              <MDBAccordionItem icon="fas fa-question-circle fa-sm me-2 opacity-70" headerTitle="Intereses"
+                collapseId="collapseTwo">
                 <div class="row gutters">
                   <ul class="ks-cboxtags">
                     <li>
-                      <input
-                        type="checkbox"
-                        id="checkboxOne"
-                        value="Música"
-                        v-model="checkedInterests"
-                      /><label for="checkboxOne">Música</label>
+                      <input type="checkbox" id="checkboxOne" value="Música" v-model="checkedInterests" /><label
+                        for="checkboxOne">Música</label>
                     </li>
                     <li>
-                      <input
-                        type="checkbox"
-                        id="checkboxTwo"
-                        value="Videojuegos"
-                        v-model="checkedInterests"
-                      /><label for="checkboxTwo">Videojuegos</label>
+                      <input type="checkbox" id="checkboxTwo" value="Videojuegos" v-model="checkedInterests" /><label
+                        for="checkboxTwo">Videojuegos</label>
                     </li>
                     <li>
-                      <input
-                        type="checkbox"
-                        id="checkboxThree"
-                        value="Deportes"
-                        v-model="checkedInterests"
-                      /><label for="checkboxThree">Deportes</label>
+                      <input type="checkbox" id="checkboxThree" value="Deportes" v-model="checkedInterests" /><label
+                        for="checkboxThree">Deportes</label>
                     </li>
                   </ul>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    @click="uploadInterests"
-                  >
+                  <button type="button" class="btn btn-primary" @click="uploadInterests">
                     Enviar
                   </button>
                 </div>
               </MDBAccordionItem>
-              <MDBAccordionItem
-                headerTitle="Fotos"
-                collapseId="collapseThree"
-                icon="image-fill"
-              >
-              <p>Foto de perfil</p>
+              <MDBAccordionItem headerTitle="Fotos" collapseId="collapseThree" icon="image-fill">
+                <p>Foto de perfil</p>
                 <div class="file-upload-wrapper imgUpload">
                   <form @submit.prevent="uploadProfileImage" enctype="multipart/form-data">
-                    <input 
-                    type="file" 
-                    id="profileImg"
-                    ref="profileImg"
-                    @change="onProfileImageUpload"
-                    name="profileImg"
-                    accept="image/png, image/jpeg"
-                    />
+                    <input type="file" id="profileImg" ref="profileImg" @change="onProfileImageUpload" name="profileImg"
+                      accept="image/png, image/jpeg" />
                     <br>
                     <button type="submit" class="btn btn-primary">Subir</button>
                   </form>
@@ -164,15 +104,8 @@
                 <p>Subir fotos</p>
                 <form @submit.prevent="uploadImg" enctype="multipart/form-data">
                   <div class="file-upload-wrapper imgUpload">
-                    <input
-                      type="file"
-                      id="imgUpload"
-                      ref="uploadImage"
-                      @change="onImageUpload"
-                      name="image"
-                      accept="image/png, image/jpeg"
-                      multiple
-                    />
+                    <input type="file" id="imgUpload" ref="uploadImage" @change="onImageUpload" name="image"
+                      accept="image/png, image/jpeg" multiple />
                   </div>
                   <br />
                   <button class="btn btn-primary" type="submit">Subir</button>
@@ -184,60 +117,24 @@
       </div>
     </div>
 
-    <div
-      class="alert alert-danger alert-dismissible"
-      role="alert"
-      v-if="alertUserDetails"
-    >
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-        @click="alertUserDetails = false"
-      ></button>
+    <div class="alert alert-danger alert-dismissible" role="alert" v-if="alertUserDetails">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+        @click="alertUserDetails = false"></button>
       <strong>Error.</strong> {{ userDetailsAlertMessage }}.
     </div>
-    <div
-      class="alert alert-danger alert-dismissible"
-      role="alert"
-      v-if="alertInterests"
-    >
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-        @click="alertInterests = false"
-      ></button>
+    <div class="alert alert-danger alert-dismissible" role="alert" v-if="alertInterests">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+        @click="alertInterests = false"></button>
       <strong>Error.</strong> Elige entre uno y cinco intereses.
     </div>
-    <div
-      class="alert alert-danger alert-dismissible"
-      role="alert"
-      v-if="alertPhotos"
-    >
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-        @click="alertPhotos = false"
-      ></button>
+    <div class="alert alert-danger alert-dismissible" role="alert" v-if="alertPhotos">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+        @click="alertPhotos = false"></button>
       <strong>Error.</strong> Algo salió mal al subir las fotos.
     </div>
-    <div
-      class="alert alert-success alert-dismissible"
-      role="alert"
-      v-if="alertSuccess"
-    >
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-        @click="alertSuccess = false"
-      ></button>
+    <div class="alert alert-success alert-dismissible" role="alert" v-if="alertSuccess">
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+        @click="alertSuccess = false"></button>
       Los cambios se han aplicado correctamente.
     </div>
   </div>
@@ -272,29 +169,29 @@ let userDetailsAlertMessage = ref(
 );
 onBeforeMount(() => {
   profileImg.value = "htpp://localhost:8000/api/getProfileImage/" + userStore.person._iId;
-}) 
+})
 
 const setProfileImg = computed(() => {
   let imgFormData = new FormData();
   imgFormData.append("id", userStore.person._iId);
-  axios.get("http://localhost:8000/api/getImage", 
-  {
-    responseType: "arrayBuffer"
-  })
-  .then(response => {
-    console.log("Llega respuesta");
-    profileImg = response.data;
-    // let bytes = new Uint8Array(response.data);
-    // // console.log(response.data)
-    // let binary = bytes.reduce((data, b) => data += String.fromCharCode(b), '');
-    // pageProfileImg.value = "data:image/jpeg;base64," + btoa(binary);
-    
-  })
-  .catch(error => console.log(error))
-})
-  
+  axios.get("http://localhost:8000/api/getImage",
+    {
+      responseType: "arrayBuffer"
+    })
+    .then(response => {
+      console.log("Llega respuesta");
+      profileImg = response.data;
+      // let bytes = new Uint8Array(response.data);
+      // // console.log(response.data)
+      // let binary = bytes.reduce((data, b) => data += String.fromCharCode(b), '');
+      // pageProfileImg.value = "data:image/jpeg;base64," + btoa(binary);
 
-function restoreUserDetailsAlert() {}
+    })
+    .catch(error => console.log(error))
+})
+
+
+function restoreUserDetailsAlert() { }
 
 //TODO: Actualizar mensajes de error con la funcion de arriba
 //TODO: Mirar por que no funciona la asignacion del userstore.person despues de la respuesta
@@ -376,23 +273,23 @@ function onProfileImageUpload() {
 }
 
 function uploadProfileImage() {
-  if(formData.get('file') != null) {
+  if (formData.get('file') != null) {
     console.log(formData);
     axios({
-    url: "http://localhost:8000/api/uploadProfileImage",
-    method: "POST",
-    data: formData,
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "multipart/form-data",
-    },
-  })
-    .then(response => {
-      alertSuccess = true;
-      // userStore.profileImage = response.data;
-      console.log(response.data);
+      url: "http://localhost:8000/api/uploadProfileImage",
+      method: "POST",
+      data: formData,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
+      },
     })
-    .catch(error => console.log(error))
+      .then(response => {
+        alertSuccess = true;
+        // userStore.profileImage = response.data;
+        console.log(response.data);
+      })
+      .catch(error => console.log(error))
   } else {
     alertPhotos = true;
   }
@@ -449,21 +346,22 @@ body {
   margin: 0 0 1rem 0;
 }
 
-.account-settings .user-profile .user-avatar img{
+.account-settings .user-profile .user-avatar img {
   width: 150px;
   height: 150px;
-  width:100%;
+  width: 100%;
   max-width: 150px;
   max-height: 150px;
   height: auto;
   -webkit-border-radius: 100px;
   -moz-border-radius: 100px;
-   border-radius: 100px; 
+  border-radius: 100px;
 }
 
 img {
   object-fit: contain;
 }
+
 /* 
 img {
   width: 100%;
@@ -542,9 +440,11 @@ ul.ks-cboxtags {
   list-style: none;
   padding: 20px;
 }
+
 ul.ks-cboxtags li {
   display: inline;
 }
+
 ul.ks-cboxtags li label {
   display: inline-block;
   background-color: rgba(255, 255, 255, 0.9);
@@ -581,13 +481,13 @@ ul.ks-cboxtags li label::before {
   transition: transform 0.3s ease-in-out;
 }
 
-ul.ks-cboxtags li input[type="checkbox"]:checked + label::before {
+ul.ks-cboxtags li input[type="checkbox"]:checked+label::before {
   content: "\f00c";
   transform: rotate(-360deg);
   transition: transform 0.3s ease-in-out;
 }
 
-ul.ks-cboxtags li input[type="checkbox"]:checked + label {
+ul.ks-cboxtags li input[type="checkbox"]:checked+label {
   border: 2px solid #1b61f8;
   background-color: #1b61f8;
   color: #fff;
@@ -597,11 +497,13 @@ ul.ks-cboxtags li input[type="checkbox"]:checked + label {
 ul.ks-cboxtags li input[type="checkbox"] {
   display: absolute;
 }
+
 ul.ks-cboxtags li input[type="checkbox"] {
   position: absolute;
   opacity: 0;
 }
-ul.ks-cboxtags li input[type="checkbox"]:focus + label {
+
+ul.ks-cboxtags li input[type="checkbox"]:focus+label {
   border: 2px solid #e9a1ff;
 }
 

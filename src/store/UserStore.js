@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { axios } from 'axios';
-import { reactive } from "vue";
+import { ref } from "vue";
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -13,7 +13,9 @@ export const useUserStore = defineStore({
     state: () => {
         return {
             person: {},
-            profileImage: null
+            profileImage: null,
+            aiShownUserIds: [],
+            tUpdatedUsersToShow: new Date()
         };
       },
     persist: true,
@@ -33,7 +35,7 @@ export const useUserStore = defineStore({
             this.profileImage = null;
             console.log("Se ejecuta logout");
             location.reload();
-        },
+        }
     },
     getters: {
         getAuth: (state) =>  state.authenticated

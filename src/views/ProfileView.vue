@@ -292,14 +292,16 @@ function setFollow() {
 }
 
 .post-border {
-    border: solid 1px #777;
-    padding: 10px;
-  }
-.avatar {
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
+  border: solid 1px #777;
+  padding: 10px;
 }
+
+.avatar {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}
+
 .colItem {
   justify-content: center;
   text-align: center;

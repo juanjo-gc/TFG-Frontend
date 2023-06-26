@@ -137,6 +137,18 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/discover/",
+    name: "discoverUsers",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/DiscoverUsersView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+
 ];
 
 const router = createRouter({
