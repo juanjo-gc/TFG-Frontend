@@ -148,6 +148,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/newEvent",
+    name: "newEvent",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/NewEventView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 
 ];
 
