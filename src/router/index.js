@@ -159,6 +159,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/events/:eventId",
+    name: "showEvent",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/ShowEventView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 
 ];
 

@@ -17,10 +17,13 @@ import {
      faArrowLeft,
      faXmark,
      faUserPlus,
-     faEye
+     faEye,
+     faLocationDot,
+     faClock,
+     faCalendar
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye);
+library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar);
 
 
 createApp(App)

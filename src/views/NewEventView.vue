@@ -15,11 +15,12 @@
             <h3 class="fw-bold ">Conviértete en el anfitrión de un evento para conocer nuevas personas.</h3>
             <div class="hline mt-2"></div>
         </div>
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h6 class="mt-2">Título del evento</h6>
+        <form @submit.prevent="submitEvent">
+            <div class="row mt-4">
+                <div class="col-md-6">
+                <h6 class="mt-2 fw-bold">Título del evento*</h6>
                 <label for="inp" class="inp">
-                    <input type="text" id="inp" placeholder="&nbsp;" v-model="sTitle">
+                    <input type="text" id="inp" placeholder="&nbsp;" v-model="sTitle" required>
                     <span class="label">Título</span>
                     <span class="focus-bg"></span>
                 </label>
@@ -31,17 +32,18 @@
             </div>
         </div>
         <div class="row mt-4">
-            <h6 class="mt-2">Descripción</h6>
+            <h6 class="mt-2 fw-bold">Descripción</h6>
             <textarea class="m-2" maxlength="5000" v-model="sDescription"></textarea>
             <p class="text-muted small">Caracteres restantes: {{ 5000 - sDescription.length }}</p>
         </div>
         <div class="row mt-4">
             <div class="col-md-6">
-                <h6 class="mt-2">Localización del evento</h6>
+                <h6 class="mt-2 fw-bold">Localización del evento*</h6>
                 <!-- TODO: poner links a cada sitio para buscar y establecerlo como localización -->
                 <!-- <input type="text" class="w-100" v-model="sLocationToSearch" @keyup="searchAndGetResults"> -->
                 <label for="inp" class="inp">
-                    <input type="text" id="inp" placeholder="&nbsp;" v-model="sLocationToSearch" @keyup="searchAndGetResults">
+                    <input type="text" id="inp" placeholder="&nbsp;" v-model="sLocationToSearch"
+                    @keyup="searchAndGetResults">
                     <span class="label">Localización</span>
                     <span class="focus-bg"></span>
                 </label>
@@ -52,30 +54,54 @@
                         </div>
                     </li>
                 </ul>
+                <p v-if="selectedLocation != null"><strong>Ubicación seleccionada:</strong> {{ selectedLocation.display_name }}</p>
             </div>
             <div class="col-md-6">
                 <!-- TODO: poner fecha con input bonito -->
-                <h6 class="mt-2">Fecha de celebración</h6>
-                <input type="date" v-model="tCelebrationDate">
+                <h6 class="mt-2 fw-bold">Hora del evento*</h6>
+                <input type="time" v-model="tCelebrationHour" required>
+                <h6 class="mt-4 fw-bold">Fecha de celebración*</h6>
+                <input type="date" v-model="tCelebrationDate" required>
             </div>
         </div>
         <div class="row">
-            <h6 class="mt-2">Intereses del evento</h6>
-              <ul class="ks-cboxtags">
+            <h6 class="mt-2 fw-bold">Intereses del evento</h6>
+            <!-- <ul class="ks-cboxtags">
                 <li>
-                  <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
+                    <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
                     for="checkboxOne">Música</label>
                 </li>
                 <li>
-                  <input type="checkbox" id="checkboxTwo" value="Videojuegos" v-model="aCheckedInterests" /><label
+                    <input type="checkbox" id="checkboxTwo" value="Videojuegos" v-model="aCheckedInterests" /><label
                     for="checkboxTwo">Videojuegos</label>
                 </li>
                 <li>
-                  <input type="checkbox" id="checkboxThree" value="Deportes" v-model="aCheckedInterests" /><label
+                    <input type="checkbox" id="checkboxThree" value="Deportes" v-model="aCheckedInterests" /><label
                     for="checkboxThree">Deportes</label>
                 </li>
-              </ul>
+            </ul> -->
+            <ul class="ks-cboxtags">
+                    <li>
+                      <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
+                        for="checkboxOne">Música</label>
+                    </li>
+                    <li>
+                      <input type="checkbox" id="checkboxTwo" value="Videojuegos" v-model="aCheckedInterests" /><label
+                        for="checkboxTwo">Videojuegos</label>
+                    </li>
+                    <li>
+                      <input type="checkbox" id="checkboxThree" value="Deportes" v-model="aCheckedInterests" /><label
+                        for="checkboxThree">Deportes</label>
+                    </li>
+                  </ul>
+        </div>
+        <div class="row">
+            <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Enviar</button>
             </div>
+        </div>
+    </form>
     </div>
 </template>
 
@@ -84,35 +110,60 @@
 import axios from 'axios';
 import { ref } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
+import { useUserStore } from '@/store/UserStore';
+const userStore = useUserStore();
 let sLocationToSearch = ref('');
 let aLocations = ref(null);
 let sTitle = ref("");
 let sDescription = ref("");
 let selectedLocation = ref(null);
-let aCheckedInterests = ref(null);
-let tCelebrationDate = ref(new Date());
+let aCheckedInterests = ref([]);
+let tCelebrationDate = ref(null);
+let tCelebrationHour = ref(null);
 let timeout = null;
+let sErrorMessage = ref("");
 
 
 
 function searchAndGetResults() {
-    if(sLocationToSearch.value.length > 3) {
+    if (sLocationToSearch.value.length > 3) {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             axios.get("https://nominatim.openstreetmap.org/search?q=" + sLocationToSearch.value.replace(' ', '+') + "&format=json&limit=3&countrycodes=es")
-            .then(response => {
-                aLocations.value = response.data;
-                console.log(response.data);
-            })
+                .then(response => {
+                    aLocations.value = response.data;
+                    //console.log(response.data);
+                })
         }, 400)
     }
 }
 
 function selectLocation(location) {
     selectedLocation.value = location;
+    console.log(selectedLocation.value)
     sLocationToSearch.value = "";
     aLocations.value = [];
 }
+
+function submitEvent() {
+    let iUserId = userStore.person._iId;
+    if(selectedLocation.value != null) {
+        axios.post("http://localhost:8000/api/newEvent", {
+            sTitle: sTitle.value,
+            tCelebratedAt: tCelebrationDate.value,
+            tCelebrationHour: tCelebrationHour.value,
+            sDescription: sDescription.value,
+            iOrganizerId: iUserId,
+            setInterests: aCheckedInterests.value,
+            sLocationName: selectedLocation.value.display_name,
+            dLatitude: selectedLocation.value.lat,
+            dLongitude: selectedLocation.value.lon
+        })
+    } else {
+        sErrorMessage.value = "Error. Seleccione una localización para el evento.";
+    }
+}
+
 
 </script>
 
@@ -222,74 +273,74 @@ body {
 }
 
 ul.ks-cboxtags {
-  list-style: none;
-  padding: 20px;
+    list-style: none;
+    padding: 20px;
 }
 
 ul.ks-cboxtags li {
-  display: inline;
+    display: inline;
 }
 
 ul.ks-cboxtags li label {
-  display: inline-block;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(139, 139, 139, 0.3);
-  color: #adadad;
-  border-radius: 25px;
-  white-space: nowrap;
-  margin: 3px 0px;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.2s;
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(139, 139, 139, 0.3);
+    color: #adadad;
+    border-radius: 25px;
+    white-space: nowrap;
+    margin: 3px 0px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.2s;
 }
 
 ul.ks-cboxtags li label {
-  padding: 8px 12px;
-  cursor: pointer;
+    padding: 8px 12px;
+    cursor: pointer;
 }
 
 ul.ks-cboxtags li label::before {
-  display: inline-block;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  font-size: 12px;
-  padding: 2px 6px 2px 2px;
-  content: "\f067";
-  transition: transform 0.3s ease-in-out;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 12px;
+    padding: 2px 6px 2px 2px;
+    content: "\f067";
+    transition: transform 0.3s ease-in-out;
 }
 
 ul.ks-cboxtags li input[type="checkbox"]:checked+label::before {
-  content: "\f00c";
-  transform: rotate(-360deg);
-  transition: transform 0.3s ease-in-out;
+    content: "\f00c";
+    transform: rotate(-360deg);
+    transition: transform 0.3s ease-in-out;
 }
 
 ul.ks-cboxtags li input[type="checkbox"]:checked+label {
-  border: 2px solid #1b61f8;
-  background-color: #1b61f8;
-  color: #fff;
-  transition: all 0.2s;
+    border: 2px solid #1b61f8;
+    background-color: #1b61f8;
+    color: #fff;
+    transition: all 0.2s;
 }
 
 ul.ks-cboxtags li input[type="checkbox"] {
-  display: absolute;
+    display: absolute;
 }
 
 ul.ks-cboxtags li input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
+    position: absolute;
+    opacity: 0;
 }
 
 ul.ks-cboxtags li input[type="checkbox"]:focus+label {
-  border: 2px solid #e9a1ff;
+    border: 2px solid #e9a1ff;
 }
 
 textarea {
@@ -314,7 +365,8 @@ textarea {
 
 .location-data:hover {
     cursor: pointer;
-    background-color: #e0e0e0;}
+    background-color: #e0e0e0;
+}
 
 .blackb {
     border: solid 1px black;
