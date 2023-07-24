@@ -176,7 +176,49 @@
                   </div>
                 </div>
                 <!-- Mostrar eventos -->
-                <div class="row" v-else></div>
+                <div class="row" v-else>
+                  <div class="col-md-12 mt-2">
+                    <div class="card">
+                      <div class="card-body">
+                        <ul class="list-unstyled">
+                          <li v-for="event in aEvents">
+                            <div class="media post-border m-2">
+                              <div class="row">
+                                <div class="col-md-7">
+                                  <h5 class="mt-0 mb-1">
+                                    <router-link :to="`/events/${event._iId}`"
+                                      style="text-decoration: none; color: inherit;">
+                                      {{ event._sTitle }}
+                                    </router-link>
+                                  </h5>
+                                  <h6>
+                                    <p class="text-muted">Organizado por: @{{ event._organizer._sUsername }}</p>
+                                  </h6>
+                                </div>
+                              </div>
+                              <div class="media-body">
+                                <router-link :to="`/events/${event._iId}`" style="text-decoration: none; color: inherit;">
+                                  <div>
+                                    <p v-if="event._sDescription.length <= 250">{{ event._sDescription }}</p>
+                                    <p v-else>{{ proccessDescription(event._sDescription) }}...</p>
+                                  </div>
+                                </router-link>
+                                <div class="row">
+                                  <div class="col-md-6"></div>
+                                  <div class="col-md-6">
+                                    <small class="text-muted float-end" style="margin-top: 10px;">
+                                      Fecha del evento: {{ moment(event._tCelebratedAt).format('D-M-YYYY') }}
+                                    </small>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div v-else>
                 <h5 class="lead fw-formal">Esta cuenta es privada</h5>
@@ -206,6 +248,7 @@ let bIsFetching = ref(true);
 let bFollowed = ref(true);
 let bShowPosts = ref(true);
 let aPosts = ref([]);
+let aEvents = ref([]);
 let iNumPosts = ref(null);
 let iNumFollowing = ref(null);
 let iNumFollowers = ref(null);
@@ -241,6 +284,10 @@ onMounted(() => {
             iNumPosts.value = aPosts.value.length;
           })
           .catch(error => console.log(error));
+        axios.get("http://localhost:8000/api/getUserEvents/" + person.value._iId)
+        .then(response => {
+            aEvents.value = response.data;
+        })
         axios.get("http://localhost:8000/api/getNumFollows/" + person.value._iId)
           .then(response => {
             iNumFollowing.value = response.data[0];
@@ -254,6 +301,16 @@ onMounted(() => {
     .catch((error) => console.log(error));
 
 });
+
+function proccessDescription(sDescription) {
+  if(sDescription.length > 250) {
+    let iShift = 250;
+    while(sDescription.charAt(iShift) != ' ')
+      iShift++;
+    sDescription = sDescription.slice(0, iShift);
+  }
+  return sDescription;
+}
 
 function setFollow() {
   axios
