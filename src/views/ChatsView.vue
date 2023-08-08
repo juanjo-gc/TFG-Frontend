@@ -135,7 +135,7 @@ function deselectUser() {
 
 function getUsersFromUsername() {
     if(sUsernameToMessage.value.length > 3) {
-        axios.get("http://localhost:8000/api/findUsers/" + sUsernameToMessage.value)
+        axios.get("http://localhost:8000/api/findFirst7Users/" + sUsernameToMessage.value)
         .then(response => aUsers.value = response.data)
         .catch(error => console.log(error));
     } else {

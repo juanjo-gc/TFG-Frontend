@@ -69,7 +69,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-5 p-2 bg-contrast">
+            <div class="row mt-5 p-2 bg-contrast clickable" @click="router.push('/events/' + event._iId + '/assistants')">
                 <h5 class="fw-formal">Asistentes</h5>
                 <div class="hline"></div>
                 <div class="row">
@@ -93,11 +93,12 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import moment from 'moment';
 
 const userStore = useUserStore();
 const route = useRoute();
+const router = useRouter();
 const event = ref(null);
 let bIsFetching = ref(true);
 let eventHeaderImage = ref(null);
@@ -148,6 +149,10 @@ function setAssist() {
 
 .text-block {
     white-space: pre; 
+}
+
+.clickable:hover {
+    cursor: pointer;
 }
 
 .event-img {

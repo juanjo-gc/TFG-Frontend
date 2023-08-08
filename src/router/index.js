@@ -170,6 +170,28 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/events/:eventId/assistants",
+    name: "assistants",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/ShowEventAssistantsView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+  {
+    path: "/events/explore",
+    name: "exploreEvents",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/ExploreEventsView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 
 ];
 

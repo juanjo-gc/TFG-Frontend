@@ -6,6 +6,7 @@ import router from "./router";
 import "bootstrap/dist/css/bootstrap.css";
 import piniaPluginPersistedState from "pinia-plugin-persistedstate";
 
+
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {

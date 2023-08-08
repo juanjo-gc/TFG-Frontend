@@ -111,6 +111,7 @@ import axios from 'axios';
 import { ref } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import { useUserStore } from '@/store/UserStore';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 const userStore = useUserStore();
 let sLocationToSearch = ref('');
 let aLocations = ref(null);
@@ -122,6 +123,7 @@ let tCelebrationDate = ref(null);
 let tCelebrationHour = ref(null);
 let timeout = null;
 let sErrorMessage = ref("");
+let sProvinceName = null;
 
 
 
@@ -135,12 +137,23 @@ function searchAndGetResults() {
                     //console.log(response.data);
                 })
         }, 400)
+    } else {
+        aLocations.value = [];
     }
 }
 
 function selectLocation(location) {
     selectedLocation.value = location;
-    console.log(selectedLocation.value)
+    sProvinceName = null;
+    axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.lat +"&lon=" + location.lon)
+    .then(response => {
+    sProvinceName = response.data.address.state_district;
+    console.log(response.data)
+    console.log(sProvinceName)
+    if(sProvinceName === null) {
+        sErrorMessage.value = "No se ha podido seleccionar la ubicación correctamente. Por favor, vuelva a intentarlo, y si el error persiste, seleccione otra ubicación."
+    }
+})
     sLocationToSearch.value = "";
     aLocations.value = [];
 }
@@ -157,7 +170,8 @@ function submitEvent() {
             setInterests: aCheckedInterests.value,
             sLocationName: selectedLocation.value.display_name,
             dLatitude: selectedLocation.value.lat,
-            dLongitude: selectedLocation.value.lon
+            dLongitude: selectedLocation.value.lon,
+            sProvinceName: sProvinceName
         })
     } else {
         sErrorMessage.value = "Error. Seleccione una localización para el evento.";

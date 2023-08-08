@@ -140,22 +140,45 @@ let aRegions = ref([]);
 let aProvinces = ref([]);
 let aPhotos = ref([]);
 let aiUserIds = ref([]);
-let sSelectedProvince = ref(userStore.person._province._sName);
-let sSelectedRegion = ref(userStore.person._province._region._sName);
-let sSelectedCountry = ref(userStore.person._province._region._country._sName);
+// let sSelectedProvince = ref(userStore.person._province._sName);
+// let sSelectedRegion = ref(userStore.person._province._region._sName);
+// let sSelectedCountry = ref(userStore.person._province._region._country._sName);
+let sSelectedProvince = ref(null);
+let sSelectedRegion = ref(null);
+let sSelectedCountry = ref(null);
+let iShownUsers = 0;
+let iPageNumber = 0;
+let iTotalPages = 1;
 
 
 onMounted(() => {
     aCountries.value.push(userStore.person._province._region._country); //findall para este valor inicial
+    setUserIds();
+    axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
+        .then(response => aRegions.value = response.data)
+        .catch(error => console.log(error));
 
-    axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId, {
+    axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
+        .then(response => aProvinces.value = response.data)
+        .catch(error => console.log(error));
+
+    
+    while(currentId === -1)
+        bIsFetching.value = true;
+    bIsFetching.value = false;
+})
+
+function setUserIds() {
+    axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
         asInterests: [],
         sCountry: sSelectedCountry.value,
         sRegion: sSelectedRegion.value,
         sProvince: sSelectedProvince.value
     })
         .then(response => {
-            aiUserIds.value = response.data;
+            console.log(response.data)
+            iTotalPages = response.data.totalPages;
+            aiUserIds.value = response.data.content;
             const tDateToday = new Date();
             if (Math.abs(tDateToday - userStore.tUpdatedUsersToShow) / 1000 * 60 * 60 * 24 * 7 >= 1) { // Si la diferencia entre dos fechas es mayor o igual a una semana, refresca
                 userStore.tUpdatedUsersToShow = tDateToday;
@@ -171,34 +194,12 @@ onMounted(() => {
                 setCurrentPersonData();
             }
         })
-
-    axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
-        .then(response => aRegions.value = response.data)
-        .catch(error => console.log(error));
-
-    axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
-        .then(response => aProvinces.value = response.data)
-        .catch(error => console.log(error));
-
-    
-    while(currentId === -1)
-        bIsFetching.value = true;
-    bIsFetching.value = false;
-})
-
-function proccessDiscardOrFollow(bWantToFollow) {
-    if(bWantToFollow) 
-        axios.patch("http://localhost:8000/api/setFollow/" + userStore.person._iId + "/" + currentPerson.value._iId)
-    currentPerson.value = null;
-    aPhotos.value = [];
-    if(aiUserIds.value.length != 0) {
-        currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
-        setCurrentPersonData();
-    }
-
 }
 
+
+
 function setCurrentPersonData() {
+    iShownUsers++;
     console.log("CurrentId en setperson: " + currentId.value)
     userStore.aiShownUserIds.push(currentId.value)
     aiUserIds.value.splice(aiUserIds.value.indexOf(currentId.value), 1);
@@ -218,10 +219,27 @@ function setCurrentPersonData() {
                 .catch(error => console.log(error))
         })
         .catch(error => console.log(error));
+    if(iShownUsers >= 10) {
+        iPageNumber++;
+        setUserIds();
+    }
+}
+
+function proccessDiscardOrFollow(bWantToFollow) {
+    if(bWantToFollow) 
+        axios.patch("http://localhost:8000/api/setFollow/" + userStore.person._iId + "/" + currentPerson.value._iId)
+    currentPerson.value = null;
+    aPhotos.value = [];
+    if(aiUserIds.value.length != 0) {
+        currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
+        setCurrentPersonData();
+    }
+
 }
 
 function sendInterestsFilter() {
-    axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId, {
+    iPageNumber = 0;
+    axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
         asInterests: aCheckedInterests.value,
         sCountry: sSelectedCountry.value,
         sRegion: sSelectedRegion.value,
@@ -229,7 +247,8 @@ function sendInterestsFilter() {
     })
         .then(response => {
             if (response.data.length != 0) {
-                aiUserIds.value = response.data;
+                aiUserIds.value = response.data.content;
+                iTotalPages = response.data.totalPages;
                 aiUserIds.value = aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iId === iExcludedId));    // Elimina las ocurrencias de las ids filtradas con las que se han mostrado recientemente
                 if(aiUserIds.value.length != 0) {
                     do {
