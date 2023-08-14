@@ -1,18 +1,13 @@
 <template>
-    <HeaderComponent></HeaderComponent>
-    <div class="container">
-        <!-- <input type="text" v-model="sLocationToSearch" @keyup="searchAndGetResults">
-        <ul class="list-unstyled">
-            <li v-for="location in aLocations">
-                {{ location.display_name }}
-            </li>
-        </ul>
-        <div class="m-5">
-            Buscando: {{ sLocationToSearch.replace(' ', '+') }}
-        </div> -->
+<HeaderComponent></HeaderComponent>
+<div class="container" v-if="!bIsFetching">
+    <div class="row" v-if="event._tCelebratedAt > Date.now()">
+        <h3>El evento ha terminado, no se puede editar.</h3>
+    </div>
+    <div class="row" v-else>
         <div class="mt-4">
             <!-- <h3 class="fw-bold">Inicia un nuevo evento</h3> -->
-            <h3 class="fw-bold ">Conviértete en el anfitrión de un evento para conocer nuevas personas.</h3>
+            <h3 class="fw-bold ">Editar evento.</h3>
             <div class="hline mt-2"></div>
         </div>
         <form @submit.prevent="submitEvent">
@@ -63,7 +58,7 @@
                         </div>
                     </li>
                 </ul>
-                <p v-if="selectedLocation != null"><strong>Ubicación seleccionada:</strong> {{ selectedLocation.display_name }}</p>
+                <p v-if="selectedLocation != null"><strong>Ubicación seleccionada:</strong> {{ sLocationName }}</p>
             </div>
             <div class="col-md-6" v-else>
                 <p><strong>IMPORTANTE: </strong>Has indicado que el evento es online. Incluye información relevante en la descripción
@@ -81,20 +76,6 @@
             <div class="col-md-6">
 
                 <h6 class="mt-2 fw-bold">Intereses del evento</h6>
-                <!-- <ul class="ks-cboxtags">
-                    <li>
-                        <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
-                        for="checkboxOne">Música</label>
-                    </li>
-                    <li>
-                        <input type="checkbox" id="checkboxTwo" value="Videojuegos" v-model="aCheckedInterests" /><label
-                        for="checkboxTwo">Videojuegos</label>
-                </li>
-                <li>
-                    <input type="checkbox" id="checkboxThree" value="Deportes" v-model="aCheckedInterests" /><label
-                    for="checkboxThree">Deportes</label>
-                </li>
-            </ul> -->
             <ul class="ks-cboxtags">
                     <li>
                         <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
@@ -143,21 +124,27 @@
         </div>
     </form>
     </div>
+</div>
 </template>
-
+    
 
 <script setup>
 import axios from 'axios';
-import { ref, watch } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/store/UserStore';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+
 const userStore = useUserStore();
+const route = useRoute();
+const router = useRouter();
+let event = ref(null);
+let bIsFetching = ref(true);
 let sLocationToSearch = ref('');
 let aLocations = ref(null);
 let sTitle = ref("");
 let sDescription = ref("");
-let selectedLocation = ref(null);
+let selectedLocation = ref({display_name: ""});
 let aCheckedInterests = ref([]);
 let tCelebrationDate = ref(null);
 let tCelebrationHour = ref(null);
@@ -168,8 +155,27 @@ let formData = new FormData();
 let sImageName = ref("");
 let imgUpload = ref(null);
 let bIsOnline = ref(false);
+let sLocationName = ref("");
 
-
+onMounted(() => {
+    axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
+    .then(response => {
+        event.value = response.data;
+        if(event.value._organizer._iId != userStore.person._iId)
+            router.push("/events/explore");
+        sTitle.value = event.value._sTitle;
+        sDescription.value = event.value._sDescription;
+        bIsOnline.value = event.value._bIsOnline;
+        sLocationName.value = event.value._location._sName;
+        console.log(event.value._location)
+        event.value._setInterest.forEach(interest => aCheckedInterests.value.push(interest._sName));
+        tCelebrationDate.value = event.value._tCelebratedAt;
+        tCelebrationHour.value = event.value._tCelebrationHour;
+        if(event.value._headerPhoto != null)
+            sImageName.value = event.value._headerPhoto._sName;
+        bIsFetching.value = false;
+    })
+})
 
 function searchAndGetResults() {
     if(formData.get('file') != null) console.log("holasdasdsadsadas")
@@ -190,6 +196,7 @@ function searchAndGetResults() {
 function selectLocation(location) {
     selectedLocation.value = location;
     sProvinceName = null;
+    sLocationName = selectedLocation.value.display_name;
     axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.lat +"&lon=" + location.lon)
     .then(response => {
     sProvinceName = response.data.address.state_district;
@@ -219,7 +226,7 @@ function submitEvent() {
         bIsOnline: bIsOnline.value
     }
     if((selectedLocation.value != null && !bIsOnline.value) || (bIsOnline.value)) {
-        axios.post("http://localhost:8000/api/newEvent", eventDTO)
+        axios.post("http://localhost:8000/api/updateEvent/" + event.value._iId, eventDTO)
         .then(response => {
             console.log("Response: " + response.data)
             formData.append('id', response.data);
@@ -244,8 +251,11 @@ function onImageUpload(iEventId) {
     formData.append('file', file);
     console.log(formData.get('file'))
 }
-        
+
+
+
 </script>
+
 
 <style scoped>
 body {

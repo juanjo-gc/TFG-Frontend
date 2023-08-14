@@ -21,10 +21,11 @@ import {
      faEye,
      faLocationDot,
      faClock,
-     faCalendar
+     faCalendar,
+     faUpload
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar);
+library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload);
 
 
 createApp(App)

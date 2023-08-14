@@ -192,6 +192,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/events/edit/:eventId",
+    name: "editEvent",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/EditEventView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 
 ];
 

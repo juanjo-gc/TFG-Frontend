@@ -53,7 +53,7 @@
                     <h5 class="fw-formal">Resultados de la búsqueda:</h5>
                     <ul class="list-unstyled">
                         <li v-for="event in aEvents">
-                            <div class="row mt-2 p-2 grey-border">
+                            <div class="row mt-2 p-2 grey-border clickable" @click="router.push('/events/' + event._iId)">
                                 <h6 class="ms-2 fw-bold">{{ event._sTitle }}</h6>
                                 <p class="ms-2 small"><strong>Organizado por:</strong> {{ event._organizer._sUsername }}</p>
                                 <p class="ms-2 mt-1">{{ event._sDescription }}</p>
@@ -77,8 +77,10 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import { onMounted, ref, watch, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const router = useRouter();
 let bIsFetching = ref(true);
 let bIsOnline = ref(false);
 let aEvents = ref([]);
@@ -246,6 +248,11 @@ input[type=text]:focus {
 
 .grey-border {
     border: solid 1px #909090;
+}
+
+.clickable:hover {
+    cursor: pointer;
+    background-color: #e4e4e4;
 }
 
 .hline {
