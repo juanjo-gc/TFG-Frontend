@@ -98,7 +98,35 @@
             </div>
         </div>
 
-        <div id="photos" class="row">
+        <div class="row mt-3">
+            <div class="col-md-7 bg-contrast">
+                <h4 class="fw-formal mt-4">Comentarios</h4>
+                <div class="hline"></div>
+                <div id="commentsBox" ref="commentsBox" class="comments-box mt-4 mb-4">
+                    <ul id="commentList" ref="commentList" class="list-unstyled">
+                        <li v-for="comment in aComments">
+                            <div class="row mt-1">
+                                <div class="col-sm-1">
+                                    <img :src="'http://localhost:8000/api/getProfileImage/' + comment._user._iId" 
+                                     @click="router.push('/profile/' + comment._user._sUsername)" class="avatar-mini clickable">
+                                </div>
+                                <div class="col-sm-7">
+                                    <p class="fw-bold mt-2 clickable" @click="router.push('/profile/' + comment._user._sUsername)">{{ comment._user._sName }}</p>
+                                </div>
+                                <p class="text-muted lh-sm">{{ comment._sText }}</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- scrollTop: {{ commentsBox.scrollTop }} -->
+                <!-- <div class="new-comment" contenteditable="true"></div> -->
+                <textarea v-model="sComment" placeholder="Escribe tu comentario sobre el evento aquí"></textarea>
+                <button @click="submitNewComment" class="btn btn-primary float-end mt-1">Enviar</button>
+            </div>
+
+        </div>
+
+        <div id="photos" class="row bg-contrast mt-3">
             <div class="col-md-3">
                 <h4 class="fw-formal mt-4">Fotos del evento</h4>
             </div>
@@ -153,9 +181,14 @@ let aAssistantProfileImages = ref([]);
 let bIsAssistant = ref(false);
 let bIsFinished = false;
 let aEventPhotos = ref([]);
+let sComment = ref("");
+let aComments = ref([]);
 
 let formData = new FormData();
 let uploadImage = ref(null);
+let commentsBox = ref(null);
+
+
 
 onMounted(() => {
     axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
@@ -175,14 +208,22 @@ onMounted(() => {
                 bIsAssistant.value = true;
         }) 
     // Si el evento ha finalizado
-    // if(event.value._tCelebratedAt < Date.now()) {
+    // if(bIsFinished) {
         bIsFinished = true;
         axios.get("http://localhost:8000/api/getEventPhotos/" + event.value._iId)
         .then(response => {
             aEventPhotos.value = response.data;
         })
+        axios.get("http://localhost:8000/api/getEventComments/" + event.value._iId)
+        .then(response => {
+            aComments.value = response.data;
+            setTimeout(() => {
+                commentsBox.value.scrollTop = commentsBox.value.scrollHeight;
+            }, 500);
+        })
     // }
     })
+    
 })
 
 
@@ -225,7 +266,23 @@ async function uploadImg() {
             aEventPhotos.value = response.data;
         })
 })
-
+}
+function submitNewComment() {
+    console.log("Se envia")
+    if(sComment.value != "" && bIsFinished) {
+        axios.post("http://localhost:8000/api/newComment", {
+            iUserId: userStore.person._iId,
+            iEventId: event.value._iId,
+            sText: sComment.value
+        })
+        .then(response => {
+            aComments.value.push(response.data);
+            console.log(response.data)
+            commentsBox.value.scrollTop = commentsBox.value.scrollHeight;
+        })
+    } else {
+        //mensaje error
+    }
 }
 </script>
 
@@ -239,9 +296,37 @@ async function uploadImg() {
     white-space: pre; 
 }
 
+.comments-box {
+    /* border: solid 1px rgb(160, 160, 160); */
+    border: none;
+    background-color: white;
+    height: 350px;
+    max-height: 350px;
+    width: auto;
+    padding: 25px;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+}
+
+.new-comment {
+    border: solid 2px rgb(160, 160, 160);
+    height: 35px;
+    max-height: 35px;
+    padding: 25px;
+    width: auto;
+}
+
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+}
+
 .clickable:hover {
     cursor: pointer;
 }
+
 
 .event-img {
     max-height: 400px;
@@ -255,6 +340,12 @@ async function uploadImg() {
     border-radius: 50%;
     width: 50px;
     height: 50px;
+}
+
+.avatar-mini {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
 }
 
 .bg-contrast {
