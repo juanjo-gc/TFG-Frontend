@@ -24,7 +24,7 @@
                                         <p class="small text-muted">{{ message._sText }}</p>
                                     </div>
                                     <div class="col-sm-4  align-self-center">
-                                        <div v-if="message._issuer._iId != userStore.person._iId" class="circle float-end"></div>
+                                        <div v-if="message._issuer._iId != userStore.person._iId && !message._bSeen" class="circle float-end"></div>
                                     </div>
                                 </div>
                             <!-- </router-link> -->

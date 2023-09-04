@@ -203,6 +203,17 @@ const routes = [
       userAuth: true,
     }
   },
+  {
+    path: "/notifications",
+    name: "notifications",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/NotificationsView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
 
 ];
 

@@ -80,12 +80,16 @@
               <div class="col-md-9"></div>
               <div class="col-md-3 d-flex flex-row-reverse">
                 <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
-                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed">
+                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed && !bPendingFollow">
                   Seguir
                 </button>
                 <button type="button" class="btn btn-dark" data-mdb-ripple-color="dark"
-                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-else>
+                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="bFollowed">
                   Siguiendo
+                </button>
+                <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark"
+                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed && bPendingFollow">
+                  Pendiente
                 </button>
               </div>
             </div>
@@ -156,7 +160,7 @@
                                   </div>
                                   <div class="col-md-3">
                                     <button class="btn float-end" style="background-color: transparent;"
-                                      @click="setLike(post._iId)">
+                                      @click="setLike(post)">
                                       <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" />
                                       {{ post._iLikes }}
                                     </button>
@@ -246,6 +250,7 @@ let sProfileImageURL = ref("");
 const person = ref("");
 let bIsFetching = ref(true);
 let bFollowed = ref(true);
+let bPendingFollow = ref(false);
 let bShowPosts = ref(true);
 let aPosts = ref([]);
 let aEvents = ref([]);
@@ -256,10 +261,7 @@ let bShouldDisplayData = ref(false);
 
 onMounted(() => {
   person.value = userStore.person;
-  axios
-    .get(
-      "http://localhost:8000/api/getUserFromUsername/" + route.params.username
-    )
+  axios.get("http://localhost:8000/api/getUserFromUsername/" + route.params.username)
     .then((response) => {
       person.value = response.data;
       if (person.value._iId != 0) { //Usuario válido
@@ -267,7 +269,10 @@ onMounted(() => {
           axios.get("http://localhost:8000/api/checkFollow/" + userStore.person._iId + "/" + person.value._iId)
             .then((response) => {
               bFollowed.value = response.data;
-              console.log("bFollowed: " + bFollowed.value)
+              if(!bFollowed.value && person.value._bIsPrivate) {
+                userStore.checkPendingFollow(person.value._iId).then(bIsPending => bPendingFollow.value = bIsPending)
+                console.log("Pendiente: " + bPendingFollow.value);
+              }
               //Mostrar datos
               if (!person.value._bIsPrivate || (person.value._bIsPrivate && bFollowed.value)) { //Si la cuenta no es privada, o si es privada y el usuario le sigue, muestra datos
                 bShouldDisplayData.value = true;
@@ -285,9 +290,9 @@ onMounted(() => {
           })
           .catch(error => console.log(error));
         axios.get("http://localhost:8000/api/getUserEvents/" + person.value._iId)
-        .then(response => {
+          .then(response => {
             aEvents.value = response.data;
-        })
+          })
         axios.get("http://localhost:8000/api/getNumFollows/" + person.value._iId)
           .then(response => {
             iNumFollowing.value = response.data[0];
@@ -303,9 +308,9 @@ onMounted(() => {
 });
 
 function proccessDescription(sDescription) {
-  if(sDescription.length > 250) {
+  if (sDescription.length > 250) {
     let iShift = 250;
-    while(sDescription.charAt(iShift) != ' ')
+    while (sDescription.charAt(iShift) != ' ')
       iShift++;
     sDescription = sDescription.slice(0, iShift);
   }
@@ -313,14 +318,84 @@ function proccessDescription(sDescription) {
 }
 
 function setFollow() {
-  axios
-    .patch(
-      "http://localhost:8000/api/setFollow/" + userStore.person._iId + "/" + person.value._iId)
+  // if(bPendingFollow.value) {
+  //   // axios.patch("http://localhost:8000/api/deleteNotification/" + userStore.person._iId + "/" + person._iId + "/FollowRequest");
+  //   bPendingFollow.value = false;
+  //   bFollowed.value = false;
+  //   } else {
+  //     if(person.value._bIsPrivate)
+  //       bPendingFollow.value = true;
+  //     userStore.proccessFollow(person.value, bFollowed.value)
+  //     bFollowed.value = !bFollowed.value;
+  //     console.log("Despues de pulsar")
+  //     bFollowed.value === true ? iNumFollowers.value = iNumFollowers.value + 1 : iNumFollowers.value = iNumFollowers.value - 1;
+  // }
+  if(!bPendingFollow.value)
+    userStore.proccessFollow(person.value, bFollowed.value)
+
+  if(person.value._bIsPrivate && !bFollowed.value) {
+    bPendingFollow.value = !bPendingFollow.value;
+    if(!bPendingFollow.value)  // Si bPendingFollow es falso, significa que ha cancelado la solicitud de seguimiento
+      axios.patch("http://localhost:8000/api/deleteNotification/" + userStore.person._iId + "/" + person.value._iId + "/FollowRequest")
+  }
+  if(!person.value._bIsPrivate) {
+    bFollowed.value = !bFollowed.value;
+    bFollowed.value === true ? iNumFollowers.value = iNumFollowers.value + 1 : iNumFollowers.value = iNumFollowers.value - 1;
+  }
+}
+  /*
+  if(!person.value._bIsPrivate) {     //Cuenta pública
+    axios.patch("http://localhost:8000/api/setFollow/" + userStore.person._iId + "/" + person.value._iId)
     .then((response) => {
       bFollowed.value = response.data;
       bFollowed.value === true ? iNumFollowers.value = iNumFollowers.value + 1 : iNumFollowers.value = iNumFollowers.value - 1;
+        if(bFollowed.value) {
+          let notificationParams = {
+            sInfo: "¡Ahora " + userStore.person._sName + " te está siguiendo!",
+            iRecipientId: person.value._iId,
+            sType: "NewFollow",
+            iIssuerId: userStore.person._iId
+          }
+          console.log(notificationParams)
+        axios.post("http://localhost:8000/api/newNotification", notificationParams)
+        .then(response => console.log(response.data))
+
+      }
     })
     .catch((error) => console.log(error));
+  } else {
+    let notificationParams = {
+      sInfo: userStore.person._sName + " solicitó seguirte.",
+      iRecipientId: person.value._iId,
+      sType: "FollowRequest",
+      iIssuerId: userStore.person._iId
+    }
+    axios.post("http://localhost:8000/api/newNotification", notificationParams)
+    .then(response => console.log(response.data))
+  }
+  */
+
+function setLike(post) {
+  axios.post("http://localhost:8000/api/setLike/" + post._iId + "/" + userStore.person._iId)
+    .then(response => {
+      let postIndex = aPosts.value.findIndex(receivedPost => receivedPost._iId === post._iId);
+      if (response.data === true) {
+        aPosts.value[postIndex]._iLikes++;
+        if (userStore.person._iId != post._user._iId) {
+          console.log("H o l a")
+          axios.post("http://localhost:8000/api/newNotification", {
+            sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
+            iRecipientId: post._user._iId,
+            iIssuerId: userStore.person._iId,
+            iPostId: post._iId,
+            sType: "NewPostLike"
+          })
+            .then(response => console.log(response.data))
+        }
+      } else {
+        aPosts.value[postIndex]._iLikes--;
+      }
+    })
 }
 </script>
 
@@ -417,4 +492,5 @@ function setFollow() {
   .btnSwitch {
     padding: 0 2.6rem;
   }
-}</style>
+}
+</style>

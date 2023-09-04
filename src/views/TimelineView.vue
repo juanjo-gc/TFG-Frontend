@@ -37,7 +37,7 @@
                         <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"  alt="User avatar">
                         </router-link>
                       </div>
-                      <div class="col-md-7">
+                      <div class="col-md-7"> 
                         <h5 class="mt-0 mb-1">
                           <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
                           {{ post._user._sName }}
@@ -62,7 +62,7 @@
                           </button>
                         </div>
                         <div class="col-md-3">
-                          <button class="btn float-end" style="background-color: transparent;" @click="setLike(post._iId)">
+                          <button class="btn float-end" style="background-color: transparent;" @click="setLike(post)">
                             <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> {{ post._iLikes }}
                           </button>
                         </div>
@@ -126,12 +126,20 @@
 
   }
 
-  function setLike(postId) {
-    axios.post("http://localhost:8000/api/setLike/" + postId + "/" + userStore.person._iId)
+  function setLike(post) {
+    axios.post("http://localhost:8000/api/setLike/" + post._iId + "/" + userStore.person._iId)
     .then(response => {
       let postIndex = aPosts.value.findIndex(post => post._iId === postId);
       if(response.data === true) {
         aPosts.value[postIndex]._iLikes++;
+        if(userStore.person._iId != post._user._iId) {
+          axios.post("http://localhost:8000/api/newNotification", {
+            sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
+            iRecipientId: post._user._iId,
+            iIssuerId: userStore.person._iId,
+            iPostId: post._iId
+          })
+        }
       } else {
         aPosts.value[postIndex]._iLikes--;
       }

@@ -73,21 +73,23 @@ let targetUser = ref(null);
 
 onMounted(() => {
     axios.get("http://localhost:8000/api/getUser/" + route.params.targetId)
-        .then(response => targetUser.value = response.data)
-        .catch(error => console.log(error));
-
+    .then(response => targetUser.value = response.data)
+    .catch(error => console.log(error));
+    
     axios.get("http://localhost:8000/api/getConversation/" + userStore.person._iId + "/" + route.params.targetId)
-        .then(response => {
-            aMessages.value = response.data.map(item => {
-                return {
-                    _sText: item._sText,
-                    _iIssuerId: item._issuer._iId,
-                    _iRecipientId: item._recipient._iId
-                }
-            });
-            // chatContainer = $refs.chatContainer;
-            // chatContainer.scrollTop = chatContainer.scrollHeight;
-            chatContainer.value.$el.scrollTop = chatContainer.value.scrollHeight;
+    .then(response => {
+        aMessages.value = response.data.map(item => {
+            return {
+                _sText: item._sText,
+                _iIssuerId: item._issuer._iId,
+                _iRecipientId: item._recipient._iId
+            }
+        });
+        axios.patch("http://localhost:8000/api/setSeenMessages/" + userStore.person._iId + "/" + targetUser.value._iId)
+
+        setTimeout(() => {
+            chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+        }, 250);
         })
 
     const pusher = new Pusher('56c83b0b9e4a25060b44', {

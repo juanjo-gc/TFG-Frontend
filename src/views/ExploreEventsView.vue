@@ -151,9 +151,11 @@ function sendFilter() {
         asInterests: aCheckedInterests.value,
         sProvince: sSelectedProvince.value,
         sRegion: sSelectedRegion.value,
-        sCountry: sSelectedCountry.value
+        sCountry: sSelectedCountry.value,
+        bIsOnline: bIsOnline.value
     })
         .then(response => {
+            console.log(response.data)
             aEvents.value = response.data.content;
             aEventsBackup = aEvents.value;
             iTotalPages = response.data.totalPages;

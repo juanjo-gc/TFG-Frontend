@@ -106,7 +106,7 @@
                         </div>
                         <div class="col-md-6">
                           <small class="text-muted float-end" style="margin-top: 10px;">
-                            Publicado el {{ moment(reply._tCreatedAt).format('D-M-YYY') }}  
+                            Publicado el {{ moment(reply._tCreatedAt).format('D-M-YYYY') }}  
                           </small>
                         </div>
                       </div>
@@ -200,7 +200,17 @@
           iUserId: userStore.person._iId
         })
         .then(response => {
-          aReplies.value.unshift(response.data);
+          let reply = response.data;
+          aReplies.value.unshift(reply);
+          if(post.value._user._iId != userStore.person._iId) {
+            axios.post("http://localhost:8000/api/newNotification", {
+              sInfo: "¡" + userStore.person._sName + " ha comentado tu publicación!",
+              iRecipientId: post.value._user._iId,
+              iIssuerId: userStore.person._iId,
+              sType: "NewPostComment",
+              iPostId: reply._iId
+            })
+          }
         })
         .catch(error => console.log(error));
         sReplyText.value = "";
