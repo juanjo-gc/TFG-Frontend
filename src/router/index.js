@@ -214,7 +214,51 @@ const routes = [
       userAuth: true,
     }
   },
-
+  {
+    path: "/help/newTicket",
+    name: "newTicket",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/NewTicketView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+  {
+    path: "/admin/dashboard",
+    name: "adminDashboard",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/AdminDashboardView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+  {
+    path: "/admin/tickets",
+    name: "ticketManagement",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/TicketManagementView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+  {
+    path: "/help/tickets/:ticketId",
+    name: "ticketDetail",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/TicketDetailView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+  
 ];
 
 const router = createRouter({
@@ -227,7 +271,7 @@ router.beforeEach((to, from, next) => {
   const sRole = userStore.person._sRole;
 
   if(sRole && (to.name === "login" || to.name === "register")) {
-    router.push({path: '/profile'})
+    router.push({path: '/timeline'})
   }
 
   if(to.meta.requiresAuth) {
