@@ -76,13 +76,13 @@
             <li v-for="operation in aLastOperations">
                 <div class="row">
                     <div class="col-md-2">
-                        Joselito
+                        {{ operation._admin._sUsername }}
                     </div>
                     <div class="col-md-2 d-flex">
-                        12-03-2023
+                        {{ moment(operation._tTimestamp).format("DD/MM/YYYY") }}
                     </div>
                     <div class="col-md-8">
-                        Suspensión de cuenta de periquitodelospalote
+                        {{ truncateText(operation._sInformation) }}
                     </div>
                 </div>
             </li>
@@ -96,6 +96,7 @@
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
+import moment from 'moment';
 
 
 const router = useRouter();
@@ -103,7 +104,7 @@ const aActions = [  {action: "Gestionar tickets", route: "/admin/tickets"},
                     {action: "Gestionar usuarios", route: "/admin/manage/users"},
                     {action: "Gestionar contenido", route: "/admin/manage/content"}
                 ];
-const aLastOperations = [1, 2, 3]
+const aLastOperations = ref([]);
 let lUsers = 0;
 let lEvents = 0;
 let lMessages = 0;
@@ -118,6 +119,8 @@ onMounted(() => {
         lPosts = response.data
         bIsFetching.value = false;
     });
+    axios.get("http://localhost:8000/api/getOperations/0")
+    .then(response => aLastOperations.value = response.data.content)
 
     setTimeout(() => {
         console.log(lUsers)
@@ -129,6 +132,13 @@ onMounted(() => {
 
 
 })
+
+function truncateText(text) {
+    if(text.length > 75)
+        return text.slice(0, 75);
+    else
+        return text;
+}
 
 
 </script>

@@ -6,7 +6,12 @@
         </div>
         <div v-else>
             <div class="row mt-4">
-                <h3 class="fw-formal fw-bold">{{ event._sTitle }}</h3>
+                <div class="col-md-10">
+                    <h3 class="fw-formal fw-bold">{{ event._sTitle }}</h3>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger" v-if="userStore.person._sRole === 'Admin'">Eliminar evento</button>
+                </div>
                 <div class="hline"></div>
                 <div class="row">
                     <div class="col-md-3 bg-contrast p-2 m-2 mt-4">
@@ -28,8 +33,8 @@
                             </div>
                         </div>
                     </div>
-                    <div v-if="!bIsFinished">
-                        <div class="col-md-8 d-flex align-items-center justify-content-end"
+                    <div class="col-md-8 d-flex align-items-center justify-content-end " v-if="!bIsFinished && userStore.person._sRole === 'user'">
+                        <div class="row"
                             v-if="userStore.person._iId != event._organizer._iId">
                             <button type="button" class="btn btn-outline-primary me-5" v-if="!bIsAssistant"
                                 @click="setAssist">Participar</button>
@@ -37,13 +42,13 @@
                                 participar</button>
                         </div>
                     </div>
-                    <div v-else>
-                        <div class="col-md-5 d-flex align-items-center justify-content-end">
+                    <!-- <div class="col-md-5 d-flex align-items-center justify-content-end" v-else>
+                        <div class="row">
                             <a href="#photos">
                                 <button type="button" class="btn btn-primary">Ver fotos</button>
                             </a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="row mt-4 mb-4 bg-dark" v-if="bIsFinished">

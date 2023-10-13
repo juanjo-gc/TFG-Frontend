@@ -29,7 +29,7 @@
                         <select name="format" id="format" v-model="sSelectedCategory">
                             <option selected disabled>Categoría</option>
                             <option v-for="category in aCategories" :value="category._sName">{{
-                                category._sDisplayName }}</option>
+                                category._sName }}</option>
                         </select>
                     </div>
                 </div>
@@ -330,4 +330,6 @@ select::-ms-expand {
 
 .select:hover::after {
     color: #23b499;
-}</style>
+}
+
+</style>

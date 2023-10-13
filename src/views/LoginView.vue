@@ -104,7 +104,7 @@
       .then( response => {
         console.log(response)
         userStore.person = response.data;
-        router.push("/timeline");
+        userStore.person._sRole === "user" ? router.push("/timeline") : router.push("/admin/dashboard")
         if(userStore.person._iId === 0)
           formError.value = true;
       })

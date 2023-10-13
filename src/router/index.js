@@ -166,7 +166,7 @@ const routes = [
       import(/* webpackChunkName "register" */ "@/views/ShowEventView.vue"),
     meta: {
       requiresAuth: true,
-      adminAuth: false,
+      adminAuth: true,
       userAuth: true,
     }
   },
@@ -232,8 +232,8 @@ const routes = [
       import(/* webpackChunkName "register" */ "@/views/AdminDashboardView.vue"),
     meta: {
       requiresAuth: true,
-      adminAuth: false,
-      userAuth: true,
+      adminAuth: true,
+      userAuth: false,
     }
   },
   {
@@ -243,8 +243,8 @@ const routes = [
       import(/* webpackChunkName "register" */ "@/views/TicketManagementView.vue"),
     meta: {
       requiresAuth: true,
-      adminAuth: false,
-      userAuth: true,
+      adminAuth: true,
+      userAuth: false,
     }
   },
   {
@@ -256,6 +256,28 @@ const routes = [
       requiresAuth: true,
       adminAuth: false,
       userAuth: true,
+    }
+  },
+  {
+    path: "/admin/manage/content",
+    name: "contentManagement",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/ContentManagementView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: true,
+      userAuth: false,
+    }
+  },
+  {
+    path: "/admin/manage/users",
+    name: "userManagement",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/UserManagementView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: true,
+      userAuth: false,
     }
   },
   
@@ -270,15 +292,24 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   const sRole = userStore.person._sRole;
 
-  if(sRole && (to.name === "login" || to.name === "register")) {
-    router.push({path: '/timeline'})
+  if(sRole) { 
+    if(sRole.toLowerCase() === "user" && (to.name === "login" || to.name === "register")) {
+      router.push({path: '/timeline'})
+    }
+    
+    if(sRole.toLowerCase() === "admin" && (to.name === "login" || to.name === "register")) {
+      router.push({path: '/admin/dashboard'})
+    }
   }
+  
 
   if(to.meta.requiresAuth) {
     if(!sRole) {
       router.push({path: '/'});
     } else {
-      if(to.meta.adminAuth) {
+      if(to.meta.adminAuth && to.meta.userAuth) {
+        return next();
+      } else if(to.meta.adminAuth) {
         if(sRole === "Admin") {
           return next();
         } else {
