@@ -1,6 +1,6 @@
 <template>
   <HeaderComponent></HeaderComponent>
-    <div class="container">
+  <div class="container">
       <div class="row">
         <div class="col-md-2">
         </div>
@@ -12,10 +12,10 @@
                   <img class="mr-3 avatar" :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"  alt="User avatar">
                 </div>
                 <div class="col-md-11" style="margin: auto;">
-                  <h5 class="card-title">Nueva publicación</h5>
+                  <h5 class="card-title mt-2">Nueva publicación</h5>
                 </div>
               </div>
-              <textarea class="form-control" rows="2" maxlength="255" v-model="sPost"></textarea>
+              <textarea class="form-control mt-2" rows="2" maxlength="255" v-model="sPost"></textarea>
               <span>Caracteres restantes: {{ 255 - sPost.length }}</span>
               <button class="btn btn-primary mt-2 float-end" @click="newPost">Publicar</button>
             </div>
@@ -26,11 +26,11 @@
       <div class="row">
         <div class="col-md-2 "></div>
         <div class="col-md-8">
-          <div class="card">
+          <div class="card mt-4">
             <div class="card-body">
               <ul class="list-unstyled">
                 <li v-for="post in aPosts">
-                  <div class="media post-border">
+                  <div class="media post-border" v-if="post._tDeleteDate === null && !post._user._bIsSuspended">
                     <div class="row">
                       <div class="col-md-1">
                         <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
@@ -81,13 +81,18 @@
         </div>
         <div class="col-md-2 "></div>
       </div>
+        <div class="alert alert-danger alert-dismissible fade show fixed-bottom d-flex justify-content-center align-content-center" role="alert" v-if="bTriggerEmptyPostAlert">
+          <p><strong>Error.</strong> El cuerpo de la publicación debe contener al menos un carácter alfanumérico.</p>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="bTriggerEmptyPostAlert = false"></button>
+      </div>
     </div>
   </template>
   
   <script setup>
   
   import { computed, onMounted, ref } from "vue";
-  import HeaderComponent from "@/components/HeaderComponent.vue"
+  import HeaderComponent from "@/components/HeaderComponent.vue";
+  import Popup from "@/components/Popup.vue";
   import { useUserStore } from "@/store/UserStore";
   import axios from "axios";
   import moment from 'moment';
@@ -96,20 +101,34 @@
   const userStore = useUserStore();
   let sPost = ref('');
   let aPosts = ref([]);
+  let bTriggerEmptyPostAlert = ref(false);
 
   function newPost() {
-    axios.post("http://localhost:8000/api/newPost", {
-      sText: sPost.value,
-      iUserId: userStore.person._iId
-    }).then((response) => {
-      aPosts.value.unshift(response.data);
-      sPost.value = '';
-    }).catch(error => console.log(error))
+    if(!isBlank(sPost.value)) {
+      axios.post("http://localhost:8000/api/newPost", {
+        sText: sPost.value,
+        iUserId: userStore.person._iId
+      }).then((response) => {
+        aPosts.value.unshift(response.data);
+        sPost.value = '';
+      }).catch(error => console.log(error))
+    } else {
+      bTriggerEmptyPostAlert.value = true;
+    }
   }
 
   onMounted(() => {
     getTimelinePosts();
   })
+
+  function isBlank(sStr) {
+    let bIsBlank = true;
+    for(let i = 0; i < sStr.length; i++) {
+      if(sStr.charAt(i) != " ")
+        bIsBlank = false;
+    }
+    return bIsBlank;
+  }
 
   function getTimelinePosts() {
     axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId)
@@ -121,15 +140,26 @@
         // console.log(typeof(post._setLikes.size))
     })
     }).catch(error => console.log(error));
+  }
 
-    
-
+  function findIndex(id) {
+    let i = 0;
+    let bFound = false;
+    while(!bFound) {
+      if(aPosts.value[i]._iId === id)
+        bFound = true;
+      else
+        i++;
+    }
+    return i;
   }
 
   function setLike(post) {
+    console.log(post._iId)
     axios.post("http://localhost:8000/api/setLike/" + post._iId + "/" + userStore.person._iId)
     .then(response => {
-      let postIndex = aPosts.value.findIndex(post => post._iId === postId);
+      let postIndex = findIndex(post._iId);
+
       if(response.data === true) {
         aPosts.value[postIndex]._iLikes++;
         if(userStore.person._iId != post._user._iId) {
@@ -181,7 +211,7 @@
   }
 
   .post-border {
-    border: solid 1px #777;
+    border: solid 1px #d0d0d0;
     padding: 10px;
   }
 

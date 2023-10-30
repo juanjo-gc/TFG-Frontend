@@ -1,6 +1,11 @@
 <template>
     <HeaderComponent></HeaderComponent>
     <div class="container" v-if="!bIsFetching">
+        <div class="row" v-if="event._tDeleteDate != null">
+            <h3 class="mt-2">El evento ha sido eliminado.</h3>
+            <div class="hline"></div>
+            <button type="button" class="btn btn-primary mt-2" @click="router.push('/timeline')">Volver</button>
+        </div>
         <div v-if="event._iId === 0">
             <h2 class="mt-4 ms-2 fw-formal">El evento no existe</h2>
         </div>
@@ -17,7 +22,7 @@
             <div class="row mt-3 ms-2">
                 <ul class="list-unstyled">
                     <li v-for="assistant in aUsers">
-                        <div class="row mt-2 clickable" @click="router.push('/profile/' + assistant._sUsername)">
+                        <div class="row mt-2 clickable" @click="router.push('/profile/' + assistant._sUsername)" v-if="!assistant._bIsSuspended">
                             <div class="col-sm-1">
                                 <img class="mr-3 avatar float-left"
                                     :src="`http://localhost:8000/api/getProfileImage/${assistant._iId}`" alt="User avatar">

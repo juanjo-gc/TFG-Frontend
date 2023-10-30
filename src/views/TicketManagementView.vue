@@ -36,7 +36,7 @@
                 <div class="select">
                     <select name="format" id="format">
                         <option selected disabled>Categoría</option>
-                        <option v-for="category in aCategories" :value="category._sName">{{ proccessCategoryName(category._sName) }}</option>
+                        <option v-for="category in aCategories" :value="category._sName">{{ category._sName }}</option>
                     </select>
                 </div>
             </div>
@@ -44,39 +44,39 @@
                 <h4>Resultados:</h4>
                 <ul class="list-unstyled mt-4" v-if="bIsOpen">
                     <li v-for="ticket in aOpenedTickets">
-                        <div class="row p-2 ticket-box mt-3">
+                        <div class="row p-3 ticket-box mt-3" @click="router.push('/help/tickets/' + ticket._iId)">
                             <div class="row">
                                 <div class="col-md-7">
-                                    <h5 class="fw-bold">{{ ticket.sSubject }}</h5>
-                                    <p class="mt-2 small">{{ ticket.user }}</p>
+                                    <h5 class="fw-bold">{{ ticket._sSubject }}</h5>
+                                    <p class="mt-2 small">Denunciante: <strong>@{{ ticket._issuer._sUsername }}</strong></p>
                                 </div>
-                                <div class="col-md-2">
-                                    <p>Categoría: <strong>{{ ticket.category }}</strong></p>
+                                <div class="col-md-4">
+                                    <p>Categoría: <strong>{{ ticket._category._sName }}</strong></p>
                                     <p>
-                                        {{ moment(ticket.date).format("DD/MM/YYYY") }}
+                                        {{ moment(ticket._tCreationDate).format("DD/MM/YYYY") }}
                                     </p>
                                 </div>
                             </div>
-                            <p>{{ ticket.sInfo }}</p>
+                            <p>{{ proccessDescription(ticket._sDescription) }}</p>
                         </div>
                     </li>
                 </ul>
                 <ul class="list-unstyled mt-4" v-else>
                     <li v-for="ticket in aClosedTickets">
-                        <div class="row p-2 ticket-box mt-3">
+                        <div class="row p-3 ticket-box mt-3" @click="router.push('/help/tickets/' + ticket._iId)">
                             <div class="row">
                                 <div class="col-md-7">
-                                    <h5 class="fw-bold">{{ ticket.sSubject }}</h5>
-                                    <p class="mt-2 small">{{ ticket.user }}</p>
+                                    <h5 class="fw-bold">{{ ticket._sSubject }}</h5>
+                                    <p class="mt-2 small">Denunciante: <strong>@{{ ticket._issuer._sUsername }}</strong></p>
                                 </div>
-                                <div class="col-md-2">
-                                    <p>Categoría: <strong>{{ ticket.category }}</strong></p>
+                                <div class="col-md-4">
+                                    <p>Categoría: <strong>{{ ticket._category._sName }}</strong></p>
                                     <p>
-                                        {{ moment(ticket.date).format("DD/MM/YYYY") }}
+                                        {{ moment(ticket._tCreationDate).format("DD/MM/YYYY") }}
                                     </p>
                                 </div>
                             </div>
-                            <p>{{ ticket.sInfo }}</p>
+                            <p>{{ proccessDescription(ticket._sDescription) }}</p>
                         </div>
                     </li>
                 </ul>
@@ -87,32 +87,71 @@
 
 
 <script setup>
+import { useUserStore } from '@/store/UserStore';
+import axios from 'axios';
 import moment from 'moment';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const aTickets = [{ sSubject: "ticket 1", sInfo: "Info del ticket 1", date: Date.now(), user: "pericopalotes", category: "Bug" },
-{ sSubject: "ticket 2", sInfo: "Info del ticket 2", date: Date.now(), user: "pericopalotes2", category: "Denuncia" }];
-const aCategories = [{ _sName: "Bug" }, { _sName: "Denuncia" }]
+// const aTickets = [{ sSubject: "ticket 1", sInfo: "Info del ticket 1", date: Date.now(), user: "pericopalotes", category: "Bug" },
+// { sSubject: "ticket 2", sInfo: "Info del ticket 2", date: Date.now(), user: "pericopalotes2", category: "Denuncia" }];
+const router = useRouter();
+const userStore = useUserStore();
+let aCategories = ref([]);
+let aOpenedTickets = ref([]);
+let aTicketsBackup = [];
+let aClosedTickets = ref([]);
 let bIsOpen = ref(true);
 let bTicketsOrderedByDateAsc = ref(true);
 let sSubjectToSearch = ref("Buscar por asunto...");
 
+onMounted(() => {
+    axios.get("http://localhost:8000/api/getAdminTickets/" + userStore.person._iId)
+    .then(response => {
+        response.data.forEach(ticket => {
+            ticket._bIsOpen ? aOpenedTickets.value.push(ticket) : aClosedTickets.value.push(ticket);
+        })
+        aTicketsBackup = aOpenedTickets.value;
+
+    });
+
+    axios.get("http://localhost:8000/api/getAllCategories")
+    .then(response => aCategories.value = response.data);
+})
+
+function proccessDescription(sDescription) {
+    if(sDescription.length > 150)
+        return sDescription.slice(0, 150);
+    else
+        return sDescription;
+}
 
 function toggleSelectedOpen() {
     bIsOpen.value = true;
+    aTicketsBackup = aOpenedTickets.value;
 }
 
 function toggleSelectedClose() {
     bIsOpen.value = false;
+    aTicketsBackup = aClosedTickets.value;
+
 }
 
 function findTicketsBySubject() {
-
-}
-
-function proccessCategoryName(category) {
-    //devolver categoria traducida
-    return category
+    if(sSubjectToSearch.value.length > 3) {
+        if(bIsOpen.value)
+            aOpenedTickets.value = aOpenedTickets.value.filter(ticket => {
+                let regEx = new RegExp(sSubjectToSearch.value, 'gi');
+                if(ticket._sSubject.match(regEx))
+                    return ticket;
+            })
+    } else {
+        if(bIsOpen.value)
+            aOpenedTickets.value = aTicketsBackup;
+        else 
+            aClosedTickets.value = aTicketsBackup;
+    }
+    console.log(aOpenedTickets.value)
 }
 
 </script>
@@ -137,6 +176,10 @@ function proccessCategoryName(category) {
 }
 
 .ticket-box {
+    border: solid 1px rgb(201, 201, 201);
+}
+
+.ticket-box:hover {
     background-color: rgb(224, 240, 255);
     cursor: pointer;
 }

@@ -27,10 +27,13 @@ import {
      faArrowUp,
      faArrowDown,
      faReply,
-     faPen
+     faPen,
+     faFlag,
+     faTrashArrowUp
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload, faAngleRight, faArrowUp, faArrowDown, faReply, faPen);
+library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload,
+          faAngleRight, faArrowUp, faArrowDown, faReply, faPen, faFlag, faTrashArrowUp);
 
 
 createApp(App)

@@ -8,7 +8,8 @@
             <div class="col-md-12">
                 <ul class="list-unstyled">
                     <li v-for="notification in aNotifications">
-                        <div class="row mt-2 notification" @click="router.push(generateLink(notification))">
+                        <div class="row mt-2 notification" @click="router.push(generateLink(notification))"
+                        v-if="shouldBeShown(notification)">
                             <div class="col-sm-1 mt-3" v-if="notification._issuer._iId != 0">
                                 <img :src="'http://localhost:8000/api/getProfileImage/' + notification._issuer._iId"
                                     class="avatar-mini float-end">
@@ -97,6 +98,23 @@ function getNotificationsPage() {
 onMounted(() => {
     getNotificationsPage();
 })
+
+function shouldBeShown(notification) {
+    let bShouldBeShown = true;
+    console.log(notification)
+
+    if(notification._issuer._sRole === 'User')
+        if(notification._issuer._bIsSuspended)
+            bShouldBeShown = false;
+    if(notification._event != null)
+        if(notification._event._tDeleteDate != null)
+            bShouldBeShown = false;
+    if(notification._post != null)
+        if(notification._post._tDeleteDate != null)
+            bShouldBeShown = false;
+    
+    return bShouldBeShown;
+}
 
 // async function checkIfFollowing(user) {
 //     const bIsFollowing = await axios.get("http://localhost:8000/checkFollow/" + userStore.person._iId + "/" + user._iId)

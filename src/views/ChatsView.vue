@@ -13,7 +13,8 @@
                 <div class="pt-2 me-5" v-else>
                     <ul class="list-unstyled">
                         <li v-for="message in aLastMessages">
-                                <div class="row message-preview" :class="{newmessage: !message._bIsSeen}" @click="navigateToChat(message)">
+                                <div class="row message-preview" :class="{newmessage: !message._bIsSeen}" @click="navigateToChat(message)"
+                                v-if="!message._issuer._bIsSuspended && !message._recipient._bIsSuspended">
                                     <div class="col-sm-1">
                                         <img v-if="message._issuer._iId != userStore.person._iId" class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${message._issuer._iId}`"  alt="User avatar">
                                         <img v-else class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${message._recipient._iId}`"  alt="User avatar">
@@ -52,7 +53,7 @@
                 <div v-if="aUsers.length != 0">
                     <ul class="list-unstyled">
                         <li v-for="user in aUsers" @click="selectUser(user)">
-                            <div class="row user-data" v-if="user._iId != userStore.person._iId">
+                            <div class="row user-data" v-if="user._iId != userStore.person._iId && !user._bIsSuspended">
                                 <div class="col-ms-1">
                                     <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${user._iId}`"  alt="User avatar">
                                 </div>

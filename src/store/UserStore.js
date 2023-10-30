@@ -80,9 +80,46 @@ export const useUserStore = defineStore({
                 })
             }
         },
+        reportUser(iReportedId, sUsername, sDescription) {
+            axios.post("http://localhost:8000/api/newTicket", {
+                sSubject: "Denuncia de usuario con nombre " + sUsername,
+                sDescription,
+                iIssuerId: this.person._iId,
+                iReportedId,
+                iEventId: -1,
+                iPostId: -1,
+                sCategory: 'Denunciar un usuario'
+            })
+        },
+        softDeleteRestorePost(iPostId, iUserId, sUsername, sPost, bIsCurrentlyDeleted) {
+            let bIsDeleted = !bIsCurrentlyDeleted;
+            axios.patch("http://localhost:8000/api/softDeleteOrRestorePost/" + iPostId) 
+            .then(response => {
+                bIsDeleted = response.data;
+                console.log(response.data)
+                let sInformation = bIsCurrentlyDeleted ? "Se ha restaurado la publicación de @" + sUsername + ". Texto de la publicación: " + sPost :
+                "Se ha eliminado una publicación de @" + sUsername + ". Texto de la publicación: " + sPost;
+                let sInfo = bIsCurrentlyDeleted ? "Tu publicación con texto '" + sPost + "' que había sido borrada ha sido restaurada. Disculpa las molestias." :
+                "Tu publicación con texto '" + sPost + "' ha sido eliminada por no cumplir con los términos de la plataforma."
+                let sType = bIsCurrentlyDeleted ? 'Announcement' : 'BehaviorWarning';
+                console.log(sInformation)
+                axios.post("http://localhost:8000/api/newOperation", {
+                    sInformation,
+                    iAdminId: this.person._iId
+                })
+                axios.post("http://localhost:8000/api/newNotification", {
+                    sInfo,
+                    iRecipientId: iUserId,
+                    iIssuerId: this.person._iId,
+                    iPostId: -1,
+                    iEventId: -1,
+                    sType
+                })
+            })
+            return bIsDeleted;
+        },
         async checkPendingFollow(iId) {
             const bIsPending = await axios.get("http://localhost:8000/api/checkPendingFollow/" + this.person._iId + "/" + iId);
-            console.log("(Desde US) Esta pendiente? " + bIsPending.data);
             return bIsPending.data;
         }
     },

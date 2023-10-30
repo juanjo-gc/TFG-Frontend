@@ -1,12 +1,19 @@
 <template>
 <HeaderComponent></HeaderComponent>
 <div class="container" v-if="!bIsFetching">
-    <div class="row" v-if="event._tCelebratedAt > Date.now()">
-        <h3>El evento ha terminado, no se puede editar.</h3>
+    <div class="row" v-if="event._tDeleteDate != null">
+        <h3 class="fw-light mt-4">El evento ha sido eliminado</h3>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-primary mt-2" @click="router.push('/timeline')">Volver</button>
+        </div>
     </div>
     <div class="row" v-else>
-        <div class="mt-4">
-            <!-- <h3 class="fw-bold">Inicia un nuevo evento</h3> -->
+        <div class="row" v-if="event._tCelebratedAt > Date.now()">
+            <h3>El evento ha terminado, no se puede editar.</h3>
+        </div>
+        <div class="row" v-else>
+            <div class="mt-4">
+                <!-- <h3 class="fw-bold">Inicia un nuevo evento</h3> -->
             <h3 class="fw-bold ">Editar evento.</h3>
             <div class="hline mt-2"></div>
         </div>
@@ -33,7 +40,7 @@
         </div>
         <div class="row mt-4">
             <div class="col-md-3">
-
+                
                 <input type="checkbox" id="checkbox" v-model="bIsOnline" />
                 <label for="checkbox">
                     <p class="ms-2 fw-bold">Evento online</p>
@@ -62,21 +69,21 @@
             </div>
             <div class="col-md-6" v-else>
                 <p><strong>IMPORTANTE: </strong>Has indicado que el evento es online. Incluye información relevante en la descripción
-                para que los demás usuarios puedan comunicarse contigo, o con los demás participantes del evento.</p>
+                    para que los demás usuarios puedan comunicarse contigo, o con los demás participantes del evento.</p>
+                </div>
+                <div class="col-md-6">
+                    <!-- TODO: poner fecha con input bonito -->
+                    <h6 class="mt-2 fw-bold">Hora del evento*</h6>
+                    <input type="time" v-model="tCelebrationHour" required>
+                    <h6 class="mt-4 fw-bold">Fecha de celebración*</h6>
+                    <input type="date" v-model="tCelebrationDate" required>
+                </div>
             </div>
-            <div class="col-md-6">
-                <!-- TODO: poner fecha con input bonito -->
-                <h6 class="mt-2 fw-bold">Hora del evento*</h6>
-                <input type="time" v-model="tCelebrationHour" required>
-                <h6 class="mt-4 fw-bold">Fecha de celebración*</h6>
-                <input type="date" v-model="tCelebrationDate" required>
-            </div>
-        </div>
         <div class="row">
             <div class="col-md-6">
-
+                
                 <h6 class="mt-2 fw-bold">Intereses del evento</h6>
-            <ul class="ks-cboxtags">
+                <ul class="ks-cboxtags">
                     <li>
                         <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
                         for="checkboxOne">Música</label>
@@ -107,13 +114,13 @@
                                 </div>
                             </div>
                         </button>
-                </div>
-                <input type="file"  id="imgUpload" ref="imgUpload" @change="onImageUpload" name="image" style="display: none;"
-                        accept="image/png, image/jpeg" /> 
-                        <p v-if="sImageName != ''" class="mt-2 small">Imagen seleccionada: <strong>{{ sImageName }}</strong></p>
-                        <span class="small text-muted"><strong>AVISO: </strong>La imagen subida aparecerá en la página principal del evento</span>
                     </div>
-                        
+                    <input type="file"  id="imgUpload" ref="imgUpload" @change="onImageUpload" name="image" style="display: none;"
+                    accept="image/png, image/jpeg" /> 
+                    <p v-if="sImageName != ''" class="mt-2 small">Imagen seleccionada: <strong>{{ sImageName }}</strong></p>
+                    <span class="small text-muted"><strong>AVISO: </strong>La imagen subida aparecerá en la página principal del evento</span>
+                </div>
+                
             </div>
         </div>
         <div class="row">
@@ -123,7 +130,8 @@
             </div>
         </div>
     </form>
-    </div>
+</div>
+</div>
 </div>
 </template>
     
@@ -166,8 +174,10 @@ onMounted(() => {
         sTitle.value = event.value._sTitle;
         sDescription.value = event.value._sDescription;
         bIsOnline.value = event.value._bIsOnline;
-        sLocationName.value = event.value._location._sName;
-        console.log(event.value._location)
+        if(!event.value._bIsOnline)
+            sLocationName.value = event.value._location._sName;
+        else
+            sLocationName.value = "";
         event.value._setInterest.forEach(interest => aCheckedInterests.value.push(interest._sName));
         tCelebrationDate.value = event.value._tCelebratedAt;
         tCelebrationHour.value = event.value._tCelebrationHour;

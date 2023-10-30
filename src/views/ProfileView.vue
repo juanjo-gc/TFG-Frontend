@@ -1,7 +1,9 @@
 <template>
   <HeaderComponent></HeaderComponent>
-  <section class="h-100 gradient-custom-2">
-    <div class="container py-5 h-100">
+  <div class="container">
+
+    <section class="h-100 gradient-custom-2">
+      <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col col-lg-12 col-xl-10">
           <div class="card">
@@ -13,7 +15,7 @@
                   // setProfileImageURL
                   " alt="ProfileImg" class="img-thumbnail mt-4 mb-2" style="width: 150px; z-index: 1"
                   v-if="person._iId != 0 && sProfileImageURL" />
-                <img v-else
+                  <img v-else
                   src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
                   alt="" />
               </div>
@@ -31,9 +33,10 @@
               </div>
             </div>
             <div class="p-4 text-black" style="background-color: #f8f9fa">
-              <div class="row">
+              <div class="row mt-3">
                 <div class="col-2" v-if="person._iId != 0">
-                  <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                  <div class="row">
+                    <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
                     style="margin-left: 10px; z-index: 1" @click="router.push('/editProfile')"
                     v-if="person._iId === userStore.person._iId">
                     Modificar perfil
@@ -43,6 +46,16 @@
                     Ver fotos
                   </button>
                 </div>
+                <div class="row">
+                  <div class="col-md-1">
+                    <button type="button" class="btn btn-outline-danger mt-4 ms-2 " v-if="userStore.person._iId != person._iId"
+                    @click="bTriggerReportPopup = true">
+                    <font-awesome-icon icon="fa-solid fa-flag" class="report-button" size="sm" />
+                  </button>
+                </div>
+              </div>
+
+            </div>
                 <div class="col-2" v-else></div>
                 <div class="col-7">
                   <div class="d-flex justify-content-left text-left py-1" style="position: relative">
@@ -80,13 +93,13 @@
               <div class="col-md-9"></div>
               <div class="col-md-3 d-flex flex-row-reverse">
                 <button type="button" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
-                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed && !bPendingFollow">
-                  Seguir
-                </button>
-                <button type="button" class="btn btn-dark" data-mdb-ripple-color="dark"
-                  style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="bFollowed">
-                  Siguiendo
-                </button>
+                style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed && !bPendingFollow">
+                Seguir
+              </button>
+              <button type="button" class="btn btn-dark" data-mdb-ripple-color="dark"
+              style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="bFollowed">
+              Siguiendo
+            </button>
                 <button type="button" class="btn btn-outline-secondary" data-mdb-ripple-color="dark"
                   style="margin-right: 20px; z-index: 1" @click="setFollow()" v-if="!bFollowed && bPendingFollow">
                   Pendiente
@@ -96,7 +109,7 @@
             <div class="card-body p-4 text-black">
               <!-- Mostrar publicaciones y eventos -->
               <div v-if="bShouldDisplayData">
-
+                
                 <div class="row">
                   <!-- <p class="lead fw-normal mb-1">About</p> -->
                   <!-- <div class="p-4" style="background-color: #f8f9fa;"> -->
@@ -113,29 +126,29 @@
                 </div>
                 <!-- Mostrar publicaciones -->
                 <div class="row" v-if="bShowPosts">
-
+                  
                   <div class="col-md-12 mt-2">
                     <div class="card">
                       <div class="card-body">
                         <ul class="list-unstyled">
                           <li v-for="post in aPosts">
-                            <div class="media post-border m-2">
+                            <div class="media post-border m-2" v-if="post._tDeleteDate === null">
                               <div class="row">
                                 <div class="col-md-1">
                                   <router-link :to="`/profile/${post._user._sUsername}`"
-                                    style="text-decoration: none; color: inherit;">
-                                    <img class="mr-3 avatar float-left"
-                                      :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"
-                                      alt="User avatar">
+                                  style="text-decoration: none; color: inherit;">
+                                  <img class="mr-3 avatar float-left"
+                                  :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"
+                                  alt="User avatar">
                                   </router-link>
                                 </div>
                                 <div class="col-md-7">
                                   <h5 class="mt-0 mb-1">
                                     <router-link :to="`/profile/${post._user._sUsername}`"
-                                      style="text-decoration: none; color: inherit;">
-                                      {{ post._user._sName }}
-                                    </router-link>
-                                  </h5>
+                                    style="text-decoration: none; color: inherit;">
+                                    {{ post._user._sName }}
+                                  </router-link>
+                                </h5>
                                   <h6>
                                     <p class="text-muted">@{{ post._user._sUsername }}</p>
                                   </h6>
@@ -186,15 +199,15 @@
                       <div class="card-body">
                         <ul class="list-unstyled">
                           <li v-for="event in aEvents">
-                            <div class="media post-border m-2">
+                            <div class="media post-border m-2" v-if="event._tDeleteDate === null">
                               <div class="row">
                                 <div class="col-md-7">
                                   <h5 class="mt-0 mb-1">
                                     <router-link :to="`/events/${event._iId}`"
-                                      style="text-decoration: none; color: inherit;">
-                                      {{ event._sTitle }}
-                                    </router-link>
-                                  </h5>
+                                    style="text-decoration: none; color: inherit;">
+                                    {{ event._sTitle }}
+                                  </router-link>
+                                </h5>
                                   <h6>
                                     <p class="text-muted">Organizado por: @{{ event._organizer._sUsername }}</p>
                                   </h6>
@@ -233,6 +246,25 @@
       </div>
     </div>
   </section>
+  <Popup v-if="bTriggerReportPopup">
+    <div class="row">
+      <div class="col-md-11">
+        <h4 class="mt-2">Denunciar al usuario @{{ person._sUsername }}</h4>
+      </div>
+      <div class="col-md-1">
+        <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="sm" style="color: #000000;"
+        @click="bTriggerReportPopup = false" />
+      </div>
+    </div>
+    <p class="mt-4 fw-light">Detalla el/los motivos por lo que deseas denunciar a esta persona.</p>
+    <div class="mb-3">
+      <label for="report" class="form-label">Motivo de la denuncia</label>
+      <textarea class="form-control" id="report" rows="3" v-model="sReportDescription"></textarea>
+    </div>
+    <button type="button" class="btn btn-primary float-end" 
+    @click="userStore.reportUser(person._iId, person._sUsername, sReportDescription); bTriggerReportPopup = false;">Enviar</button>
+  </Popup>
+</div>
 </template>
 
 <script setup>
@@ -242,6 +274,7 @@ import axios from "axios";
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import moment from "moment";
+import Popup from "@/components/Popup.vue";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -258,6 +291,8 @@ let iNumPosts = ref(null);
 let iNumFollowing = ref(null);
 let iNumFollowers = ref(null);
 let bShouldDisplayData = ref(false);
+let bTriggerReportPopup = ref(false);
+let sReportDescription = ref("");
 
 onMounted(() => {
   person.value = userStore.person;
@@ -382,7 +417,6 @@ function setLike(post) {
       if (response.data === true) {
         aPosts.value[postIndex]._iLikes++;
         if (userStore.person._iId != post._user._iId) {
-          console.log("H o l a")
           axios.post("http://localhost:8000/api/newNotification", {
             sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
             iRecipientId: post._user._iId,
@@ -424,7 +458,7 @@ function setLike(post) {
 }
 
 .post-border {
-  border: solid 1px #777;
+  border: solid 1px #d0d0d0;
   padding: 10px;
 }
 
@@ -451,8 +485,12 @@ function setLike(post) {
   margin-right: 2px;
 }
 
-.blueb {
-  border: solid 3px blue;
+.report-button {
+  color: 8e0000;
+}
+
+.report-button:hover {
+  color: white;
 }
 
 /* CSS */
@@ -481,6 +519,10 @@ function setLike(post) {
   -webkit-user-select: none;
   touch-action: manipulation;
   width: 100%;
+}
+
+.clickable:hover {
+  cursor: pointer;
 }
 
 .btnSwitch:hover {

@@ -28,7 +28,7 @@
           <div class="col-md-8">
             <ul class="list-unstyled">
               <li v-for="follower in aFollowers" v-if="!bFollowingActive">
-                <div class="user-data">
+                <div class="user-data" v-if="!follower._bIsSuspended">
                   <div class="row">
                     <div class="col-sm-1">
                       <router-link :to="`/profile/${follower._sUsername}`" style="text-decoration: none; color: inherit;">
@@ -50,7 +50,7 @@
             </ul>
             <ul class="list-unstyled">
               <li v-for="followed in aFollowing" v-if="bFollowingActive">
-                <div class="user-data">
+                <div class="user-data" v-if="!followed._bIsSuspended">
                   <div class="row">
                     <div class="col-sm-1">
                       <router-link :to="`/profile/${followed._sUsername}`" style="text-decoration: none; color: inherit;">

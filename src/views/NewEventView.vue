@@ -152,7 +152,9 @@ import { ref, watch } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import { useUserStore } from '@/store/UserStore';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { useRouter } from 'vue-router';
 const userStore = useUserStore();
+const router = useRouter();
 let sLocationToSearch = ref('');
 let aLocations = ref(null);
 let sTitle = ref("");
@@ -204,7 +206,11 @@ function selectLocation(location) {
 }
 
 function submitEvent() {
+
     let iUserId = userStore.person._iId;
+    let sLocationName = selectedLocation.value === null ? "" : selectedLocation.value.display_name;
+    console.log(sLocationName)
+    console.log(bIsOnline.value)
     let eventDTO = {
         sTitle: sTitle.value,
         tCelebratedAt: tCelebrationDate.value,
@@ -212,7 +218,7 @@ function submitEvent() {
         sDescription: sDescription.value,
         iOrganizerId: iUserId,
         setInterests: aCheckedInterests.value,
-        sLocationName: selectedLocation.value != null ? selectedLocation.value.display_name : "",
+        sLocationName, //: selectedLocation.value != null ? selectedLocation.value.display_name : "",
         dLatitude: selectedLocation.value != null ? selectedLocation.value.lat : -1.00,
         dLongitude: selectedLocation.value != null ? selectedLocation.value.lon : -1.00,
         sProvinceName: sProvinceName != null ? sProvinceName : "",
@@ -232,6 +238,7 @@ function submitEvent() {
                     console.log(response.data);
                 })
             }
+            router.push("/events/" + response.data)
         })
     } else {
         sErrorMessage.value = "Error. Seleccione una localización para el evento.";

@@ -2,6 +2,7 @@
     <div class="container">
         <h2 class="mt-4">Gestionar usuarios</h2>
         <div class="hline"></div>
+        <button @click="userStore.logout()">logout</button>
         <div class="row">
             <div class="col-md-5">
                 <h4 class="mt-4">Datos del usuario</h4>
@@ -99,7 +100,7 @@
                     <div class="col-md-6"></div>
                     <div class="col-md-4" v-if="selectedPost._iId != -1">
                         <button type="button" class="btn mt-3 btn-danger float-end"
-                            v-if="selectedPost._tRemoveDate === null">Eliminar publicación</button>
+                            v-if="selectedPost._tDeleteDate === null">Eliminar publicación</button>
                         <button type="button" class="btn mt-3 btn-primary float-end" v-else>Restaurar publicación</button>
                     </div>
                 </div>
@@ -128,9 +129,7 @@ let selectedPost = ref({_iId: -1});
 let postsBox = ref(null);
 
 
-onMounted(() => {
 
-})
 
 function searchUsers() {
     if (sUsernameToSearch.value.length > 3)

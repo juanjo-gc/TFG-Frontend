@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="hline"></div>
-        <div class="row justify-content-center scroller h-75" ref="chatContainer">
+        <div class="row justify-content-center scroller" ref="chatContainer">
             <div class="chat">
                 <ul class="list-unstyled">
                     <li v-for="message in aMessages">
@@ -46,10 +46,10 @@
         <div class="hline"></div>
         <div class="row new-message align-items-center d-flex">
             <div class="col-sm-11">
-                <input type="text" class="w-100 message-box">
+                <input type="text" class="w-100 message-box" v-model="sMessage">
             </div>
             <div class="col-sm-1">
-                <button type="button" class="btn btn-primary">Enviar</button>
+                <button type="button" class="btn btn-primary" @click="submitMessage">Enviar</button>
             </div>
         </div>
     </div>
@@ -61,10 +61,11 @@ import { ref, onMounted } from "vue";
 import Pusher from 'pusher-js';
 import axios from "axios";
 import { useUserStore } from "@/store/UserStore";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const route = useRoute();
+const router = useRouter();
 let chatContainer = ref(null);
 let aMessages = ref([]);
 let sMessage = ref('');
@@ -73,8 +74,13 @@ let targetUser = ref(null);
 
 onMounted(() => {
     axios.get("http://localhost:8000/api/getUser/" + route.params.targetId)
-    .then(response => targetUser.value = response.data)
+    .then(response => {
+        targetUser.value = response.data;
+        if(targetUser.value._bIsSuspended)
+            router.push('/timeline');
+    }) 
     .catch(error => console.log(error));
+
     
     axios.get("http://localhost:8000/api/getConversation/" + userStore.person._iId + "/" + route.params.targetId)
     .then(response => {
@@ -85,6 +91,7 @@ onMounted(() => {
                 _iRecipientId: item._recipient._iId
             }
         });
+        console.log(aMessages.value)
         axios.patch("http://localhost:8000/api/setSeenMessages/" + userStore.person._iId + "/" + targetUser.value._iId)
 
         setTimeout(() => {
@@ -97,11 +104,11 @@ onMounted(() => {
     })
 
     const channel = pusher.subscribe('rt-chat');
-    channel.bind('newMessage', (data) => {
-        aMessages.value.push(data.message);
-        console.log(aMessages.value)
-        chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
-    })
+    // channel.bind('newMessage', (data) => {
+    //     aMessages.value.push(data.message);
+    //     console.log(aMessages.value)
+    //     chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    // })
 
 })
 
@@ -112,7 +119,12 @@ function submitMessage() {
         sText: sMessage.value
     })
         .then(response => {
-
+            sMessage.value = "";
+            aMessages.value.push({
+                _sText: response.data._sText,
+                _iIssuerId: response.data._issuer._iId,
+                _iRecipientId: response.data._recipient._iId
+            })
         })
         .catch(error => console.log(error));
     sMessage.value = '';
@@ -123,6 +135,10 @@ function submitMessage() {
 
 
 <style scoped>
+
+body {
+    overflow-y: auto;
+}
 .text-muted {
     color: #777;
 }
@@ -146,6 +162,7 @@ function submitMessage() {
 }
 
 .scroller {
+    height: 60vh;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;

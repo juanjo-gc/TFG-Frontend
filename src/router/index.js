@@ -254,7 +254,7 @@ const routes = [
       import(/* webpackChunkName "register" */ "@/views/TicketDetailView.vue"),
     meta: {
       requiresAuth: true,
-      adminAuth: false,
+      adminAuth: true,
       userAuth: true,
     }
   },
