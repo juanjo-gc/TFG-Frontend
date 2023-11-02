@@ -94,6 +94,7 @@ import PostComponent from "@/components/PostComponent.vue";
 import Popup from "@/components/Popup.vue";
 
 
+
 const userStore = useUserStore();
 const route = useRoute();
 let post = ref(axios.get("http://localhost:8000/api/getPost/" + route.params.id));

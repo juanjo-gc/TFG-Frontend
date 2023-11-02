@@ -30,10 +30,11 @@ import {
      faPen,
      faFlag,
      faTrashArrowUp
+     ,faBars
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload,
-          faAngleRight, faArrowUp, faArrowDown, faReply, faPen, faFlag, faTrashArrowUp);
+          faAngleRight, faArrowUp, faArrowDown, faReply, faPen, faFlag, faTrashArrowUp, faBars);
 
 
 createApp(App)

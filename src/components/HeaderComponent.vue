@@ -86,20 +86,29 @@
 <div class="page">
   <!-- <header tabindex="0">Header</header> -->
   <div id="nav-container">
-    <div class="bg blueb"></div>
-    <div class="button" tabindex="0">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
+    <div class="bg"></div>
+    <div class="row">
+        <div class="button" tabindex="0">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </div>
     </div>
     <div id="nav-content" tabindex="0">
-      <ul>
-        <li><a href="#0">Home</a></li>
+      <ul class="list-unstyled">
+        <li v-for="link in userRoutes">
+          <div class="link mt-2">
+            <p class="p-2 fs-light">{{ link.name }}</p>
+          </div>
+        </li>
+        <!-- <li><a href="#0">Home</a></li>
         <li><a href="#0">Services</a></li>
         <li><a href="#0">Blog</a></li>
         <li><a href="#0">About</a></li>
-        <li><a href="#0">Contact</a></li>
-        <li class="small"><a href="#0">Facebook</a><a href="#0">Instagram</a></li>
+        <li><a href="#0">Contact</a></li> -->
+        <div class="small">
+          <p class="p-2">Cerrar sesión</p>
+        </div>
       </ul>
     </div>
   </div>
@@ -115,7 +124,14 @@ import { useUserStore } from '@/store/UserStore.js';
 import { ref } from 'vue';
 
 const userStore = useUserStore();
-let show = ref(false);
+const userRoutes = [
+  {name: 'Inicio', route: '/timeline'},
+  {name: 'Ver perfil', route: '/profile/' + userStore.person._sUsername},
+  {name: 'Explorar eventos', route: '/events/explore'},
+  {name: 'Explorar eventos', route: '/events/explore'},
+  {name: 'Descubrir personas', route: '/discover'},
+  {name: 'Mensajes privados', route: '/messages'},
+]
 
 // function show(){
 //     document.querySelector('.hamburger').classList.toggle('open')
@@ -127,7 +143,21 @@ let show = ref(false);
 <style scoped>
 
 .blueb {
-  border: solid 1px blue;
+  border: solid 5px blue;
+}
+
+.link:hover {
+  background-color: #000;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease-out;
+}
+
+.logout:hover {
+  cursor: pointer;
+  background-color: rgb(136, 1, 1);
+  width: 50%;
+  height: 50px;
 }
 
 /* .slide-menu-enter-active {
@@ -191,217 +221,6 @@ let show = ref(false);
 }
 
 
-.menu-lateral {
-  width: 450px;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  background-color: #767676;
-  transition: left 5s linear 2.5s;
-  z-index: 100;
-}
-
-.menu-lateral h3 {
-  text-align: center;
-}
-
-.menu-lateral ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.menu-lateral ul li {
-  padding: 10px;
-}
-
-.menu-lateral ul li a {
-  text-decoration: none;
-  color: #000000;
-}
-
-.menu-lateral.desplegado {
-  left: 0;
-}
-
-.menu-lateral.oculto {
-  left: -200px;
-}
-
-
-
-
-/* .blackb {
-  border: solid 1px blue;
-}
-
-*{
-    margin: 0;
-    padding: 0;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-
-a,button{
-    cursor: pointer;
-}
-
-nav{
-    position: absolute;
-    top: 100px;
-    right: 50px;
-    width: 250px;
-}
-
-.navigation{
-    position: fixed;
-    right: -500px;
-    width: 350px;
-    height: 100%;
-    background-color: #000;
-    transition: .5s;
-}
-
-.navigation ul li{
-    color: #fff;
-    text-align: left;
-    text-transform: uppercase;
-    list-style-type: none;
-    font-size: 1.5em;
-    padding: 20px 30px;
-    border-bottom: 1pt solid #252525;
-}
-
-.hamburger, .bar{
-    position: fixed;
-}
-
-.hamburger{
-    display: block;
-    top: 5%;
-    left: 95%;
-    width: 30px;
-    height: 30px;
-    transform: translateY(-50%);
-    border: 0;
-    background: 0 0;
-}
-
-.bar{
-    top: 3px;
-    background: #000;
-    width: 100%;
-    height: 4px;
-    transition: all .3s ease-in;
-}
-
-#bar2{
-    top: 11px;
-}
-
-#bar3{
-    top: 19px;
-}
-
-.navigation.active{
-    left: 0;
-}
-
-.hamburger.open #bar1{
-    background-color: #fff;
-    transform: rotate(45deg) translate(6px, 5px);
-}
-
-.hamburger.open #bar2{
-    background-color: transparent;
-}
-
-.hamburger.open #bar3{
-    background-color: #fff;
-    transform: rotate(-45deg) translate(6px, -5px);
-} */
-
-
-
-
-
-/* 
-#menu__toggle {
-  opacity: 0;
-}
-#menu__toggle:checked + .menu__btn > span {
-  transform: rotate(45deg);
-}
-#menu__toggle:checked + .menu__btn > span::before {
-  top: 0;
-  transform: rotate(0deg);
-}
-#menu__toggle:checked + .menu__btn > span::after {
-  top: 0;
-  transform: rotate(90deg);
-}
-#menu__toggle:checked ~ .menu__box {
-  left: 0 !important;
-}
-.menu__btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  z-index: 98;
-}
-.menu__btn > span,
-.menu__btn > span::before,
-.menu__btn > span::after {
-  display: block;
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background-color: #616161;
-  transition-duration: .25s;
-  z-index: 98;
-}
-.menu__btn > span::before {
-  content: '';
-  top: -8px;
-}
-.menu__btn > span::after {
-  content: '';
-  top: 8px;
-}
-.menu__box {
-  display: block;
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: 300px;
-  height: 100%;
-  margin: 0;
-  padding: 80px 0;
-  list-style: none;
-  background-color: #ECEFF1;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, .4);
-  transition-duration: .25s;
-  z-index: 98;
-}
-.menu__item {
-  display: block;
-  padding: 12px 24px;
-  color: #333;
-  font-family: 'Roboto', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  text-decoration: none;
-  transition-duration: .25s;
-  z-index: 98;
-}
-.menu__item:hover {
-  background-color: #CFD8DC;
-} */
-
-
 @import url('https://fonts.googleapis.com/css?family=Encode+Sans+Condensed:400,600');
 
 * {
@@ -416,7 +235,6 @@ strong {
   /* width: 100%;
   height: 100vh; */
   background: #fdfdfd;
-  font-family: 'Encode Sans Condensed', sans-serif;
   font-weight: 600;
   letter-spacing: .03em;
   color: #212121;
@@ -501,7 +319,7 @@ main small {
   background: transparent;
   border-radius: 0;
   height: 70px;
-  width: 30px;
+  width: 60px;
   cursor: pointer;
   pointer-events: auto;
   margin-left: 25px;

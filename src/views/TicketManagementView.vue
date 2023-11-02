@@ -1,4 +1,5 @@
 <template>
+    <SidebarComponent></SidebarComponent>
     <div class="container">
         <h2 class="mt-4">Gestionar tickets</h2>
         <div class="hline"></div>
@@ -20,7 +21,7 @@
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-2">
-                <div class="row clickable" @click="bTicketsOrderedByDateAsc = !bTicketsOrderedByDateAsc">
+                <div class="row clickable" @click="orderAscDesc">
                     <div class="col-md-6">
                         <p class="fs-5 float-end" style="margin-top: 6px;">Fecha</p>
                     </div>
@@ -34,7 +35,7 @@
             <div class="col-md-4">
                 <!-- <p class="fs-5 mt-1" style="margin-top: 6px;">Categoría</p> -->
                 <div class="select">
-                    <select name="format" id="format">
+                    <select name="format" id="format" v-model="sSelectedCategory" @change="filterByCategory">
                         <option selected disabled>Categoría</option>
                         <option v-for="category in aCategories" :value="category._sName">{{ category._sName }}</option>
                     </select>
@@ -88,22 +89,23 @@
 
 <script setup>
 import { useUserStore } from '@/store/UserStore';
+import SidebarComponent from '@/components/SidebarComponent.vue';
 import axios from 'axios';
 import moment from 'moment';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-// const aTickets = [{ sSubject: "ticket 1", sInfo: "Info del ticket 1", date: Date.now(), user: "pericopalotes", category: "Bug" },
-// { sSubject: "ticket 2", sInfo: "Info del ticket 2", date: Date.now(), user: "pericopalotes2", category: "Denuncia" }];
 const router = useRouter();
 const userStore = useUserStore();
 let aCategories = ref([]);
+let aOpenedTicketsBackup = [];
+let aClosedTicketsBackup = [];
 let aOpenedTickets = ref([]);
-let aTicketsBackup = [];
 let aClosedTickets = ref([]);
 let bIsOpen = ref(true);
 let bTicketsOrderedByDateAsc = ref(true);
 let sSubjectToSearch = ref("Buscar por asunto...");
+let sSelectedCategory = ref('Categoría');
 
 onMounted(() => {
     axios.get("http://localhost:8000/api/getAdminTickets/" + userStore.person._iId)
@@ -111,13 +113,36 @@ onMounted(() => {
         response.data.forEach(ticket => {
             ticket._bIsOpen ? aOpenedTickets.value.push(ticket) : aClosedTickets.value.push(ticket);
         })
-        aTicketsBackup = aOpenedTickets.value;
-
+        aOpenedTicketsBackup = aOpenedTickets.value;
+        aClosedTicketsBackup = aClosedTickets.value;
+        console.log(aOpenedTicketsBackup)
     });
 
     axios.get("http://localhost:8000/api/getAllCategories")
-    .then(response => aCategories.value = response.data);
+    .then(response => {
+        aCategories.value = response.data;
+        aCategories.value = aCategories.value.filter(category => category._sName != "Borrada previamente")
+    });
+
+
 })
+
+function orderAscDesc(bToggled) {
+    if(bToggled)
+        bTicketsOrderedByDateAsc.value = !bTicketsOrderedByDateAsc.value;
+    aOpenedTickets.value = aOpenedTickets.value.reverse();
+    aClosedTickets.value = aClosedTickets.value.reverse();
+}
+
+function filterByCategory() {
+    console.log(sSelectedCategory.value)
+    if(sSelectedCategory.value != 'Categoría') {
+        aOpenedTickets.value = aOpenedTicketsBackup;
+        aClosedTickets = aClosedTicketsBackup;
+        aOpenedTickets.value = aOpenedTicketsBackup.filter(ticket => ticket._category._sName === sSelectedCategory.value);
+        aClosedTickets.value = aClosedTicketsBackup.filter(ticket => ticket._category._sName === sSelectedCategory.value);
+    }
+}
 
 function proccessDescription(sDescription) {
     if(sDescription.length > 150)
@@ -128,12 +153,12 @@ function proccessDescription(sDescription) {
 
 function toggleSelectedOpen() {
     bIsOpen.value = true;
-    aTicketsBackup = aOpenedTickets.value;
+    aOpenedTicketsBackup = aOpenedTickets.value;
 }
 
 function toggleSelectedClose() {
     bIsOpen.value = false;
-    aTicketsBackup = aClosedTickets.value;
+    aClosedTicketsBackup = aClosedTickets.value;
 
 }
 
@@ -147,9 +172,9 @@ function findTicketsBySubject() {
             })
     } else {
         if(bIsOpen.value)
-            aOpenedTickets.value = aTicketsBackup;
+            aOpenedTickets.value = aOpenedTicketsBackup;
         else 
-            aClosedTickets.value = aTicketsBackup;
+            aClosedTickets.value = aClosedTicketsBackup;
     }
     console.log(aOpenedTickets.value)
 }
