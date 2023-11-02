@@ -118,7 +118,9 @@
   }
 
   onMounted(() => {
+    userStore.logout();
     getTimelinePosts();
+    console.log(userStore.person._iId)
   })
 
   function isBlank(sStr) {

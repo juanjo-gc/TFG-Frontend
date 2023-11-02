@@ -118,6 +118,41 @@ export const useUserStore = defineStore({
             })
             return bIsDeleted;
         },
+        softDeleteOrRestoreImage(iImageId, iUserId, sUsername, bPhotoFromProfile, iEventId) {
+            let bIsDeleted = false;
+            
+            axios.patch("http://localhost:8000/api/softDeleteOrRestoreImage/" + iImageId)
+            .then(response => {
+                console.log("Se ejecuta en US")
+                bIsDeleted = response.data; // return != null => true si esta borrado, false si no
+                let sType = bIsDeleted ? 'BehaviorWarning' : 'Announcement';
+                let sInfo = "";
+                let sInformation = "";
+                console.log("bIsDeleted: " + bIsDeleted);
+                if(bIsDeleted) {
+                    sInformation = bPhotoFromProfile ? "Se ha eliminado una foto del perfil de @" + sUsername + "." :
+                    "Se ha eliminado la foto con ID " + iImageId + " subida por el usuario @" + sUsername + " en el evento con ID " + iEventId;
+                    sInfo = bPhotoFromProfile ? "Una de las fotos de tu perfil ha sido eliminada por no cumplir con los términos de nuestra plataforma." :
+                    "Una de las fotos que has subido a un evento ha sido eliminada por no cumplir con los términos de nuestra plataforma.";
+                } else {
+                    sInformation = "Se ha restaurado la foto con ID " + iImageId + " que había subido el usuario @" + sUsername + ".";
+                    sInfo = "Una de tus fotos que había sido borrada ha sido restaurada. Disculpa las molestias.";
+                }
+                axios.post("http://localhost:8000/api/newOperation", {
+                    sInformation,
+                    iAdminId: this.person._iId
+                })
+                axios.post("http://localhost:8000/api/newNotification", {
+                    sInfo,
+                    iRecipientId: iUserId,
+                    iIssuerId: this.person._iId,
+                    iPostId: -1,
+                    iEventId: -1,
+                    sType
+                })
+                return bIsDeleted;
+            })
+        },
         async checkPendingFollow(iId) {
             const bIsPending = await axios.get("http://localhost:8000/api/checkPendingFollow/" + this.person._iId + "/" + iId);
             return bIsPending.data;

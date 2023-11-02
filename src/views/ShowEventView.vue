@@ -21,8 +21,7 @@
                             @click="softDeleteEvent()">
                             Eliminar evento
                         </button>
-                        <button type="button" class="btn btn-primary" v-else
-                            @click="softDeleteEvent()">
+                        <button type="button" class="btn btn-primary" v-else @click="softDeleteEvent()">
                             Restaurar evento
                         </button>
                     </div>
@@ -197,7 +196,8 @@
                         <div class="d-flex justify-content-center">
                             <ul class="list-group list-group-horizontal list-unstyled">
                                 <li v-for="photo in aEventPhotos">
-                                    <div class="blackb d-flex justify-content-center">
+                                    <div class="blackb d-flex justify-content-center clickable"
+                                        @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
                                         <img class="event-image"
                                             :src="'http://localhost:8000/api/getEventImage/' + photo._sName" alt="">
                                     </div>
@@ -207,6 +207,28 @@
                     </div>
                 </div>
             </div>
+            <Popup v-if="bTriggerFullscreenImage">
+                <div class="row">
+                    <div class="col-md-12">
+                        <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="m"
+                            style="color: #000000;" @click="bTriggerFullscreenImage = false" />
+                    </div>
+                    <div class="img-wrapper" v-if="userStore.person._sRole === 'Admin'">
+                        <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2" alt="">
+                        <button class="btn btn-danger align-self-center del-btn"
+                            v-if="!bFsImageIsDeleted" @click="softDeleteOrRestoreImage(fsImage)">
+                        Borrar
+                        </button>
+                        <button class="btn btn-primary align-self-center del-btn"
+                            v-else @click="softDeleteOrRestoreImage(fsImage)">
+                        Restaurar
+                        </button>
+                    </div>
+                    <div v-else>
+                        <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2" alt="">
+                    </div>
+                </div>
+            </Popup>
             <Popup v-if="bTriggerReportPopup">
                 <div class="row">
                     <div class="col-md-6">
@@ -254,6 +276,9 @@ let sComment = ref("");
 let aComments = ref([]);
 let bTriggerReportPopup = ref(false);
 let sReportDescription = ref("");
+let bTriggerFullscreenImage = ref(false);
+let fsImage = ref(null);
+let bFsImageIsDeleted = ref(false);
 
 let formData = new FormData();
 let uploadImage = ref(null);
@@ -387,6 +412,25 @@ function softDeleteComment(comment) {
                 let iIndexToModify = aComments.value.findIndex(item => item._iId === comment._iId);
                 aComments.value[iIndexToModify]._tDeleteDate = null;
             }
+        })
+}
+
+function softDeleteOrRestoreImage(image) {
+    let bIsDeleted = false;
+    axios.get("http://localhost:8000/api/getUploader/" + image._iId)
+    .then(response => {
+        if(response.data._iId != 0)
+            bIsDeleted = userStore.softDeleteOrRestoreImage(image._iId, response.data._iId, response.data._sUsername, false, event._iId);
+            let iIndex = aEventPhotos.value.findIndex(item => image._iId === item._iId);
+            if(bIsDeleted) {
+                aEventPhotos.value[iIndex]._tDeleteDate = moment(Date.now());
+            } else {
+                aEventPhotos.value[iIndex]._tDeleteDate = null;
+            }
+            console.log("Antes " + bFsImageIsDeleted.value)
+            // Se devuelve si está borrado, por lo tanto la variable que determina si está borrado será lo contrario a lo devuelto
+            bFsImageIsDeleted.value = bIsDeleted; 
+            console.log("Despues s" + bFsImageIsDeleted.value)
         })
 }
 
@@ -591,6 +635,72 @@ textarea {
     color: blue;
 }
 
+.fsimg {
+    height: 70vh;
+    width: auto;
+    align-self: center;
+    justify-self: center;
+    object-fit: contain;
+}
+
+.img-wrapper {
+    position: relative;
+    width: 400px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+}
+
+.img-wrapper:before {
+    /* empty pseudo */
+    content: '';
+
+    /* start transparent, include a transition bcuz */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+    /* covers the whole div */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 2;
+}
+
+.img-wrapper:hover:before {
+    opacity: 1;
+    background-color: transparent;
+}
+
+.img-wrapper img {
+    position: absolute;
+    display: block;
+    max-width: 100%;
+    height: auto;
+    z-index: 1;
+}
+
+.del-btn {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    position: relative;
+    padding: 0 40px;
+    height: 40px;
+    line-height: 40px;
+    max-width: 260px;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.img-wrapper:hover .del-btn {
+    opacity: 1;
+}
+
 .blackb {
     border: solid 1px black;
-}</style>
+}
+</style>
