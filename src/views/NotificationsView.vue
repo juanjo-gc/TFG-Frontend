@@ -1,5 +1,5 @@
 <template>
-    <HeaderComponent></HeaderComponent>
+    <SidebarFinal></SidebarFinal>
     <div class="container">
         <h2 class="mt-4 fw-formal">Notificaciones</h2>
         <div class="hline"></div>
@@ -63,7 +63,7 @@
     
 
 <script setup>
-import HeaderComponent from '@/components/HeaderComponent.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import axios, { Axios } from 'axios';
 import moment from 'moment';

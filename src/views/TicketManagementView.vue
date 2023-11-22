@@ -1,5 +1,5 @@
 <template>
-    <SidebarComponent></SidebarComponent>
+    <SidebarFinal></SidebarFinal>
     <div class="container">
         <h2 class="mt-4">Gestionar tickets</h2>
         <div class="hline"></div>
@@ -89,7 +89,7 @@
 
 <script setup>
 import { useUserStore } from '@/store/UserStore';
-import SidebarComponent from '@/components/SidebarComponent.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import axios from 'axios';
 import moment from 'moment';
 import { onMounted, ref } from 'vue';

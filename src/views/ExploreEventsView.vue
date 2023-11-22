@@ -1,6 +1,6 @@
 <template>
-    <HeaderComponent></HeaderComponent>
-    <div class="container">
+<SidebarFinal></SidebarFinal>
+<div class="container">
         <h2 class="mt-4 fw-formal">Explorar eventos</h2>
         <div class="row mt-3 ms-1">
             <div class="col-sm-3">
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import HeaderComponent from '@/components/HeaderComponent.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import { onMounted, ref, watch, nextTick } from 'vue';
@@ -92,9 +92,9 @@ let asInterests = ref([]);
 let aCountries = ref([]);
 let aRegions = ref([]);
 let aProvinces = ref([]);
-let sSelectedProvince = ref(null);
-let sSelectedRegion = ref(null);
-let sSelectedCountry = ref(null);
+let sSelectedCountry = ref(userStore.person._province._region._country._sName);
+let sSelectedRegion = ref(userStore.person._province._region._sName);
+let sSelectedProvince = ref(userStore.person._province._sName);
 let aInterests = ref(null);
 let iPageNumber = 0;
 let iTotalPages = 0;
@@ -103,13 +103,19 @@ let currentSearch = {};
 onMounted(() => {
     //axios.get("http://localhost:8000/api/getFilteredEvents/1")
     axios.get("http://localhost:8000/api/getAllInterestNames")
-        .then(response => asInterests = response.data)
+    .then(response => asInterests = response.data)
 
     axios.get("http://localhost:8000/api/getAllCountries")
-        .then(response => aCountries.value = response.data)
+    .then(response => aCountries.value = response.data)
+        
+    axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
+    .then(response => aRegions.value = response.data)
+        
+    axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
+    .then(response => aProvinces.value = response.data)
 
-    // console.log("Region: " + sSelectedRegion.value);
-    // console.log("Provincia: " + sSelectedProvince.value)
+    console.log("Region: " + sSelectedRegion.value);
+    console.log("Provincia: " + sSelectedProvince.value)
     axios.post("http://localhost:8000/api/getFilteredEvents/" + iPageNumber, {
         sTitle: "",
         asInterests: [],
@@ -139,15 +145,20 @@ onMounted(() => {
 })
 
 function filterByName() {
-    aEvents.value = aEventsBackup.filter((event) => event._sTitle.includes(sEventTitle.value));
-    if (sEventTitle.value === 0) {
+    aEvents.value = aEventsBackup.filter((event) => {
+        let regEx = new RegExp(sEventTitle.value, 'gi');
+        if(event._sTitle.match(regEx))
+            return event;
+    });
+    if (sEventTitle.length === 0) {
         aEvents.value = aEventsBackup;
     }
 }
 
 
 function sendFilter() {
-    axios.post("http://localhost:8000/api/getFilteredEvents/" + iPageNumber, {
+    iPageNumber = 0;
+    axios.post("http://localhost:8000/api/getFilteredEvents/" + 0, {
         sTitle: sEventTitle.value,
         asInterests: aCheckedInterests.value,
         sProvince: sSelectedProvince.value,

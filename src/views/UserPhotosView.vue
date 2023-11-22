@@ -1,5 +1,5 @@
 <template>
-  <header-component></header-component>
+  <SidebarFinal></SidebarFinal>
 
 
 
@@ -67,7 +67,7 @@
   </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue";
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import axios from "axios";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";

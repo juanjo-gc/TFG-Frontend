@@ -1,5 +1,5 @@
 <template>
-    <HeaderComponent></HeaderComponent>
+    <SidebarFinal></SidebarFinal>
     <div class="container" v-if="!bIsFetching">
         <div class="row" v-if="event._tDeleteDate != null">
             <h3 class="mt-2">El evento ha sido eliminado.</h3>
@@ -45,7 +45,7 @@
     
 
 <script setup>
-import HeaderComponent from '@/components/HeaderComponent.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

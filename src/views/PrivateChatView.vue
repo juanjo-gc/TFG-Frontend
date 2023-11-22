@@ -1,5 +1,5 @@
 <template>
-    <HeaderComponent></HeaderComponent>
+    <SidebarFinal></SidebarFinal>
     <div class="container container-fluid vh-100 min-vh-100 mw-75 min-mw-75 d-flex flex-column" v-if="targetUser != null">
         <div class="row">
             <div class="col-md-5">
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import HeaderComponent from "@/components/HeaderComponent.vue"
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { ref, onMounted } from "vue";
 import Pusher from 'pusher-js';
 import axios from "axios";

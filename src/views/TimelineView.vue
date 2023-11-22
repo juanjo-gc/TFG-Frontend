@@ -1,6 +1,6 @@
 <template>
-  <HeaderComponent></HeaderComponent>
-  <div class="container">
+<SidebarFinal></SidebarFinal>
+<div class="container">
       <div class="row">
         <div class="col-md-2">
         </div>
@@ -45,8 +45,8 @@
                         </h5>
                         <h6><p class="text-muted">@{{ post._user._sUsername }}</p></h6>
                       </div>
-                      <div class="col-md-4">
-                        <p class="small text-muted" v-if="post._repliesTo != null">Respondiendo a @{{ post._repliesTo._user._sUsername }}</p>
+                      <div class="col-md-4" v-if="post._repliesTo != null" @click="router.push('/post/' + post._repliesTo._iId)">
+                        <p class="small text-muted clickable">Respondiendo a @{{ post._repliesTo._user._sUsername }}</p>
                       </div>
                     </div>
                     <div class="media-body">
@@ -91,16 +91,20 @@
   <script setup>
   
   import { computed, onMounted, ref } from "vue";
-  import HeaderComponent from "@/components/HeaderComponent.vue";
+  import SidebarFinal from "@/components/SidebarFinal.vue";
   import Popup from "@/components/Popup.vue";
   import { useUserStore } from "@/store/UserStore";
   import axios from "axios";
   import moment from 'moment';
+import { useRouter } from "vue-router";
 
 
   const userStore = useUserStore();
+  const router = useRouter();
   let sPost = ref('');
   let aPosts = ref([]);
+  let iPageNumber = ref(0);
+  let iTotalPages = ref(-1);
   let bTriggerEmptyPostAlert = ref(false);
 
   function newPost() {
@@ -118,8 +122,7 @@
   }
 
   onMounted(() => {
-    userStore.logout();
-    getTimelinePosts();
+    getTimelinePosts(0);
     console.log(userStore.person._iId)
   })
 
@@ -132,15 +135,12 @@
     return bIsBlank;
   }
 
-  function getTimelinePosts() {
-    axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId)
+  function getTimelinePosts(iPageNumber) {
+    axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId + "/" + iPageNumber)
     .then(response => {
-      aPosts.value = response.data;
-      // aPosts.value.map( (data, index) => ({...data, iNumLikes: 0}))   
-      aPosts.value.forEach(post => {
-        console.log("Texto: " + post._sText + " Likes: " + post.iNumLikes)
-        // console.log(typeof(post._setLikes.size))
-    })
+      console.log(response.data)
+      aPosts.value = aPosts.value.concat(response.data.content);
+      iTotalPages.value = response.data.totalPages;
     }).catch(error => console.log(error));
   }
 
@@ -178,8 +178,14 @@
     })
   }
 
-  // const person = userStore.person;
-      
+
+window.onscroll = () => {
+  if(document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight) {
+    iPageNumber.value++;
+    if(iPageNumber.value < iTotalPages.value)
+      getTimelinePosts(iPageNumber.value);
+  }
+}
     
   
   </script>
@@ -206,6 +212,10 @@
     max-height: 80px;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
   
   .text-muted {

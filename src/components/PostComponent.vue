@@ -7,11 +7,14 @@
                         :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`" alt="User avatar">
                 </router-link>
             </div>
-            <div class="col-md-11">
+            <div class="col-md-7">
                 <h5 class="mt-0 mb-1">{{ post._user._sName }}</h5>
                 <h6>
                     <p class="text-muted">@{{ post._user._sUsername }}</p>
                 </h6>
+            </div>
+            <div class="col-md-4" v-if="post._repliesTo != null" @click="router.push('/post/' + post._repliesTo._iId)">
+                <p class="small text-muted clickable">Respondiendo a @{{ post._repliesTo._user._sUsername }}</p>
             </div>
         </div>
         <div class="media-body">
@@ -28,14 +31,15 @@
                         }}
                     </button>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" v-if="post._user._iId != userStore.person._iId">
                     <button class="btn float-end" style="background-color: transparent;" @click="$emit('report', post)" v-if="!bIsAdmin">
                         <font-awesome-icon icon="fa-solid fa-flag" size="sm" style="color: #8e0000;" />
                     </button>
                 </div>
+                <div class="col-md-3" v-else></div>
                 <div class="col-md-3">
                     <small class="text-muted float-end" style="margin-top: 10px;">
-                        Publicado el {{ moment(post._tCreatedAt).format('D-M-YYY') }}
+                        Publicado el {{ moment(post._tCreatedAt).format('D-M-YYYY') }}
                     </small>
                 </div>
             </div>
@@ -47,9 +51,11 @@
 import { useUserStore } from '@/store/UserStore';
 import moment from 'moment';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 const props = defineProps(['post', 'admin']);
 const userStore = useUserStore();
+const router = useRouter();
 
 let post = props.post;
 let bIsAdmin = props.admin === undefined ? false : props.admin;
@@ -140,6 +146,10 @@ function reportPost(post) {
   textarea {
     width: 100%;
     height: 100px;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
   
     

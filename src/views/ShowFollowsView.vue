@@ -1,5 +1,5 @@
 <template>
-    <HeaderComponent></HeaderComponent>
+    <SidebarFinal></SidebarFinal>
       <div class="container" >
         <div class="row">
             <div class="col-md-2"></div>
@@ -80,7 +80,7 @@
     <script setup>
     
     import { computed, onMounted, ref } from "vue";
-    import HeaderComponent from "@/components/HeaderComponent.vue"
+    import SidebarFinal from '@/components/SidebarFinal.vue'
     import { useUserStore } from "@/store/UserStore";
     import axios from "axios";
     import moment from 'moment';

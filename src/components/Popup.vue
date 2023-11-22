@@ -2,9 +2,6 @@
     <div class="popup">
         <div class="popup-inner">
             <slot />
-            <!-- <button class="btn btn-outline-dark float-start popup-close">
-                Cerrar
-            </button> -->
         </div>
     </div>
 </template>
@@ -23,7 +20,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    z-index: 99;
+    z-index: 999;
     background-color: rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;

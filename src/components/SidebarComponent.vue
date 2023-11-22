@@ -5,7 +5,7 @@
         <font-awesome-icon icon="fa-solid fa-xmark" class="float-start mt-3" @click="showNav"></font-awesome-icon>
 
       </div>
-      <div class="navigation-icons">
+      <!-- <div class="navigation-icons">
         <font-awesome-icon icon="fa-solid fa-arrow-up" class="float-start mt-3"></font-awesome-icon>
         <font-awesome-icon icon="fa-solid fa-arrow-up" class="float-start mt-3"></font-awesome-icon>
         <font-awesome-icon icon="fa-solid fa-arrow-up" class="float-start mt-3"></font-awesome-icon>
@@ -20,38 +20,77 @@
           <div v-show="showLink" key="4">Contact</div>
           <div v-show="showLink" key="5">FAQ</div>
         </transition-group>
+      </div> -->
+      <div class="navigation-links">
+        <div class="row blackb" v-show="showLink">
+
+          <div class="col-sm-1">
+            <font-awesome-icon icon="fa-solid fa-arrow-up" class="float-start mt-3"></font-awesome-icon>
+          </div>
+          <div class="col-sm-8">
+            <p class="small">hola buenas</p>
+          </div>
+        </div>
       </div>
     </div>
   </template>
   
-  <script>
-    export default {
-      data: () => {
-        return {
-          showSidebar: false,
-          showLink: false
-        }
-      },
-      methods: {
-        showNav() {
-          if(this.showSidebar) {
-            this.showLink = false;
-            setTimeout(() => {
-              this.showSidebar = false;
-            }, 500);
-          }
-          else {
-            this.showSidebar = true;
-            setTimeout(() => {
-              this.showLink = true;
-            }, 500);
-          }
-        }
-      }
-    }
+  <script setup>
+
+import { ref, reactive } from 'vue'
+
+const showSidebar = ref(false)
+const showLink = ref(false)
+
+const showNav = () => {
+  if (showSidebar.value) {
+    showLink.value = false
+    setTimeout(() => {
+      showSidebar.value = false
+    }, 500)
+  } else {
+    showSidebar.value = true
+    setTimeout(() => {
+      showLink.value = true
+    }, 500)
+  }
+}
+
+    // export default {
+    //   data: () => {
+    //     return {
+    //       showSidebar: false,
+    //       showLink: false
+    //     }
+    //   },
+    //   methods: {
+    //     showNav() {
+    //       if(this.showSidebar) {
+    //         this.showLink = false;
+    //         setTimeout(() => {
+    //           this.showSidebar = false;
+    //         }, 500);
+    //       }
+    //       else {
+    //         this.showSidebar = true;
+    //         setTimeout(() => {
+    //           this.showLink = true;
+    //         }, 500);
+    //       }
+    //     }
+    //   }
+    // }
   </script>
   
   <style scoped>
+
+  .blackb {
+    border: solid 3px black;
+  }
+
+  .small{
+    font-size: 0.7em;
+  }
     .container {
       position: absolute;
       top: 0;
@@ -59,7 +98,7 @@
       width: 50px;
       padding: 10px;
       min-height: calc(100vh - 20px);
-      background-color: rgb(223, 223, 223);
+      background-color: rgb(0, 0, 140);
       border: solid #fff;
       border-width: 0 1px 0 0;
       z-index: 999;
@@ -115,6 +154,7 @@
       .navigation-links {
         padding-top: 14px;
         float: left;
+        color: white;
   
         div {
           font-size: 1.35rem;

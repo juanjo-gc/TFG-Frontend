@@ -167,7 +167,7 @@ let alertPhotos = ref(false);
 let userDetailsAlertMessage = ref(
   "Asegúrate de que ningún campo se encuentra vacío y todos cumplen con el formato requerido."
 );
-onBeforeMount(() => {
+onMounted(() => {
   profileImg.value = "htpp://localhost:8000/api/getProfileImage/" + userStore.person._iId;
 })
 
@@ -191,7 +191,6 @@ const setProfileImg = computed(() => {
 })
 
 
-function restoreUserDetailsAlert() { }
 
 //TODO: Actualizar mensajes de error con la funcion de arriba
 //TODO: Mirar por que no funciona la asignacion del userstore.person despues de la respuesta

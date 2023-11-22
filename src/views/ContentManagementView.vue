@@ -1,4 +1,5 @@
 <template>
+    <SidebarFinal></SidebarFinal>
     <div class="container">
         <h2 class="mt-4">Gestionar contenidos</h2>
         <div class="hline"></div>
@@ -343,6 +344,135 @@
                         </div>
                     </div>
                 </div>
+                <div class="row mt-2" v-if="aIndex[iItemToShow] === 'Gestionar FAQs'">
+                    <div class="col-md-6">
+                        <h5 class="mt-3">Registrar una FAQ:</h5>
+                        <div class="form-group field">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label for="faqQuestion">Pregunta</label>
+                                        <textarea class="form-control mt-2" id="faqQuestion" rows="2" v-model="sFaqQuestion"></textarea>
+                                    </div>
+                                    <p class="mt-2 small">La pregunta en sí a registrar</p>
+                                    <div class="form-group">
+                                        <label for="faqAnswer">Respuesta</label>
+                                        <textarea class="form-control mt-2" id="faqAnswer" rows="2" v-model="sFaqAnswer"></textarea>
+                                    </div>
+                                    <p class="mt-2 small">La respuesta a la pregunta</p>
+                                    <button type="button" class="btn btn-primary float-end"
+                                        @click="createEntity('faq')">Enviar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mt-3">Editar/borrar FAQs</h5>
+                        <ListBox display-key="Pregunta" v-if="!bIsBeingModified">
+                            <li v-for="faq in aFAQs">
+                                <div class="row mt-2 item">
+                                    <div class="col-sm-2">
+                                        {{ faq._iId }}
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ faq._sQuestion }}
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <font-awesome-icon icon="fa-solid fa-pen" class="clickable"
+                                            @click="currentEntity = faq; bIsBeingModified = true" />
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <font-awesome-icon icon="fa-solid fa-xmark" class="clickable"
+                                            @click="setPopup('FAQ', faq)" />
+                                    </div>
+                                </div>
+                            </li>
+                        </ListBox>
+                        <div class="mt-4" v-else>
+                            <p class="mt-4">Id de la entidad: <strong>{{ currentEntity._iId }}</strong></p>
+                            <div class="form-group field mt-2">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <label for="faqQuestion">Pregunta</label>
+                                            <textarea class="form-control mt-2" id="faqQuestion" rows="2" v-model="currentEntity._sQuestion"></textarea>
+                                        </div>
+                                        <p class="mt-2 small">La pregunta en sí a registrar</p>
+                                        <div class="form-group">
+                                            <label for="faqAnswer">Respuesta</label>
+                                            <textarea class="form-control mt-2" id="faqAnswer" rows="2" v-model="currentEntity._sAnswer"></textarea>
+                                        </div>
+                                        <p class="mt-2 small">La respuesta a la pregunta</p>
+                                        <button type="button" class="btn btn-secondary mt-2"
+                                            @click="currentEntity = {}; bIsBeingModified = false">Volver</button>
+                                        <button type="button" class="btn btn-primary float-end mt-2"
+                                            @click="modifyEntity('faq')">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2" v-if="aIndex[iItemToShow] === 'Gestionar Preguntas \'Conóceme\''">
+                    <div class="col-md-6">
+                        <h5 class="mt-3">Registrar una Pregunta 'Conóceme':</h5>
+                        <div class="form-group field">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <div class="form-group">
+                                        <label for="faqQuestion">Pregunta</label>
+                                        <textarea class="form-control mt-2" id="faqQuestion" rows="2" v-model="sAMQuestion"></textarea>
+                                    </div>
+                                    <p class="mt-2 small">La pregunta en sí a registrar</p>
+                                    <button type="button" class="btn btn-primary float-end"
+                                        @click="createEntity('AMQuestion')">Enviar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mt-3">Editar/borrar preguntas 'Conóceme'</h5>
+                        <ListBox display-key="Pregunta" v-if="!bIsBeingModified">
+                            <li v-for="question in aAMQuestions">
+                                <div class="row mt-2 item">
+                                    <div class="col-sm-2">
+                                        {{ question._iId }}
+                                    </div>
+                                    <div class="col-sm-7">
+                                        {{ question._sQuestion }}
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <font-awesome-icon icon="fa-solid fa-pen" class="clickable"
+                                            @click="currentEntity = question; bIsBeingModified = true" />
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <font-awesome-icon icon="fa-solid fa-xmark" class="clickable"
+                                            @click="setPopup('AMQuestion', question)" />
+                                    </div>
+                                </div>
+                            </li>
+                        </ListBox>
+                        <div class="mt-4" v-else>
+                            <p class="mt-4">Id de la entidad: <strong>{{ currentEntity._iId }}</strong></p>
+                            <div class="form-group field mt-2">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <label for="faqQuestion">Pregunta</label>
+                                            <textarea class="form-control mt-2" id="faqQuestion" rows="2" v-model="currentEntity._sQuestion"></textarea>
+                                        </div>
+                                        <p class="mt-2 small">La pregunta en sí a registrar</p>
+                                        <button type="button" class="btn btn-secondary mt-2"
+                                            @click="currentEntity = {}; bIsBeingModified = false">Volver</button>
+                                        <button type="button" class="btn btn-primary float-end mt-2"
+                                            @click="modifyEntity('AMQuestion')">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -368,24 +498,30 @@
 
 <script setup>
 import axios from 'axios';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { onMounted, ref } from 'vue';
 import ListBox from '@/components/ListBox.vue';
 import Popup from '@/components/Popup.vue';
 import { useUserStore } from '@/store/UserStore';
 
 const userStore = useUserStore();
-const aIndex = ["Gestionar categorías", "Gestionar intereses", "Gestionar provincias", "Gestionar CCAs", "Gestionar países"];
+const aIndex = ["Gestionar categorías", "Gestionar intereses", "Gestionar provincias", "Gestionar CCAs", "Gestionar países", "Gestionar FAQs", "Gestionar Preguntas 'Conóceme'"];
 let aCategories = ref([]);
 let aInterests = ref([]);
 let aProvinces = ref([]);
 let aRegions = ref([]);
 let aCountries = ref([]);
+let aFAQs = ref([]);
+let aAMQuestions = ref([]);
 let iItemToShow = ref(-1);
 let sCategoryName = ref("");
 let sInterestName = ref("");
 let sProvinceName = ref("");
 let sRegionName = ref("");
 let sCountryName = ref("");
+let sFaqQuestion = ref("");
+let sFaqAnswer = ref("");
+let sAMQuestion = ref("");
 let sSelectedRegion = ref("Comunidad autónoma");
 let sSelectedCountry = ref("País");
 let bIsBeingModified = ref(false);
@@ -414,6 +550,12 @@ onMounted(() => {
 
     axios.get("http://localhost:8000/api/getAllCountries")
         .then(response => aCountries.value = response.data);
+
+    axios.get("http://localhost:8000/api/getAllFAQs")
+        .then(response => aFAQs.value = response.data);
+
+    axios.get("http://localhost:8000/api/getAllAboutMeQuestions")
+        .then(response => aAMQuestions.value = response.data);
 
 })
 
@@ -500,6 +642,40 @@ function createEntity(sEntityType) {
                 sErrorMessage.value = "Introduce un nombre para el país."
             }
             break;
+        case 'faq':
+            if (sFaqQuestion.value != "" && sFaqAnswer.value != "") {
+                axios.post("http://localhost:8000/api/newFAQ/" + userStore.person._iId, {
+                    sQuestion: sFaqQuestion.value,
+                    sAnswer: sFaqAnswer.value
+                })
+                    .then(response => {
+                        if (response.data._iId != 0) {
+                            aFAQs.value.push(response.data);
+                        }
+                    })
+            } else {
+                sErrorMessage.value = "Introduce los dos campos para registrar la entidad."
+            }
+            break;
+        case 'AMQuestion':
+            if (sAMQuestion.value != "") {
+                axios.post("http://localhost:8000/api/newAboutMeQuestion", {
+                    sQuestion: sAMQuestion.value,
+                    sAnswer: "",
+                    iAdminId: userStore.person._iId,
+                    iUserId: -1,
+                    iQuestionId: -1,
+                    iAnswerId: -1
+                })
+                    .then(response => {
+                        if (response.data._iId != 0) {
+                            aAMQuestions.value.push(response.data);
+                        }
+                    })
+            } else {
+                sErrorMessage.value = "Introduce un enunciado para la pregunta."
+            }
+            break;
     }
 }
 
@@ -513,7 +689,7 @@ function modifyEntity(sEntityType) {
                 .then(response => {
                     if (response.data._iId != 0) {
                         let updatedEntity = response.data;
-                        let sInformation = "Se ha modificado la categoría con id " + updatedEntity.data._iId + ". Antes de modificar: " +
+                        let sInformation = "Se ha modificado la categoría con id " + updatedEntity._iId + ". Antes de modificar: " +
                             " nombre -> " + currentEntity.value._sName + ". Después de modificar: " +
                             " nombre -> " + updatedEntity._sName;
                         axios.post("http://localhost:8000/api/newOperation", {
@@ -537,7 +713,7 @@ function modifyEntity(sEntityType) {
                 .then(response => {
                     if (response.data._iId != 0) {
                         let updatedEntity = response.data;
-                        let sInformation = "Se ha modificado el interés con id " + updatedEntity.data._iId + ". Antes de modificar: " +
+                        let sInformation = "Se ha modificado el interés con id " + updatedEntity._iId + ". Antes de modificar: " +
                             " nombre -> " + currentEntity.value._sName + ". Después de modificar: " +
                             " nombre -> " + updatedEntity._sName;
                         axios.post("http://localhost:8000/api/newOperation", {
@@ -563,9 +739,9 @@ function modifyEntity(sEntityType) {
                     .then(response => {
                         if (response.data._iId != 0) {
                             let updatedEntity = response.data;
-                            let sInformation = "Se ha modificado la provincia con id " + updatedEntity.data._iId  + ". Antes de modificar: " +
-                            " nombre -> " + currentEntity.value._sName + ", comunidad autónoma -> " + currentEntity.value._region._sName + ". Después de modificar: " +
-                            " nombre -> " + updatedEntity._sName + ", comunidad autónoma -> " + updatedEntity._region._sName;
+                            let sInformation = "Se ha modificado la provincia con id " + updatedEntity._iId + ". Antes de modificar: " +
+                                " nombre -> " + currentEntity.value._sName + ", comunidad autónoma -> " + currentEntity.value._region._sName + ". Después de modificar: " +
+                                " nombre -> " + updatedEntity._sName + ", comunidad autónoma -> " + updatedEntity._region._sName;
                             axios.post("http://localhost:8000/api/newOperation", {
                                 sInformation: sInformation,
                                 iAdminId: userStore.person._iId
@@ -592,9 +768,9 @@ function modifyEntity(sEntityType) {
                     .then(response => {
                         if (response.data._iId != 0) {
                             let updatedEntity = response.data;
-                            let sInformation = "Se ha modificado la región con id " + updatedEntity.data._iId + ". Antes de modificar: " +
-                            " nombre -> " + currentEntity.value._sName + ", país -> " + currentEntity.value._country._sName + ". Después de modificar: " +
-                            " nombre -> " + updatedEntity._sName + ", país -> " + updatedEntity._country._sName;
+                            let sInformation = "Se ha modificado la región con id " + updatedEntity._iId + ". Antes de modificar: " +
+                                " nombre -> " + currentEntity.value._sName + ", país -> " + currentEntity.value._country._sName + ". Después de modificar: " +
+                                " nombre -> " + updatedEntity._sName + ", país -> " + updatedEntity._country._sName;
                             axios.post("http://localhost:8000/api/newOperation", {
                                 sInformation: sInformation,
                                 iAdminId: userStore.person._iId
@@ -619,7 +795,7 @@ function modifyEntity(sEntityType) {
                 .then(response => {
                     if (response.data._iId != 0) {
                         let updatedEntity = response.data;
-                        let sInformation = "Se ha modificado el país con id " + updatedEntity.data._iId + ". Antes de modificar: " +
+                        let sInformation = "Se ha modificado el país con id " + updatedEntity._iId + ". Antes de modificar: " +
                             " nombre -> " + currentEntity.value._sName + ". Después de modificar: " +
                             " nombre -> " + updatedEntity._sName;
                         axios.post("http://localhost:8000/api/newOperation", {
@@ -633,6 +809,63 @@ function modifyEntity(sEntityType) {
                         })
                         currentEntity = {};
                         bIsBeingModified.value = false;
+                    }
+                })
+            break;
+        case 'faq':
+            axios.patch("http://localhost:8000/api/updateFAQ/" + currentEntity._rawValue._iId, {
+                sQuestion: currentEntity._rawValue._sQuestion,
+                sAnswer: currentEntity._rawValue._sAnswer
+            })
+                .then(response => {
+                    if (response.data._iId != 0) {
+                        let updatedEntity = response.data;
+                        let sInformation = "Se ha modificado la FAQ con id " + updatedEntity._iId + ". Antes de modificar: " +
+                            " Pregunta -> " + currentEntity.value._sQuestion + " Después de modificar: " +
+                            " Pregunta -> " + updatedEntity._sQuestion + ". Respuesta -> " + currentEntity.value._sAnswer +
+                            " Después de modificar: Respuesta -> " + updatedEntity._sAnswer;
+                        axios.post("http://localhost:8000/api/newOperation", {
+                            sInformation: sInformation,
+                            iAdminId: userStore.person._iId
+                        })
+                        aFAQs.value = aFAQs.value.map(item => {
+                            if (item._iId === updatedEntity._iId)
+                                item = updatedEntity;
+                            return item;
+                        })
+                        currentEntity = {};
+                        bIsBeingModified.value = false;
+                    }
+                })
+            break;
+        case 'AMQuestion':
+            axios.patch("http://localhost:8000/api/updateAboutMeQuestion", {
+                sQuestion: currentEntity._rawValue._sQuestion,
+                sAnswer: "",
+                iAdminId: userStore.person._iId,
+                iUserId: -1,
+                iQuestionId: currentEntity._rawValue._iId,
+                iAnswerId: -1
+            })
+                .then(response => {
+                    if (response.data._iId != 0) {
+                        let updatedEntity = response.data;
+                        aAMQuestions.value = aAMQuestions.value.map(item => {
+                            if (item._iId === updatedEntity._iId)
+                                item = updatedEntity;
+                            return item;
+                        })
+                        currentEntity = {};
+                        bIsBeingModified.value = false;
+                        // let updatedEntity = response.data;
+                        // let sInformation = "Se ha modificado la FAQ con id " + updatedEntity._iId + ". Antes de modificar: " +
+                        //     " Pregunta -> " + currentEntity.value._sQuestion + " Después de modificar: " +
+                        //     " Pregunta -> " + updatedEntity._sQuestion + ". Respuesta -> " + currentEntity.value._sAnswer +
+                        //     " Después de modificar: Respuesta -> " + updatedEntity._sAnswer;
+                        // axios.post("http://localhost:8000/api/newOperation", {
+                        //     sInformation: sInformation,
+                        //     iAdminId: userStore.person._iId
+                        // })
                     }
                 })
             break;
@@ -670,6 +903,13 @@ function setPopup(sType, entity) {
             sPopupMessage.value = "Estás a punto de borrar un país del sistema. Esta acción es irreversible, y traerá las siguientes consecuencias:";
             asConsequencesOfOperation.value[1] = "La operación es en cascada; es decir, TODAS las comunidades autónomas del país serán BORRADAS del sistema junto al mismo.";
             asConsequencesOfOperation.value[2] = "Por consiguiente, esta acción traerá TODAS las CONSECUENCIAS de borrar cada una de las REGIONES que conforman el país.";
+            break;
+        case 'FAQ':
+            sPopupMessage.value = "Estás a punto de borrar una FAQ del sistema. Esta acción es irreversible, y traerá las siguientes consecuencias:";
+            break;
+        case 'AMQuestion':
+            sPopupMessage.value = "Estás a punto de eliminar una pregunta 'Conóceme' del sistema. Esta acción es irreversible, y traerá las siguientes consecuencias:";
+            asConsequencesOfOperation.value[1] = "La operación borrará todas las respuestas de aquellos usuarios que hayan respondido a la pregunta.";
             break;
     }
     asConsequencesOfOperation.value.push("La operación quedará registrada en el sistema para tareas de seguimiento y registro en caso de comportamiento inadecuado.");
@@ -750,6 +990,33 @@ function deleteEntity(sEntityType, entityToDelete) {
 
                 })
             break;
+        case 'FAQ':
+            axios.delete("http://localhost:8000/api/deleteFAQ/" + entityToDelete._iId)
+                .then(response => {
+                    axios.post("http://localhost:8000/api/newOperation", {
+                        sInformation: "Se ha eliminado la FAQ con los siguientes datos: Pregunta: " + entityToDelete._sQuestion + " Respuesta: " +
+                        entityToDelete._sAnswer,
+                        iAdminId: userStore.person._iId
+                    })
+                    aFAQs.value = aFAQs.value.filter(item => {
+                        if (item._iId != entityToDelete._iId)
+                            return item;
+                    })
+                })
+            break;
+        case 'AMQuestion':
+            axios.delete("http://localhost:8000/api/deleteAboutMeQuestion/" + entityToDelete._iId)
+                .then(response => {
+                    axios.post("http://localhost:8000/api/newOperation", {
+                        sInformation: "Se ha eliminado la pregunta 'Conóceme' con los siguientes datos: Pregunta: " + entityToDelete._sQuestion,
+                        iAdminId: userStore.person._iId
+                    })
+                    aAMQuestions.value = aAMQuestions.value.filter(item => {
+                        if (item._iId != entityToDelete._iId)
+                            return item;
+                    })
+                })
+            break;
     }
     sPopupMessage.value = "";
     asConsequencesOfOperation.value = [];
@@ -777,6 +1044,7 @@ function deleteEntity(sEntityType, entityToDelete) {
 
 .hv-increase:hover {
     cursor: pointer;
+    transform: scale(1.1);
     -webkit-transform: scale(1.1);
 }
 

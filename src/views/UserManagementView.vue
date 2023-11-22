@@ -1,8 +1,8 @@
 <template>
+    <SidebarFinal></SidebarFinal>
     <div class="container">
         <h2 class="mt-4">Gestionar usuarios</h2>
         <div class="hline"></div>
-        <button @click="userStore.logout()">logout</button>
         <div class="row">
             <div class="col-md-5">
                 <h4 class="mt-4">Datos del usuario</h4>
@@ -72,9 +72,6 @@
                         <textarea class="form-control" id="textbody" rows="3" v-model="sReason"></textarea>
                     </div>
                     <div class="col-md-12">
-
-
-
                         <button type="button" class="btn btn-warning mt-2 me-4 float-end"
                             v-if="!userToDisplay._bIsSuspended" @click="sendWarning()">Enviar aviso</button>
                     </div>
@@ -82,9 +79,27 @@
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-6" v-if="userToDisplay != null">
-                <h4 class="mt-4">Publicaciones de @{{ userToDisplay._sUsername }}</h4>
-                <div class="hline"></div>
-                <div class="row d-flex justify-content-center">
+                <div class="row" v-if="bShowPosts">
+                    <div class="col-md-8">
+                        <h4 class="mt-4">Publicaciones de @{{ userToDisplay._sUsername }}</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-primary mt-3" @click="bShowPosts = !bShowPosts">Ver
+                            fotos</button>
+                    </div>
+                    <div class="hline"></div>
+                </div>
+                <div class="row" v-else>
+                    <div class="col-md-8">
+                        <h4 class="mt-4">Fotos de @{{ userToDisplay._sUsername }}</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-primary mt-3" @click="bShowPosts = !bShowPosts">Ver
+                            publicaciones</button>
+                    </div>
+                    <div class="hline"></div>
+                </div>
+                <div class="row d-flex justify-content-center" v-if="bShowPosts">
                     <div class="posts-box mt-4" ref="postsBox">
                         <ul class="list-unstyled">
                             <li v-for="post in aPosts">
@@ -100,18 +115,65 @@
                     <div class="col-md-6"></div>
                     <div class="col-md-4" v-if="selectedPost._iId != -1">
                         <button type="button" class="btn mt-3 btn-danger float-end"
-                            v-if="selectedPost._tDeleteDate === null">Eliminar publicación</button>
-                        <button type="button" class="btn mt-3 btn-primary float-end" v-else>Restaurar publicación</button>
+                            v-if="selectedPost._tDeleteDate === null" @click="deleteOrRestorePost">
+                            Eliminar publicación
+                        </button>
+                        <button type="button" class="btn mt-3 btn-primary float-end" v-else @click="deleteOrRestorePost">
+                            Restaurar publicación
+                        </button>
                     </div>
                 </div>
+                <!-- <div class="row d-flex justify-content-center" v-else> -->
+                <!-- <div class="photos-container blackb mt-4">
+                        <ul class="list-unstyled list-group list-group-horizontal">
+                            <li v-for="photo in aUserPhotos">
+                                <div>
+                                    <img :src="'http://localhost:8000/api/getImage/' + photo._sName" alt="">
+                                </div>
+                            </li>
+                        </ul>
+                    </div> -->
+                <div class="d-flex justify-content-center mt-4" v-else>
+                    <ul class="list-group list-group-horizontal list-unstyled">
+                        <li v-for="photo in aUserPhotos">
+                            <div class="blackb d-flex justify-content-center clickable"
+                                @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
+                                <img class="user-image" :class="{deleted: photo._tDeleteDate != null}"
+                                :src="'http://localhost:8000/api/getImage/' + photo._sName" alt="">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- </div> -->
             </div>
         </div>
+        <Popup v-if="bTriggerFullscreenImage">
+            <div class="row">
+                <div class="col-md-12">
+                    <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="m" style="color: #000000; cursor: pointer;"
+                        @click="bTriggerFullscreenImage = false" />
+                </div>
+                <div class="img-wrapper">
+                    <img :src="'http://localhost:8000/api/getImage/' + fsImage._sName" class="fsimg p-2" alt="">
+                    <button class="btn btn-danger align-self-center del-btn" v-if="!bFsImageIsDeleted"
+                        @click="softDeleteOrRestoreImage(fsImage)">
+                        Borrar
+                    </button>
+                    <button class="btn btn-primary align-self-center del-btn" v-else
+                        @click="softDeleteOrRestoreImage(fsImage)">
+                        Restaurar
+                    </button>
+                </div>
+            </div>
+        </Popup>
     </div>
 </template>
     
 
 <script setup>
 import { useUserStore } from '@/store/UserStore';
+import SidebarFinal from '@/components/SidebarFinal.vue';
+import Popup from '@/components/Popup.vue';
 import axios from 'axios';
 import moment from 'moment';
 import { onMounted, ref } from 'vue';
@@ -124,7 +186,13 @@ let sReason = ref("");
 let aPosts = ref([]);
 let aWarnings = ref([]);
 let aReports = ref([]);
-let selectedPost = ref({_iId: -1});
+let selectedPost = ref({ _iId: -1 });
+let aUserPhotos = ref([]);
+let aRows = ref([]);
+let bShowPosts = ref(true);
+let bTriggerFullscreenImage = ref(false);
+let fsImage = ref(null);
+let bFsImageIsDeleted = ref(false);
 
 let postsBox = ref(null);
 
@@ -140,6 +208,7 @@ function searchUsers() {
 }
 
 function loadUserData(user) {
+    selectedPost.value = {};
     userToDisplay.value = {};
     aPosts.value = [];
     axios.get("http://localhost:8000/api/getUserFromUsername/" + user._sUsername)
@@ -160,8 +229,9 @@ function loadUserData(user) {
                     .then(response => {
                         aReports.value = response.data;
                     })
+                axios.get("http://localhost:8000/api/getImageNames/" + user._iId)
+                    .then(response => aUserPhotos.value = response.data)
             }
-
             sUsernameToSearch.value = ''
         })
 }
@@ -171,9 +241,30 @@ function suspendReactivateAccount(iSuspend) {
         .then(response => userToDisplay.value._bIsSuspended = response.data)
 }
 
-function deletePost() {
-    
+function deleteOrRestorePost() {
+    userStore.softDeleteRestorePost(selectedPost.value._iId, userToDisplay.value._iId, userToDisplay.value._sUsername,
+        selectedPost.value._sText, selectedPost.value._tDeleteDate != null);
+    aPosts.value.map(post => {
+        if (post._iId === selectedPost.value._iId)
+            post._tDeleteDate = post._tDeleteDate === null ? moment(Date.now()) : null;
+    })
 }
+
+function softDeleteOrRestoreImage(image) {
+    let iIndex = aUserPhotos.value.findIndex(item => image._iId === item._iId);
+    userStore.softDeleteOrRestoreImage(image._iId, userToDisplay.value._iId, userToDisplay.value._sUsername, true, -1);
+    //Si la imagen no tiene fecha de borrado, y se acaba de borrar, bIsDeleted debe ser true para establecer la fecha de borrado sin necesidad de petición extra para mostrar reactividad
+    let bIsDeleted = image._tDeleteDate === null ? true : false;
+    if (bIsDeleted) {
+        aUserPhotos.value[iIndex]._tDeleteDate = moment(Date.now());
+    } else {
+        aUserPhotos.value[iIndex]._tDeleteDate = null;
+    }
+    console.log("Antes " + bFsImageIsDeleted.value)
+    bFsImageIsDeleted.value = bIsDeleted;
+    console.log("Despues s" + bFsImageIsDeleted.value)
+}
+
 
 function sendWarning() {
     console.log("hola")
@@ -187,7 +278,7 @@ function sendWarning() {
             iEventId: -1,
             sType: 'BehaviorWarning'
         })
-        .then(response => aWarnings.value.push(response.data))
+            .then(response => aWarnings.value.push(response.data))
         sReason.value = "";
     }
 }
@@ -198,6 +289,17 @@ function selectPost() { }
 
 
 <style scoped>
+.user-image {
+    object-fit: contain;
+    max-height: 200px;
+    width: auto;
+}
+
+.user-image:hover {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
 .blackb {
     border: solid 1px black;
 }
@@ -246,6 +348,108 @@ function selectPost() { }
     overflow-y: scroll;
     scrollbar-width: thin;
 }
+
+.photos-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 40px;
+    width: 80%;
+    height: 60vh;
+    background-color: aliceblue;
+}
+
+.user-image {
+    height: 30%;
+    width: auto;
+    max-height: 100px;
+    margin: 5px;
+    object-fit: contain;
+}
+
+.deleted {
+    opacity: 0.5;
+    z-index: 5;
+}
+
+.fsimg {
+    /* height: 70vh;
+    width: auto; */
+    align-self: center;
+    justify-self: center;
+    object-fit: contain;
+}
+
+.img-wrapper {
+    position: relative;
+    width: 70vh;
+    height: 70vh;
+    max-height: 600px;
+    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+}
+
+.img-wrapper:before {
+    /* empty pseudo */
+    content: '';
+
+    /* start transparent, include a transition bcuz */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+    /* covers the whole div */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 2;
+}
+
+.img-wrapper:hover:before {
+    opacity: 1;
+    background-color: transparent;
+}
+
+.img-wrapper img {
+    position: absolute;
+    display: block;
+    max-width: 100%;
+    height: auto;
+    z-index: 1;
+    background-color: transparent;
+}
+
+.del-btn {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    position: relative;
+    padding: 0 40px;
+    height: 40px;
+    line-height: 40px;
+    max-width: 260px;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.img-wrapper:hover .del-btn {
+    opacity: 1;
+}
+
+.img-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* img {
+    height: 100%;
+    width: auto;
+} */
 
 .text-muted {
     color: #777;
@@ -318,4 +522,5 @@ function selectPost() { }
 .form-field:required,
 .form-field:invalid {
     box-shadow: none;
-}</style>
+}
+</style>

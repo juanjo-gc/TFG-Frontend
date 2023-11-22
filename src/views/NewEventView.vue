@@ -1,6 +1,6 @@
 <template>
-    <HeaderComponent></HeaderComponent>
-    <div class="container">
+<SidebarFinal></SidebarFinal>
+<div class="container">
         <!-- <input type="text" v-model="sLocationToSearch" @keyup="searchAndGetResults">
         <ul class="list-unstyled">
             <li v-for="location in aLocations">
@@ -149,7 +149,7 @@
 <script setup>
 import axios from 'axios';
 import { ref, watch } from 'vue';
-import HeaderComponent from '@/components/HeaderComponent.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { useRouter } from 'vue-router';

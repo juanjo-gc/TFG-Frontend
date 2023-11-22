@@ -1,6 +1,7 @@
 import axios from "axios";
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -13,9 +14,9 @@ export const useUserStore = defineStore({
     state: () => {
         return {
             person: {},
-            profileImage: null,
             aiShownUserIds: [],
-            tUpdatedUsersToShow: new Date()
+            tUpdatedUsersToShow: new Date(),
+            router: useRouter()
         };
       },
     persist: true,
@@ -32,8 +33,6 @@ export const useUserStore = defineStore({
         },
         logout() {
             this.person = {};
-            this.profileImage = null;
-            console.log("Se ejecuta logout");
             location.reload();
         },
         setFollow(user) {
@@ -128,7 +127,7 @@ export const useUserStore = defineStore({
                 let sType = bIsDeleted ? 'BehaviorWarning' : 'Announcement';
                 let sInfo = "";
                 let sInformation = "";
-                console.log("bIsDeleted: " + bIsDeleted);
+                console.log("bIsDeleted: " + bIsDeleted + " Response.data: " + response.data);
                 if(bIsDeleted) {
                     sInformation = bPhotoFromProfile ? "Se ha eliminado una foto del perfil de @" + sUsername + "." :
                     "Se ha eliminado la foto con ID " + iImageId + " subida por el usuario @" + sUsername + " en el evento con ID " + iEventId;
@@ -150,7 +149,6 @@ export const useUserStore = defineStore({
                     iEventId: -1,
                     sType
                 })
-                return bIsDeleted;
             })
         },
         async checkPendingFollow(iId) {

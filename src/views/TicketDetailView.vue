@@ -1,4 +1,5 @@
 <template>
+    <SidebarFinal></SidebarFinal>
     <div class="container mb-4" ref="main" v-if="!bIsFetching">
         <h2 class="mt-4">Ticket: {{ ticket._sSubject }}</h2>
         <div class="hline"></div>
@@ -180,6 +181,7 @@
 
 <script setup>
 import Popup from '@/components/Popup.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import moment from 'moment';

@@ -1,6 +1,7 @@
 <template>
-    <header-component></header-component>
-    <div class="container" v-if="!bIsFetching">
+    <!-- <header-component></header-component> -->
+    <SidebarFinal></SidebarFinal>
+    <div class="container ps-4" v-if="!bIsFetching">
         <div v-if="event._iId === 0">
             <h2 class="mt-4 ms-2 fw-formal">El evento no existe</h2>
         </div>
@@ -56,7 +57,7 @@
                             </div>
                         </div>
                         <div class="row d-flex align-items-center justify-content-end"
-                            v-if="!bIsFinished && userStore.person._sRole === 'User'">
+                            v-if="!bIsFinished && userStore.person._sRole === 'User' && userStore.person._iId != event._organizer._iId">
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-outline-danger" @click="bTriggerReportPopup = true">
                                     <font-awesome-icon icon="fa-solid fa-flag" class="mt-1" /> Reportar
@@ -165,9 +166,11 @@
                             </div>
                             <!-- scrollTop: {{ commentsBox.scrollTop }} -->
                             <!-- <div class="new-comment" contenteditable="true"></div> -->
-                            <textarea v-model="sComment"
+                            <textarea v-model="sComment" v-if="userStore.person._sRole === 'User'"
                                 placeholder="Escribe tu comentario sobre el evento aquí"></textarea>
-                            <button @click="submitNewComment" class="btn btn-primary float-end mt-1">Enviar</button>
+                            <button @click="submitNewComment" class="btn btn-primary float-end mt-1" v-if="userStore.person._sRole === 'User'">
+                                Enviar
+                            </button>
                         </div>
 
                     </div>
@@ -178,7 +181,7 @@
                         </div>
 
                         <div class="col-md-9">
-                            <div class="row float-start">
+                            <div class="row float-start" v-if="userStore.person._sRole === 'User'">
                                 <div class="col-md-8">
                                     <p class="mt-3 float-end">¿Tienes fotos del evento? ¡Compártelas con los demás!</p>
                                 </div>
@@ -196,7 +199,7 @@
                         <div class="d-flex justify-content-center">
                             <ul class="list-group list-group-horizontal list-unstyled">
                                 <li v-for="photo in aEventPhotos">
-                                    <div class="blackb d-flex justify-content-center clickable"
+                                    <div class="blackb d-flex justify-content-center clickable" v-if="photo._tDeleteDate === null || userStore.person._sRole === 'Admin'"
                                         @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
                                         <img class="event-image"
                                             :src="'http://localhost:8000/api/getEventImage/' + photo._sName" alt="">
@@ -256,6 +259,7 @@
 
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import Popup from '@/components/Popup.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue';
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';
@@ -416,21 +420,23 @@ function softDeleteComment(comment) {
 }
 
 function softDeleteOrRestoreImage(image) {
-    let bIsDeleted = false;
+    let bIsDeleted = null;
     axios.get("http://localhost:8000/api/getUploader/" + image._iId)
     .then(response => {
-        if(response.data._iId != 0)
-            bIsDeleted = userStore.softDeleteOrRestoreImage(image._iId, response.data._iId, response.data._sUsername, false, event._iId);
+        if(response.data._iId != 0) {
             let iIndex = aEventPhotos.value.findIndex(item => image._iId === item._iId);
+            userStore.softDeleteOrRestoreImage(image._iId, response.data._iId, response.data._sUsername, false, event._iId);
+            //Si la imagen no tiene fecha de borrado, y se acaba de borrar, bIsDeleted debe ser true para establecer la fecha de borrado sin necesidad de petición extra para mostrar reactividad
+            let bIsDeleted = image._tDeleteDate === null ? true : false;
             if(bIsDeleted) {
                 aEventPhotos.value[iIndex]._tDeleteDate = moment(Date.now());
             } else {
                 aEventPhotos.value[iIndex]._tDeleteDate = null;
             }
             console.log("Antes " + bFsImageIsDeleted.value)
-            // Se devuelve si está borrado, por lo tanto la variable que determina si está borrado será lo contrario a lo devuelto
             bFsImageIsDeleted.value = bIsDeleted; 
             console.log("Despues s" + bFsImageIsDeleted.value)
+        }
         })
 }
 
@@ -636,8 +642,8 @@ textarea {
 }
 
 .fsimg {
-    height: 70vh;
-    width: auto;
+    /* height: 70vh;
+    width: auto; */
     align-self: center;
     justify-self: center;
     object-fit: contain;
@@ -645,8 +651,10 @@ textarea {
 
 .img-wrapper {
     position: relative;
-    width: 400px;
-    height: 220px;
+    width: 70vh;
+    height: 70vh;
+    max-height: 600px;
+    display: inline-block;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -682,6 +690,7 @@ textarea {
     max-width: 100%;
     height: auto;
     z-index: 1;
+    background-color: transparent;
 }
 
 .del-btn {

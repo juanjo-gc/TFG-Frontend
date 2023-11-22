@@ -1,4 +1,5 @@
 <template>
+    <SidebarFinal></SidebarFinal>
     <div class="container">
         <h2 class="mt-4">Nuevo ticket</h2>
         <div class="hline"></div>
@@ -99,6 +100,7 @@
 
 <script setup>
 import Popup from '@/components/Popup.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import { onMounted, ref } from 'vue';

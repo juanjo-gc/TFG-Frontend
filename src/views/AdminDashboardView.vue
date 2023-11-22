@@ -1,4 +1,5 @@
 <template>
+<SidebarFinal></SidebarFinal>
 <div class="container" v-if="!bIsFetching">
     <h2 class="fw-formal mt-4">Panel de administración</h2>
     <div class="hline"></div>
@@ -94,6 +95,7 @@
     
 <script setup>
 import axios from 'axios';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import moment from 'moment';
@@ -120,24 +122,17 @@ onMounted(() => {
         bIsFetching.value = false;
     });
     axios.get("http://localhost:8000/api/getOperations/0")
-    .then(response => aLastOperations.value = response.data.content)
-
-    setTimeout(() => {
-        console.log(lUsers)
-        console.log(lEvents)
-        console.log(lPosts)
-        console.log(lMessages)
-
-    }, 1000);
-
+    .then(response => aLastOperations.value = response.data.content.slice(0,7))
 
 })
 
 function truncateText(text) {
-    if(text.length > 75)
-        return text.slice(0, 75);
-    else
+    if(text.length > 110){
+        text = text.slice(0, 110);
+        return text.concat('...');
+    } else {
         return text;
+    }
 }
 
 

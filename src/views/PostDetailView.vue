@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent></HeaderComponent>
+  <SidebarFinal></SidebarFinal>
   <div class="container" v-if="!bIsFetching">
     <div class="row" style="height: 150px;">
     </div>
@@ -37,10 +37,7 @@
       <div class="col-md-2"></div>
       <div class="col-md-8">
         <h5>Respuestas</h5>
-        <div v-if="aReplies.length === 0">
-          <p class="lead fw-formal" style="margin=20px;">Aún no hay respuestas para esta publicación :&#40;</p>
-        </div>
-        <div class="card" v-else>
+        <div v-if="aReplies.length != 0">
           <div class="card-body">
             <ul class="list-unstyled">
               <li v-for="reply in aReplies">
@@ -48,6 +45,9 @@
               </li>
             </ul>
           </div>
+        </div>
+        <div class="card" v-else>
+          <p class="lead fw-formal" style="margin=20px;">Aún no hay respuestas para esta publicación :&#40;</p>
         </div>
 
       </div>
@@ -85,7 +85,7 @@
 <script setup>
 
 import { onMounted, ref } from "vue";
-import HeaderComponent from "@/components/HeaderComponent.vue"
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from "@/store/UserStore";
 import axios from "axios";
 import moment from 'moment';
@@ -98,7 +98,7 @@ import Popup from "@/components/Popup.vue";
 const userStore = useUserStore();
 const route = useRoute();
 let post = ref(axios.get("http://localhost:8000/api/getPost/" + route.params.id));
-let aReplies = ref(null);
+let aReplies = ref([]);
 let aLikes = ref(null);
 let sLink = "http://localhost:8000/api/getPost/" + route.params.id;
 let bIsFetching = ref(true);
@@ -108,27 +108,22 @@ let sErrorMessage = ref("");
 let sReportDescription = ref("");
 let bTriggerReportPopup = ref(false);
 let reportedPost = ref({});
+let iPageNumber = 0;
+let iTotalPages = -1;
 
 
 onMounted(() => {
-  console.log(sLink)
+  // console.log(aReplies.value.length + " respuestas")
   axios.get("http://localhost:8000/api/getPost/" + route.params.id)
     .then(response => {
-      // console.log(response.data)
       post.value = response.data;
-      // console.log(post.value)
       if (post.value._iId != 0) {   // la publicación es válida
         axios.get("http://localhost:8000/api/getLikes/" + post.value._iId)
           .then(response => {
             aLikes.value = response.data;
           })
           .catch(error => console.log(error));
-        axios.get("http://localhost:8000/api/getReplies/" + post.value._iId)
-          .then(response => {
-            aReplies.value = response.data;
-            bIsFetching.value = false;
-          })
-          .catch(error => console.log(error));
+          getReplies(0);
       }
     }).catch(error => console.log(error));
 })
@@ -174,6 +169,18 @@ function setLike(postId) {
     })
 }
 
+function getReplies(iPageNumber) {
+  axios.get("http://localhost:8000/api/getReplies/" + post.value._iId + "/" + iPageNumber)
+    .then(response => {
+      console.log(response.data)
+      aReplies.value = aReplies.value.concat(response.data.content);
+      iTotalPages = response.data.totalPages;
+      bIsFetching.value = false;
+
+      })
+    .catch(error => console.log(error));
+}
+
 function postNewReply() {
   if (sReplyText.value === "") {
     bError.value = true;
@@ -185,7 +192,7 @@ function postNewReply() {
     })
       .then(response => {
         let reply = response.data;
-        aReplies.value.unshift(reply);
+        aReplies.value.push(reply);
         if (post.value._user._iId != userStore.person._iId) {
           axios.post("http://localhost:8000/api/newNotification", {
             sInfo: "¡" + userStore.person._sName + " ha comentado tu publicación!",
@@ -201,8 +208,14 @@ function postNewReply() {
   }
 }
 
-// const person = userStore.person;
-
+window.onscroll = () => {
+  if(document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight) {
+    iPageNumber++;
+    if(iPageNumber < iTotalPages) {
+      getReplies(iPageNumber);
+    }
+  }
+}
 
 
 </script>

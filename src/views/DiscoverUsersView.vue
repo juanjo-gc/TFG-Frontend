@@ -1,6 +1,6 @@
 <template>
-    <HeaderComponent></HeaderComponent>
-    <div class="container" v-if="!bIsFetching">
+<SidebarFinal></SidebarFinal>
+<div class="container" v-if="!bIsFetching">
 
         <div class="mt-3 text-center">
             <h3>Descubrir personas</h3>
@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import HeaderComponent from '@/components/HeaderComponent.vue';
+import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import { useRouter } from 'vue-router';
 import axios from 'axios';

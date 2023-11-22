@@ -53,7 +53,7 @@ const routes = [
     path: "/profile/:username",
     name: "profile",
     component: () =>
-      import(/* webpackChunkName "register" */ "@/views/ProfileView.vue"),
+      import(/* webpackChunkName "register" */ "@/views/ProfileFinalView.vue"),
     meta: {
       requiresAuth: true,
       adminAuth: false,
@@ -64,7 +64,7 @@ const routes = [
     path: "/editProfile",
     name: "editProfile",
     component: () =>
-      import(/* webpackChunkName "register" */ "@/views/EditProfileView.vue"),
+      import(/* webpackChunkName "register" */ "@/views/EditProfileFinalView.vue"),
     meta: {
       requiresAuth: true,
       adminAuth: false,
@@ -276,6 +276,28 @@ const routes = [
       import(/* webpackChunkName "register" */ "@/views/UserManagementView.vue"),
     meta: {
       requiresAuth: true,
+      adminAuth: true,
+      userAuth: false,
+    }
+  },
+  {
+    path: "/help",
+    name: "help",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/HelpView.vue"),
+    meta: {
+      requiresAuth: false,
+      adminAuth: true,
+      userAuth: true,
+    }
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/Test.vue"),
+    meta: {
+      requiresAuth: false,
       adminAuth: true,
       userAuth: false,
     }

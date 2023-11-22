@@ -106,7 +106,7 @@
         <li><a href="#0">Blog</a></li>
         <li><a href="#0">About</a></li>
         <li><a href="#0">Contact</a></li> -->
-        <div class="small">
+        <div class="small" @click="userStore.logout">
           <p class="p-2">Cerrar sesión</p>
         </div>
       </ul>
