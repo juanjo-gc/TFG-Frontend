@@ -13,26 +13,31 @@
             <div class="col-md-4">
                 <h4>Asunto</h4>
                 <div class="hline"></div>
-                <div class="form-group field mt-2">
-                    <div class="row">
-                        <input type="input" class="form-field ms-2" placeholder="Asunto" name="subject" id='subject'
-                            v-model="sSubject" />
-                        <label for="subject" class="form-label">Escribe el asunto...</label>
-                    </div>
+                <!-- <div class="form-group field mt-2"> -->
+                <div class="row mt-4">
+                    <input type="input" class="form-control form-control-lg ms-2" placeholder="Escribe el asunto..."
+                        name="subject" id='subject' v-model="sSubject" />
+                    <!-- <label for="subject" class="form-label">Escribe el asunto...</label> -->
                 </div>
+                <!-- </div> -->
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-4">
                 <h4>Categoría</h4>
                 <div class="hline"></div>
                 <div class="d-flex justify-content-center">
-                    <div class="select mt-4">
-                        <select name="format" id="format" v-model="sSelectedCategory">
+                    <!-- <div class="select mt-4"> -->
+                        <!-- <select name="format" id="format" v-model="sSelectedCategory">
+                            <option selected disabled>Categoría</option>
+                            <option v-for="category in aCategories" :value="category._sName">{{
+                                category._sName }}</option>
+                        </select> -->
+                        <select class="form-select form-select-lg mt-4" aria-label="Default select example" v-model="sSelectedCategory">
                             <option selected disabled>Categoría</option>
                             <option v-for="category in aCategories" :value="category._sName">{{
                                 category._sName }}</option>
                         </select>
-                    </div>
+                    <!-- </div> -->
                 </div>
             </div>
         </div>
@@ -65,6 +70,7 @@
             <div class="col-md-1">
                 <button type="button" class="btn btn-primary mt-3" @click="sendTicket">Enviar</button>
             </div>
+            <p class="small" v-if="bIsFileSelected">Imagen seleccionada: <strong>{{ uploadImage.files[0].name }}</strong></p>
         </div>
         <Popup v-if="bTriggerErrorPopup || bTriggerWarningPopup">
             <div class="d-flex justify-content-center">
@@ -115,6 +121,7 @@ let sSelectedCategory = ref("");
 let aCategories = ref([]);
 let uploadImage = ref(null);
 let formData = new FormData();
+let bIsFileSelected = ref(false);
 
 let bTriggerErrorPopup = ref(false);
 let bTriggerWarningPopup = ref(false);
@@ -125,7 +132,7 @@ onMounted(() => {
     axios.get("http://localhost:8000/api/getAllCategories").then(response => {
         aCategories.value = response.data;
         aCategories.value = aCategories.value.filter((category) => {
-            return category._sName != 'ReportUser' && category._sName != 'ReportEvent' && category._sName != 'ReportPost';
+            return category._sName != 'Denunciar un usuario' && category._sName != 'Denunciar un evento' && category._sName != 'Denunciar una publicación' && category._sName != 'Borrada previamente';
         })
     })
 
@@ -156,12 +163,13 @@ function confirmSend() {
                 bTriggerErrorPopup.value = false;
                 bTriggerWarningPopup.value = false;
                 bTriggerSuccessPopup.value = true;
+                uploadImg();
             }
         })
 }
 
 function sendTicket() {
-    if (sSubject.value === '' || sSelectedCategory.value === '')
+    if (sSubject.value === '' || sSelectedCategory.value === '' || sSelectedCategory.value === 'Categoría')
         bTriggerErrorPopup.value = true;
     if (sDescription.value === '')
         bTriggerWarningPopup.value = true;
@@ -172,36 +180,21 @@ function sendTicket() {
 
 function onImageUpload() {
     formData = new FormData();
-
+    bIsFileSelected.value = true;
     console.log(uploadImage.value.files[0].name);
     let file = uploadImage.value.files[0];
-    formData.append("file[]", file);
+    formData.append("file", file);
 
     //uploadImg()
 }
 
 async function uploadImg() {
-    formData.append('id', ticket.value._iId);
-    axios.post("http://localhost:8000/api/uploadEventImages", formData, {
+    formData.append('id', iTicketId);
+    axios.post("http://localhost:8000/api/uploadTicketImage", formData, {
         'content-type': 'form-data'
     })
         .then(response => {
             console.log(response.data);
-            axios.get("http://localhost:8000/api/getEventPhotos/" + event.value._iId)
-                .then(response => {
-                    aEventPhotos.value = response.data;
-                })
-            aAssistantIds.value.forEach(iId => {
-                if (iId != userStore.person._iId) {
-                    axios.post("http://localhost:8000/api/newNotification", {
-                        sInfo: "¡" + userStore.person._sName + " ha compartido una o varias fotos en un evento en el que has participado!",
-                        iRecipientId: iId,
-                        iIssuerId: userStore.person._iId,
-                        sType: "NewEventPhoto",
-                        iEventId: event.value._iId
-                    })
-                }
-            })
         })
 }
 </script>
@@ -284,7 +277,7 @@ async function uploadImg() {
 .form-field:invalid {
     box-shadow: none;
 }
-
+/* 
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -305,7 +298,7 @@ select {
 
 select::-ms-expand {
     display: none;
-}
+} */
 
 .select {
     position: relative;
@@ -333,5 +326,4 @@ select::-ms-expand {
 .select:hover::after {
     color: #23b499;
 }
-
 </style>

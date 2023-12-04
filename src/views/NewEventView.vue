@@ -12,7 +12,7 @@
         </div> -->
         <div class="mt-4">
             <!-- <h3 class="fw-bold">Inicia un nuevo evento</h3> -->
-            <h3 class="fw-bold ">Conviértete en el anfitrión de un evento para conocer nuevas personas.</h3>
+            <h3 class="fw-bold ">Conviértete en el anfitrión de un evento para reunir personas con tus mismos gustos.</h3>
             <div class="hline mt-2"></div>
         </div>
         <form @submit.prevent="submitEvent">
@@ -142,7 +142,11 @@
             </div>
         </div>
     </form>
-    </div>
+</div>
+<div class="alert alert-danger alert-dismissible fade show fixed-bottom" role="alert" v-if="sErrorMessage != ''">
+    {{ sErrorMessage }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="sErrorMessage = ''"></button>
+</div>
 </template>
 
 
@@ -153,6 +157,7 @@ import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { useRouter } from 'vue-router';
+import moment from 'moment';
 const userStore = useUserStore();
 const router = useRouter();
 let sLocationToSearch = ref('');
@@ -205,43 +210,57 @@ function selectLocation(location) {
     aLocations.value = [];
 }
 
-function submitEvent() {
+function isDatetimeValid() {
+    let bIsValid = true;
+    console.log("Comprobando fecha")
+    if(moment(tCelebrationDate.value).isBefore(moment(Date.now()))) 
+        bIsValid = false;
+    console.log("A devolver: " + bIsValid)
+    return bIsValid;
+}
 
+function submitEvent() {
     let iUserId = userStore.person._iId;
     let sLocationName = selectedLocation.value === null ? "" : selectedLocation.value.display_name;
     console.log(sLocationName)
     console.log(bIsOnline.value)
-    let eventDTO = {
-        sTitle: sTitle.value,
-        tCelebratedAt: tCelebrationDate.value,
-        tCelebrationHour: tCelebrationHour.value,
-        sDescription: sDescription.value,
-        iOrganizerId: iUserId,
-        setInterests: aCheckedInterests.value,
-        sLocationName, //: selectedLocation.value != null ? selectedLocation.value.display_name : "",
-        dLatitude: selectedLocation.value != null ? selectedLocation.value.lat : -1.00,
-        dLongitude: selectedLocation.value != null ? selectedLocation.value.lon : -1.00,
-        sProvinceName: sProvinceName != null ? sProvinceName : "",
-        bIsOnline: bIsOnline.value
-    }
-    if((selectedLocation.value != null && !bIsOnline.value) || (bIsOnline.value)) {
-        axios.post("http://localhost:8000/api/newEvent", eventDTO)
-        .then(response => {
-            console.log("Response: " + response.data)
-            formData.append('id', response.data);
-            console.log("FormData: " + formData.get('id'))
-            if(formData.get('file') != null) {
-                axios.post("http://localhost:8000/api/uploadEventHeaderImage", formData, {
-                    'content-type': 'form-data'
-                })
-                .then(response => {
-                    console.log(response.data);
-                })
-            }
-            router.push("/events/" + response.data)
-        })
+    if(isDatetimeValid()) {
+        let eventDTO = {
+            sTitle: sTitle.value,
+            tCelebratedAt: tCelebrationDate.value,
+            tCelebrationHour: tCelebrationHour.value,
+            sDescription: sDescription.value,
+            iOrganizerId: iUserId,
+            setInterests: aCheckedInterests.value,
+            sLocationName, //: selectedLocation.value != null ? selectedLocation.value.display_name : "",
+            dLatitude: selectedLocation.value != null ? selectedLocation.value.lat : -1.00,
+            dLongitude: selectedLocation.value != null ? selectedLocation.value.lon : -1.00,
+            sProvinceName: sProvinceName != null ? sProvinceName : "",
+            bIsOnline: bIsOnline.value
+        }
+        if((selectedLocation.value != null && !bIsOnline.value) || (bIsOnline.value)) {
+            axios.post("http://localhost:8000/api/newEvent", eventDTO)
+            .then(response => {
+                let iNewEventId = response.data;
+                formData.append('id', response.data);
+                console.log("FormData: " + formData.get('id'))
+                if(formData.get('file') != null) {
+                    axios.post("http://localhost:8000/api/uploadEventHeaderImage", formData, {
+                        'content-type': 'form-data'
+                    })
+                    .then(response => {
+                        router.push("/events/" + iNewEventId);
+                    })
+                } else {
+                    router.push("/events/" + iNewEventId);
+                }
+            })
+        } else {
+            sErrorMessage.value = "Error. Seleccione una localización para el evento.";
+        }
     } else {
-        sErrorMessage.value = "Error. Seleccione una localización para el evento.";
+        sErrorMessage.value = "Error. Seleccione una fecha válida.";
+        console.log(sErrorMessage.value)
     }
 }
 

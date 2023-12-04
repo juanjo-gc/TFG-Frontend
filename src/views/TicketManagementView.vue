@@ -16,8 +16,13 @@
         <div class="row mt-4">
             <h4 class="mb-4">Filtros</h4>
             <div class="col-md-4">
-                <input type="input" class="form-field ms-2" :placeholder="'Buscar por asunto'" name="name" id='name'
-                    v-model="sSubjectToSearch" @keyup="findTicketsBySubject" @click="sSubjectToSearch = ''" />
+                <div class="mb-3">
+                    <!-- <label for="ticketSubject" class="form-label">Asunto</label> -->
+                    <input type="text" class="form-control form-control-lg" id="ticketSubject" placeholder="Buscar por asunto..."
+                        v-model="sSubjectToSearch" @keyup="findTicketsBySubject" @click="sSubjectToSearch = ''">
+                </div>
+                <!-- <input type="input" class="form-field ms-2" :placeholder="'Buscar por asunto'" name="name" id='name'
+                    v-model="sSubjectToSearch" @keyup="findTicketsBySubject" @click="sSubjectToSearch = ''" /> -->
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-2">
@@ -34,12 +39,16 @@
             </div>
             <div class="col-md-4">
                 <!-- <p class="fs-5 mt-1" style="margin-top: 6px;">Categoría</p> -->
-                <div class="select">
+                <!-- <div class="select">
                     <select name="format" id="format" v-model="sSelectedCategory" @change="filterByCategory">
                         <option selected disabled>Categoría</option>
                         <option v-for="category in aCategories" :value="category._sName">{{ category._sName }}</option>
                     </select>
-                </div>
+                </div> -->
+                <select class="form-select mt-1" aria-label="Default select example" v-model="sSelectedCategory" @change="filterByCategory">
+                    <option>Seleccionar categoría</option>
+                    <option v-for="category in aCategories" :value="category._sName">{{ category._sName }}</option>
+                </select>
             </div>
             <div class="row mt-4">
                 <h4>Resultados:</h4>
@@ -104,31 +113,32 @@ let aOpenedTickets = ref([]);
 let aClosedTickets = ref([]);
 let bIsOpen = ref(true);
 let bTicketsOrderedByDateAsc = ref(true);
-let sSubjectToSearch = ref("Buscar por asunto...");
-let sSelectedCategory = ref('Categoría');
+let sSubjectToSearch = ref('');
+let sSelectedCategory = ref('Seleccionar categoría');
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getAdminTickets/" + userStore.person._iId)
-    .then(response => {
-        response.data.forEach(ticket => {
-            ticket._bIsOpen ? aOpenedTickets.value.push(ticket) : aClosedTickets.value.push(ticket);
-        })
-        aOpenedTicketsBackup = aOpenedTickets.value;
-        aClosedTicketsBackup = aClosedTickets.value;
-        console.log(aOpenedTicketsBackup)
-    });
+    let sLink = userStore.person._sRole === 'Admin' ? "http://localhost:8000/api/getAdminTickets/" + userStore.person._iId : "http://localhost:8000/api/getUserTickets/" + userStore.person._iId;
+    axios.get(sLink)
+        .then(response => {
+            response.data.forEach(ticket => {
+                ticket._bIsOpen ? aOpenedTickets.value.push(ticket) : aClosedTickets.value.push(ticket);
+            })
+            aOpenedTicketsBackup = aOpenedTickets.value;
+            aClosedTicketsBackup = aClosedTickets.value;
+            console.log(aOpenedTicketsBackup)
+        });
 
     axios.get("http://localhost:8000/api/getAllCategories")
-    .then(response => {
-        aCategories.value = response.data;
-        aCategories.value = aCategories.value.filter(category => category._sName != "Borrada previamente")
-    });
+        .then(response => {
+            aCategories.value = response.data;
+            aCategories.value = aCategories.value.filter(category => category._sName != "Borrada previamente")
+        });
 
 
 })
 
 function orderAscDesc(bToggled) {
-    if(bToggled)
+    if (bToggled)
         bTicketsOrderedByDateAsc.value = !bTicketsOrderedByDateAsc.value;
     aOpenedTickets.value = aOpenedTickets.value.reverse();
     aClosedTickets.value = aClosedTickets.value.reverse();
@@ -136,16 +146,19 @@ function orderAscDesc(bToggled) {
 
 function filterByCategory() {
     console.log(sSelectedCategory.value)
-    if(sSelectedCategory.value != 'Categoría') {
+    if (sSelectedCategory.value != 'Seleccionar categoría') {
         aOpenedTickets.value = aOpenedTicketsBackup;
         aClosedTickets = aClosedTicketsBackup;
         aOpenedTickets.value = aOpenedTicketsBackup.filter(ticket => ticket._category._sName === sSelectedCategory.value);
         aClosedTickets.value = aClosedTicketsBackup.filter(ticket => ticket._category._sName === sSelectedCategory.value);
+    } else {
+        aOpenedTickets.value = aOpenedTicketsBackup;
+        aClosedTickets.value = aClosedTicketsBackup;
     }
 }
 
 function proccessDescription(sDescription) {
-    if(sDescription.length > 150)
+    if (sDescription.length > 150)
         return sDescription.slice(0, 150);
     else
         return sDescription;
@@ -163,17 +176,17 @@ function toggleSelectedClose() {
 }
 
 function findTicketsBySubject() {
-    if(sSubjectToSearch.value.length > 3) {
-        if(bIsOpen.value)
+    if (sSubjectToSearch.value.length > 3) {
+        if (bIsOpen.value)
             aOpenedTickets.value = aOpenedTickets.value.filter(ticket => {
-                let regEx = new RegExp(sSubjectToSearch.value, 'gi');
-                if(ticket._sSubject.match(regEx))
+                let regEx = new RegExp('^.*' +sSubjectToSearch.value + '.*$');
+                if (ticket._sSubject.match(regEx))
                     return ticket;
             })
     } else {
-        if(bIsOpen.value)
+        if (bIsOpen.value)
             aOpenedTickets.value = aOpenedTicketsBackup;
-        else 
+        else
             aClosedTickets.value = aClosedTicketsBackup;
     }
     console.log(aOpenedTickets.value)
@@ -243,11 +256,11 @@ function findTicketsBySubject() {
     color: transparent;
 }
 
-.form-field:placeholder-shown~.form-label {
+/* .form-field:placeholder-shown~.form-label {
     font-size: 1.3rem;
     cursor: text;
     top: 20px;
-}
+} */
 
 .form-label {
     position: absolute;
@@ -284,7 +297,7 @@ function findTicketsBySubject() {
 }
 
 
-select {
+/* select {
     -webkit-appearance: none;
     -moz-appearance: none;
     -ms-appearance: none;
@@ -304,7 +317,7 @@ select {
 
 select::-ms-expand {
     display: none;
-}
+} */
 
 .select {
     position: relative;
@@ -331,4 +344,5 @@ select::-ms-expand {
 
 .select:hover::after {
     color: #23b499;
-}</style>
+}
+</style>

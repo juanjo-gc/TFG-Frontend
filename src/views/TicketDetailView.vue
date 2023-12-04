@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <div class="col-md-5"></div>
-                <div class="col-md-2">
+                <div class="col-md-2" v-if="userStore.person._sRole === 'Admin'">
                     <button type="button" class="btn btn-danger" @click="deleteRestorePost(true)"
                         v-if="!bIsDeleted">Eliminar publicacion</button>
                     <button type="button" class="btn btn-primary" @click="deleteRestorePost(false)" v-else>Restaurar
@@ -60,9 +60,26 @@
                     </div>
                     </div>
                     <div class="col-md-5"></div>
-                    <div class="col-md-2">
+                    <div class="col-md-2" v-if="userStore.person._sRole === 'Admin'">
                         <button type="button" class="btn btn-primary mt-3" @click="router.push('/events/' + ticket._event._iId)">Moderar evento</button>
                     </div>
+            </div>
+            <div class="row mt-2" v-if="ticket._reported != null && ticket._category._sName === 'Denunciar un usuario'">
+                <div class="d-flex justify-content-center">
+                    <div class="dt-element border border-secondary p-3">
+                        <p class="fw-bold">Datos del usuario:</p>
+                        <div class="row">
+                            <div class="col-md-2"><strong>ID: </strong>{{ ticket._reported._iId }}</div>
+                            <div class="col-md-6"><strong>Nombre de usuario: </strong> @{{ ticket._reported._sUsername }}</div>
+                            <div class="col-md-4"><strong>Nombre: </strong>{{ ticket._reported._sName }}</div>
+                        </div>
+                            <p class="mt-4" v-if="ticket._reported._sDescription != null"><strong>Descripción: </strong>{{ ticket._reported._sDescription }}</p>
+                    </div>
+                </div>
+                <div class="col-md-5"></div>
+                <div class="col-md-2 mt-4">
+                    <button type="button" class="btn btn-primary" @click="router.push('/admin/manage/users/' + ticket._reported._iId)">Gestionar perfil</button>
+                </div>
             </div>
             <!-- <div class="d-flex mt-2 justify-content-center" v-if="ticket._event != null">
                 <div class="dt-element mt-2">
@@ -211,6 +228,7 @@ let fsImage = ref({
 })
 
 onMounted(() => {
+    console.log(ticket._imagePath != null)
     axios.get("http://localhost:8000/api/getTicket/" + route.params.ticketId)
         .then(response => {
             ticket.value = response.data;
@@ -255,17 +273,22 @@ function deleteRestorePost(bWantToDelete) {
 
 function sendReply() {
     console.log("Se envia " + console.log(ticket.value._bIsOpen))
-    if (ticket.value._bIsOpen)
+    if (ticket.value._bIsOpen && !isBlank(sReply.value))
         axios.post("http://localhost:8000/api/newReply", {
             sText: sReply.value,
             iPersonId: userStore.person._iId,
             iTicketId: ticket.value._iId
         })
             .then(response => {
-                aReplies.value.push(response.data);
+                let reply = response.data;
+                let replyImage = null;
                 sReply.value = '';
-                if (uploadImage.value.files[0] != null)
-                    uploadImg(response.data._iId);
+                if (uploadImage.value.files[0] != null) 
+                    replyImage = uploadImg(response.data._iId);
+                if(replyImage != null)
+                    reply._imagePath = replyImage;
+                aReplies.value.push(reply);
+                console.log(reply);
                 setTimeout(() => {
                     main.value.scrollTop = main.value.scrollHeight;
                 }, 500);
@@ -301,12 +324,32 @@ function onImageUpload() {
 
 async function uploadImg(iId) {
     formData.append('id', iId);
-    axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
-        'content-type': 'form-data'
-    })
-        .then(response => {
-            console.log("Imagen bien subida?" + response.data);
-        })
+    let image = await axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
+         'content-type': 'form-data'
+    });
+    // axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
+    //     'content-type': 'form-data'
+    // })
+    //     .then(response => {
+    //         sFilename.value = "";
+    //         image = response.data;
+    //     })
+    // setTimeout(() => {
+    //     return image;
+    // }, 250);
+
+    return image.data;
+}
+
+function isBlank(str) {
+    let bIsBlank = true;
+    let i = 0;
+    while(i < str.length && bIsBlank) {
+        if(str.charAt(i) != ' ')
+            bIsBlank = false;
+        i++;
+    }
+    return bIsBlank;
 }
 
 </script>

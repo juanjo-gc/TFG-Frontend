@@ -1,21 +1,35 @@
 <template>
-<SidebarFinal></SidebarFinal>
-<div class="container">
-        <h2 class="mt-4 fw-formal">Explorar eventos</h2>
-        <div class="row mt-3 ms-1">
+    <SidebarFinal></SidebarFinal>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <h2 class="mt-4 fw-formal">Explorar eventos</h2>
+            </div>
+            <div class="col-md-7 mt-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="fw-light mt-2 text-end">¿No encuentras ningún evento que te interese? ¡Crea tú uno mismo!</p>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-outline-primary" @click="router.push('/newEvent')">Crear evento</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4 ms-1">
             <div class="col-sm-3">
                 <h5 class="fw-bold">Filtros</h5>
                 <div class="mt-3">
                     <p class="fw-bold">Intereses del evento</p>
-                    <ul class="list-unstyled" v-if="userStore.person._setInterests.length != 0">
+                    <ul class="list-unstyled">
                         <li v-for="interest in asInterests">
                             <input type="checkbox" :value="interest" v-model="aCheckedInterests"> <span
                                 class="small text-muted">{{ interest }}</span>
                         </li>
                     </ul>
-                    <div class="col-6" v-else>
+                    <!-- <div class="col-6" v-else>
                         <p class="text-muted">Selecciona al menos un interés para poder usar el filtro</p>
-                    </div>
+                    </div> -->
                     <div class="mt-3">
                         <input type="checkbox" id="checkbox" v-model="bIsOnline">
                         <label for="checkbox">
@@ -24,17 +38,17 @@
                     </div>
                     <div class="mt-2" v-if="!bIsOnline">
                         <p class="fw-bold">País</p>
-                        <select v-model="sSelectedCountry">
+                        <select class="form-select w-75" v-model="sSelectedCountry">
                             <option :value="null">Cualquiera</option>
                             <option v-for="country in aCountries" :value="country._sName">{{ country._sName }}</option>
                         </select>
                         <p class="mt-3 fw-bold">Comunidad Autónoma</p>
-                        <select v-model="sSelectedRegion">
+                        <select class="form-select w-75" v-model="sSelectedRegion">
                             <option :value="null">Cualquiera</option>
                             <option v-for="region in aRegions" :value="region._sName">{{ region._sName }}</option>
                         </select>
                         <p class="mt-3 fw-bold">Provincia</p>
-                        <select v-model="sSelectedProvince">
+                        <select class="form-select w-75" v-model="sSelectedProvince">
                             <option :value="null">Cualquiera</option>
                             <option v-for="province in aProvinces" :value="province._sName">{{ province._sName }}</option>
                         </select>
@@ -42,21 +56,34 @@
                 </div>
                 <button type="button" class="btn btn-primary mt-3" @click="sendFilter">Filtrar</button>
             </div>
-            <div class="col-md-9 ">
+            <div class="col-md-9">
                 <div class="row mt-2">
                     <div class="col-md-8">
                         <p class="fw-bold">Buscar por título:</p>
-                        <input type="text" class="mb-3" v-model="sEventTitle" @keyup="filterByName">
+                        <!-- <label for="title" class="form-label">Título del evento</label> -->
+                        <input type="text" class="mb-3 form-control" id="title" v-model="sEventTitle" @keyup="filterByName">
                     </div>
                 </div>
                 <div class="row mt-3">
                     <h5 class="fw-formal">Resultados de la búsqueda:</h5>
-                    <ul class="list-unstyled">
+                    <ul class="list-unstyled" v-if="aEvents.length != 0">
                         <li v-for="event in aEvents">
                             <div class="row mt-2 p-2 grey-border clickable" @click="router.push('/events/' + event._iId)"
-                            v-if="event._tDeleteDate === null">
-                                <h6 class="ms-2 fw-bold">{{ event._sTitle }}</h6>
-                                <p class="ms-2 small"><strong>Organizado por:</strong> {{ event._organizer._sUsername }}</p>
+                                v-if="event._tDeleteDate === null">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <h6 class="ms-2 fw-bold">{{ event._sTitle }}</h6>
+                                        <p class="ms-2 small"><strong>Organizado por:</strong> {{
+                                            event._organizer._sUsername }}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="text-muted" v-if="event._location != null">
+                                            <strong>Celebrado en: </strong>{{ event._location._province._sName }}, {{
+                                                event._location._province._region._sName }}, {{event._location._province._region._country._sName }}
+                                        </p>
+                                        <p class="text-muted float-end" v-else><strong>Evento online</strong></p>
+                                    </div>
+                                </div>
                                 <p class="ms-2 mt-1">{{ event._sDescription }}</p>
                                 <p class="mt-2 fw-bold" v-if="event._setInterest.length != 0">Intereses relacionados:</p>
                                 <ul class="list-group list-group-horizontal">
@@ -67,6 +94,7 @@
                             </div>
                         </li>
                     </ul>
+                    <p class="fw-light" v-else>No hay eventos disponibles con estas opciones de filtrado.</p>
                 </div>
             </div>
         </div>
@@ -103,16 +131,16 @@ let currentSearch = {};
 onMounted(() => {
     //axios.get("http://localhost:8000/api/getFilteredEvents/1")
     axios.get("http://localhost:8000/api/getAllInterestNames")
-    .then(response => asInterests = response.data)
+        .then(response => asInterests = response.data)
 
     axios.get("http://localhost:8000/api/getAllCountries")
-    .then(response => aCountries.value = response.data)
-        
+        .then(response => aCountries.value = response.data)
+
     axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
-    .then(response => aRegions.value = response.data)
-        
+        .then(response => aRegions.value = response.data)
+
     axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
-    .then(response => aProvinces.value = response.data)
+        .then(response => aProvinces.value = response.data)
 
     console.log("Region: " + sSelectedRegion.value);
     console.log("Provincia: " + sSelectedProvince.value)
@@ -147,7 +175,7 @@ onMounted(() => {
 function filterByName() {
     aEvents.value = aEventsBackup.filter((event) => {
         let regEx = new RegExp(sEventTitle.value, 'gi');
-        if(event._sTitle.match(regEx))
+        if (event._sTitle.match(regEx))
             return event;
     });
     if (sEventTitle.length === 0) {
@@ -240,8 +268,8 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
 </script>
 
 <style scoped>
+/*
 input[type=text] {
-    /* border-radius: 5px; */
     border: 0;
     border-bottom: 1px solid black;
     width: 100%;
@@ -253,6 +281,7 @@ input[type=text]:focus {
     border-bottom: solid 1px black;
     width: 100%;
 }
+*/
 
 .interest-item {
     padding: 5px;
@@ -275,5 +304,4 @@ input[type=text]:focus {
 
 .blackb {
     border: solid 1px black;
-}
-</style>
+}</style>

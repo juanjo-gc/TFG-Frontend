@@ -245,7 +245,7 @@ let sUsername = ref(userStore.person._sUsername);
 let sName = ref(userStore.person._sName);
 let sProvince = ref(userStore.person._province._sName);
 let userProvince = ref(null);
-let sDescription = ref(userStore.person._sDescription);
+let sDescription = ref(userStore.person._sDescription != null ? userStore.person._sDescription : "");
 let sEmail = ref(userStore.person._sEmail);
 let uploadImage = ref(null);
 let profileImg = ref(null);

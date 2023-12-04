@@ -8,7 +8,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <PostComponent :post="post" @report="setPopup" v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
+            <PostComponent :post="post" :clickable="false" @report="setPopup" v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
             <div class="row mt-2" v-else>
               <p class="fs-4 fw-light mt-2" v-if="post._tDeleteDate != null">Esta publicación ha sido eliminada.</p>
               <p class="fs-4 fw-light mt-2" v-if="post._user._bIsSuspended">Esta pertenece a una cuenta que ha sido eliminada.</p>

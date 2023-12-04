@@ -151,16 +151,18 @@
                                     <label for="provinceName" class="form-label mt-2">Nombre provincia</label>
                                     <p class="mt-2 small">El nombre de la provincia a registrar</p>
                                 </div>
-                                <div class="select mt-4">
-                                    <select name="format" id="format" v-model="sSelectedRegion">
+                                <!-- <div class="select mt-4"> -->
+                                    <select class="form-select w-75" name="format" id="format" v-model="sSelectedRegion">
                                         <option selected disabled>Comunidad autónoma</option>
                                         <option v-for="region in aRegions" :value="region._sName">{{
                                             region._sName }}</option>
                                     </select>
-                                </div>
+                                <!-- </div> -->
                                 <p class="small mt-2">La comunidad autónoma a la que pertenece la provincia</p>
-                                <button type="button" class="btn btn-primary float-end"
+                                <div class="col-md-10">
+                                    <button type="button" class="btn btn-primary float-end"
                                     @click="createEntity('province')">Enviar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -195,13 +197,13 @@
                                             id='provinceName' v-model="currentEntity._sName" />
                                         <label for="provinceName" class="form-label mt-2">Nombre provincia</label>
                                         <p class="mt-2 small">El nombre de la provincia</p>
-                                        <div class="select mt-4 mb-3">
-                                            <select name="format" id="format" v-model="sSelectedRegion">
+                                        <!-- <div class="select mt-4 mb-3"> -->
+                                            <select class="form-select w-75" name="format" id="format" v-model="sSelectedRegion">
                                                 <option selected disabled>Comunidad autónoma</option>
                                                 <option v-for="region in aRegions" :value="region._sName">{{
                                                     region._sName }}</option>
                                             </select>
-                                        </div>
+                                        <!-- </div> -->
                                         <p class="small">La comunidad autónoma a la que pertenece la provincia</p>
                                         <button type="button" class="btn btn-secondary mt-2"
                                             @click="currentEntity = {}; bIsBeingModified = false; sSelectedRegion = 'Comunidad autónoma'">Volver</button>
@@ -224,17 +226,19 @@
                                         id='regionName' v-model="sRegionName" />
                                     <label for="regionName" class="form-label mt-2">Nombre comunidad autónoma</label>
                                     <p class="mt-2 small">El nombre de la Comunidad a registrar</p>
-                                    <div class="select mt-4 mb-3">
-                                        <select name="format" id="format" v-model="sSelectedCountry">
+                                    <!-- <div class="select mt-4 mb-3"> -->
+                                        <select class="form-select w-75" name="format" id="format" v-model="sSelectedCountry">
                                             <option selected disabled>País</option>
                                             <option v-for="country in aCountries" :value="country._sName">{{
                                                 country._sName }}</option>
                                         </select>
-                                    </div>
+                                    <!-- </div> -->
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-primary float-end"
+                            <div class="col-md-9">
+                                <button type="button" class="btn btn-primary float-end mt-4"
                                 @click="createEntity('region')">Enviar</button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -268,13 +272,13 @@
                                             id='regionName' v-model="currentEntity._sName" />
                                         <label for="regionName" class="form-label mt-2">Nombre comunidad</label>
                                         <p class="mt-2 small">El nombre de la comunidad autónoma</p>
-                                        <div class="select mt-4 mb-3">
-                                            <select name="format" id="format" v-model="sSelectedCountry">
+                                        <!-- <div class="select mt-4 mb-3"> -->
+                                            <select class="form-select w-75" name="format" id="format" v-model="sSelectedCountry">
                                                 <option selected disabled>País</option>
                                                 <option v-for="country in aCountries" :value="country._sName">{{
                                                     country._sName }}</option>
                                             </select>
-                                        </div>
+                                        <!-- </div> -->
                                         <p class="small">El país al que pertenece la comunidad autónoma</p>
                                         <button type="button" class="btn btn-secondary mt-2"
                                             @click="currentEntity = {}; bIsBeingModified = false; sSelectedCountry = 'País'">Volver</button>
@@ -941,7 +945,7 @@ function deleteEntity(sEntityType, entityToDelete) {
                         sInformation: "Se ha eliminado el interés con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
-                    aCategories.value = aCategories.value.filter(item => {
+                    aInterests.value = aInterests.value.filter(item => {
                         if (item._iId != entityToDelete._iId)
                             return item;
                     })
@@ -955,7 +959,7 @@ function deleteEntity(sEntityType, entityToDelete) {
                         sInformation: "Se ha eliminado la provincia con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
-                    aCategories.value = aCategories.value.filter(item => {
+                    aProvinces.value = aProvinces.value.filter(item => {
                         if (item._iId != entityToDelete._iId)
                             return item;
                     })
@@ -969,7 +973,7 @@ function deleteEntity(sEntityType, entityToDelete) {
                         sInformation: "Se ha eliminado la comunidad autónoma con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
-                    aCategories.value = aCategories.value.filter(item => {
+                    aRegions.value = aRegions.value.filter(item => {
                         if (item._iId != entityToDelete._iId)
                             return item;
                     })
@@ -983,7 +987,7 @@ function deleteEntity(sEntityType, entityToDelete) {
                         sInformation: "Se ha eliminado el país con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
-                    aCategories.value = aCategories.value.filter(item => {
+                    aCountries.value = aCountries.value.filter(item => {
                         if (item._iId != entityToDelete._iId)
                             return item;
                     })
@@ -1114,7 +1118,7 @@ function deleteEntity(sEntityType, entityToDelete) {
     box-shadow: none;
 }
 
-
+/* 
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1135,7 +1139,7 @@ select {
 
 select::-ms-expand {
     display: none;
-}
+} */
 
 .select {
     position: relative;

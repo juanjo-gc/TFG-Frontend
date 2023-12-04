@@ -51,14 +51,15 @@ let aUserRoutes = ref([
     { name: 'Explorar eventos', route: '/events/explore', icon: "fa-solid fa-calendar", color: 'white' },
     { name: 'Descubrir personas', route: '/discover', icon: "fa-solid fa-people-robbery", color: 'white' },
     { name: 'Mensajes privados', route: '/messages', icon: "fa-solid fa-message", color: 'white' },
+    {name: 'Ayuda', route: '/help', icon:'fa-regular fa-circle-question', color: 'white'}
 ]);
 
 let aAdminRoutes = ref([
-    { name: 'Panel de administración', route: '/admin/dashboard', icon: "fa-solid fa-house", color: 'white' },
-    { name: 'Gestión de contenido', route: '/admin/manage/content', icon: "fa-solid fa-user", color: 'white' },
-    { name: 'Gestión de usuarios', route: '/admin/manage/users', icon: "fa-solid fa-calendar", color: 'white' },
-    { name: 'Gestión de tickets', route: '/admin/tickets', icon: "fa-solid fa-people-robbery", color: 'white' },
-    { name: 'Ver operaciones', route: '/adminOperations', icon: "fa-solid fa-message", color: 'white' },
+    { name: 'Panel de administración', route: '/admin/dashboard', icon: "fa-solid fa-table-columns", color: 'white' },
+    { name: 'Gestión de contenido', route: '/admin/manage/content', icon: "fa-solid fa-plus-minus", color: 'white' },
+    { name: 'Gestión de usuarios', route: '/admin/manage/users', icon: "fa-solid fa-user", color: 'white' },
+    { name: 'Gestión de tickets', route: '/admin/tickets', icon: "fa-solid fa-ticket", color: 'white' },
+    { name: 'Ver operaciones', route: '/adminOperations', icon: "fa-solid fa-list", color: 'white' },
 ])
 
 let aFinalRoutes = ref(userStore.person._sRole === 'User' ? aUserRoutes.value : aAdminRoutes.value);

@@ -17,18 +17,17 @@
                 <p class="small text-muted clickable">Respondiendo a @{{ post._repliesTo._user._sUsername }}</p>
             </div>
         </div>
-        <div class="media-body">
-            <p>{{ post._sText }}</p>
+        <div class="media-body" :class="{clickable: bIsClickable}">
+            <p  @click="router.push('/post/' + post._iId)">{{ post._sText }}</p>
             <div class="row">
                 <div class="col-md-3">
-                    <button class="btn float-end" style="background-color: transparent;">
+                    <button class="btn float-end" style="background-color: transparent;" @click="router.push('/post/' + post._iId)">
                         <font-awesome-icon icon="fa-regular fa-comment" size="sm" style="color: #1e3050;" /> {{ post._iReplies }}
                     </button>
                 </div>
                 <div class="col-md-3">
                     <button class="btn float-end" style="background-color: transparent;" @click="setLike(post._iId)">
-                        <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> {{ post._iLikes
-                        }}
+                        <font-awesome-icon icon="fa-solid fa-heart" size="sm" :style="{color: sLikeColor}" /> {{ post._iLikes }}
                     </button>
                 </div>
                 <div class="col-md-3" v-if="post._user._iId != userStore.person._iId">
@@ -52,14 +51,26 @@ import { useUserStore } from '@/store/UserStore';
 import moment from 'moment';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
 
-const props = defineProps(['post', 'admin']);
+const props = defineProps(['post', 'admin', 'clickable', 'liked']);
 const userStore = useUserStore();
 const router = useRouter();
 
 let post = props.post;
+let bIsClickable = props.clickable === undefined ? true : false;
 let bIsAdmin = props.admin === undefined ? false : props.admin;
+let bIsLiked = props.liked;
+let sLikeColor = ref(null);
 
+onMounted(() => {
+  if(bIsLiked === undefined) {
+    axios.get("http://localhost:8000/api/checkLike/" + post._iId + "/" + userStore.person._iId)
+    .then(response => sLikeColor.value = response.data ? '#8e0000' : '#1e3050')
+  } else {
+    sLikeColor.value = bIsLiked ? '#8e0000' : '#1e3050';
+  }
+})
 
 function reportPost(post) {
       axios.post("http://localhost:8000/api/newTicket", {
@@ -80,18 +91,20 @@ function reportPost(post) {
         .then(response => {
         if(response.data === true) {
           post._iLikes++;
+          sLikeColor.value = '#8e0000';
+          if (userStore.person._iId != post._user._iId) {
+            axios.post("http://localhost:8000/api/newNotification", {
+              sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
+              iRecipientId: post._user._iId,
+              iIssuerId: userStore.person._iId,
+              iPostId: post._iId,
+              sType: "NewPostLike"
+            })
+            .then(response => console.log(response.data))
+          }
         } else {
+          sLikeColor.value = '#1e3050';
           post._iLikes--;
-        }
-        if (userStore.person._iId != post._user._iId) {
-          axios.post("http://localhost:8000/api/newNotification", {
-            sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
-            iRecipientId: post._user._iId,
-            iIssuerId: userStore.person._iId,
-            iPostId: post._iId,
-            sType: "NewPostLike"
-          })
-          .then(response => console.log(response.data))
         }
       })
     }

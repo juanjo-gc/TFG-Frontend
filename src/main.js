@@ -10,8 +10,8 @@ import piniaPluginPersistedState from "pinia-plugin-persistedstate";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
-     faHeart,
-     faComment
+     faComment,
+     faCircleQuestion
 } from "@fortawesome/free-regular-svg-icons";
 
 import {
@@ -40,11 +40,17 @@ import {
      faEnvelopeOpenText,
      faPaperPlane,
      faEllipsisVertical,
+     faTableColumns,
+     faPlusMinus,
+     faTicket,
+     faList,
+     faHeart
+
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload, faAngleLeft,
           faAngleRight, faArrowUp, faArrowDown, faReply, faPen, faFlag, faTrashArrowUp, faBars, faHouse, faUser, faPeopleRobbery, faMessage,
-          faRightFromBracket, faEnvelopeOpenText, faPaperPlane, faEllipsisVertical);
+          faRightFromBracket, faEnvelopeOpenText, faPaperPlane, faEllipsisVertical, faCircleQuestion, faTableColumns, faPlusMinus, faTicket, faList, faHeart);
 
 
 createApp(App)

@@ -13,12 +13,22 @@
                 </MDBAccordion>
         </div>
         <div class="row mt-4" v-if="userStore.person._sRole === 'User'">
-            <p class="fs-6 text-center">¿No encuentras solución a tu problema? Ponte en contacto con nuestro soporte técnico e intentaremos ayudarte de la mejor manera posible.</p>
-            <div class="col-md-4"></div>
-            <div class="col-md-4 d-flex justify-content-center">
-                <button type="button" class="btn btn-primary w-75 p-2">Contactar</button>
+            <div class="row">
+                <p class="fs-6 text-center">¿No encuentras solución a tu problema? Ponte en contacto con nuestro soporte técnico e intentaremos ayudarte de la mejor manera posible.</p>
+                <div class="col-md-4"></div>
+                <div class="col-md-4 d-flex justify-content-center">
+                    <button type="button" class="btn btn-primary w-75 p-2" @click="router.push('/help/newTicket')">Contactar</button>
+                </div>
+                <div class="col-md-4"></div>
             </div>
-            <div class="col-md-4"></div>
+            <div class="row">
+                <p class="fs-6 text-center mt-4">Para ver las consultas activas con alguno de nuestros administradores, pulsa en el botón de abajo.</p>
+                <div class="col-md-4"></div>
+                <div class="col-md-4 d-flex justify-content-center">
+                    <button type="button" class="btn btn-primary w-75 p-2" @click="router.push('/help/myTickets')">Tickets</button>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -30,8 +40,10 @@ import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
 import { MDBAccordion, MDBAccordionItem } from "mdb-vue-ui-kit";
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const router = useRouter();
 let activeItem = ref('');
 let aFAQs = ref([]);
 

@@ -19,7 +19,7 @@
                     <!-- <p>Please login to your account</p> -->
                     <label class="form-label" for="email">Correo electrónico</label>
                     <div class="form-outline mb-4">
-                      <input type="email" id="email" class="form-control" v-model="email" @keyup="checkEmail" required/>
+                      <input type="email" id="email" class="form-control" v-model="email" @keyup="checkEmail" required />
                       <small class="text-muted" v-if="isEmailTaken">Esa dirección de correo ya está en uso.</small>
                     </div>
                     <label class="form-label" for="name">Nombre</label>
@@ -30,22 +30,47 @@
                     <label class="form-label" for="username">Usuario</label>
                     <div class="form-outline mb-4">
                       <input type="text" id="username" class="form-control"
-                        placeholder="Debe ser único y servirá para identificarte" v-model="username" @keyup="checkUsername" required/>
+                        placeholder="Debe ser único y servirá para identificarte" v-model="username"
+                        @keyup="checkUsername" required />
                       <small class="text-muted" v-if="isUsernameTaken">Ese nombre de usuario ya está en uso</small>
+                      <small class="text-muted" v-if="bIsUsernameIncorrect">El nombre de usuario no puede contener caracteres especiales ni espacios.</small>
                     </div>
                     <label class="form-label" for="password">Contraseña</label>
                     <div class="form-outline mb-4">
-                      <input type="password" id="password" class="form-control" v-model="password" required/>
+                      <input type="password" id="password" class="form-control" v-model="password" required />
                     </div>
                     <label class="form-label" for="password">Confirmar contraseña</label>
                     <div class="form-outline mb-4">
-                      <input type="password" id="confirmPassword" class="form-control" v-model="confirmPassword" required/>
+                      <input type="password" id="confirmPassword" class="form-control" v-model="confirmPassword"
+                        required />
                     </div>
                     <label class="form-label" for="birthDate">Fecha de nacimiento</label>
                     <div class="form-outline mb-4">
-                      <input type="date" id="birthDate" class="form-control" v-model="birthDate" required/>
+                      <input type="date" id="birthDate" class="form-control" v-model="birthDate" required />
                     </div>
-
+                    <div class="mb-3">
+                        <label class="form-label" for="province">Localización</label>
+                        <div class="row">
+                          <div class="col-md-4">
+                          <select class="form-select" aria-label="Default select example" v-model="sCountry" @change="getRegions()">
+                            <option selected disabled>País</option>
+                            <option :value="country._sName" v-for="country in aCountries">{{ country._sName }}</option>
+                          </select>
+                        </div>
+                        <div class="col-md-4">
+                          <select class="form-select" aria-label="Default select example" v-model="sRegion" :disabled="sCountry === 'País'" @change="getProvinces(sRegionName)">
+                            <option selected disabled>Comunidad autónoma</option>
+                            <option :value="region._sName" v-for="region in aFilteredRegions">{{ region._sName }}</option>
+                          </select>
+                        </div>
+                        <div class="col-md-4">
+                          <select class="form-select" aria-label="Default select example" v-model="sProvince" :disabled="sRegion === 'Comunidad autónoma'">
+                            <option selected disabled>Provincia</option>
+                            <option :value="province._sName" v-for="province in aFilteredProvinces">{{ province._sName }}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
                     <div class="text-center pt-1 mb-5 pb-1">
                       <!-- <router-link to="/"> -->
                       <button class="btn btn-primary btn-block fa-lg gradient-custom mb-3 btnLogin" type="submit">
@@ -64,15 +89,22 @@
         </div>
       </div>
     </section>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>Error. </strong>{{ sAlertMessage }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="bTriggerErrorAlert = false;"></button>
+</div>
   </div>
 </template>
 
 <script setup>
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import moment from 'moment';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const router = useRouter();
 let email = ref("");
 let name = ref("");
 let username = ref("");
@@ -80,58 +112,121 @@ let password = ref("");
 let confirmPassword = ref("");
 let birthDate = ref(new Date());
 let isUsernameTaken = ref(false);
+let bIsUsernameIncorrect = ref(false);
 let isEmailTaken = ref(false);
+let aCountries = ref([]);
+let aRegions = ref([]);
+let aProvinces = ref([]);
+let sProvince = ref("Provincia");
+let sRegion = ref("Comunidad autónoma");
+let sCountry = ref("País");
+let aFilteredRegions = ref([]);
+let aFilteredProvinces = ref([]);
+let bTriggerErrorAlert = ref(false);
+let sAlertMessage = ref("");
+
+onMounted(() => {
+  axios.get("http://localhost:8000/api/getAllCountries")
+    .then(response => aCountries.value = response.data);
+  axios.get("http://localhost:8000/api/getAllRegions")
+    .then(response => aRegions.value = response.data);
+  axios.get("http://localhost:8000/api/getAllProvinces")
+    .then(response => aProvinces.value = response.data);
+})
+
+function getRegions(sCountryName) {
+  // if(sCountry.value != 'País') {
+  //   sRegion.value = 'Comunidad autónoma';
+  //   sProvince.value = "Provincia";
+  // }
+  console.log(sCountry.value)
+  sRegion.value = 'Comunidad autónoma';
+  sProvince.value = "Provincia";
+  aFilteredRegions.value = aRegions.value.filter(region => region._country._sName === sCountry.value);
+  console.log(aFilteredRegions.value)
+}
+
+function getProvinces() {
+  // if(sRegion.value != 'Comunidad autónoma') {
+  //   sProvince.value = 'Provincia';
+  // }
+  sProvince.value = "Provincia";
+  aFilteredProvinces.value = aProvinces.value.filter(province => province._region._sName === sRegion.value);
+}
+
+function selectProvince(province) {
+  if(province._region._country._sName != sCountry.value) {
+    sRegion.value = province._region._sName;
+    sCountry.value = province._region._country._sName;
+    getRegions();
+    getProvinces();
+  }
+}
 
 async function checkEmail() {
   axios.post("http://localhost:8000/api/checkEmail", {
     sEmail: email.value
   })
-  .then( response => {
-    isEmailTaken.value = response.data
-  })
-  .catch( error => console.log(error))
+    .then(response => {
+      isEmailTaken.value = response.data
+    })
+    .catch(error => console.log(error))
 }
 
 async function checkUsername() {
-  axios.post("http://localhost:8000/api/checkUser", {
-    sUsername: username.value
-  })
-  .then( response => {
-    isUsernameTaken.value = response.data
-  })
-  .catch( error => console.log(error))
+  let whiteSpaceRegex = new RegExp(/\W+/);
+  let alphanumericRegex = new RegExp(/[a-zA-Z0-9]/);
+  if(username.value.match(whiteSpaceRegex) || !username.value.match(alphanumericRegex))
+    bIsUsernameIncorrect.value = true;
+  else
+    bIsUsernameIncorrect.value = false;
+
+  if(!bIsUsernameIncorrect.value) { //Enviar peticion si el mensaje es correcto
+    axios.post("http://localhost:8000/api/checkUser", {
+      sUsername: username.value
+    })
+    .then(response => {
+      isUsernameTaken.value = response.data
+    })
+    .catch(error => console.log(error))
+  }
 }
 
 
 async function registerUser() {
-  if(isUsernameTaken.value) {
-    alert("Error. El nombre de usuario ya se encuentra en uso.")
-  } else if(isEmailTaken.value) {
-    alert("Error. La dirección de correo ya se encuentra en uso.")
-
+  if (isUsernameTaken.value || bIsUsernameIncorrect.value) {
+    bTriggerErrorAlert.value = true;
+    sAlertMessage.value = isUsernameTaken.value ? "El nombre de usuario ya se encuentra en uso." : "Escribe un nombre de usuario correcto de acuerdo a las indicaciones";
+  } else if (isEmailTaken.value) {
+    bTriggerErrorAlert.value = true;
+    sAlertMessage.value ="La dirección de correo ya se encuentra en uso."
   } else if (password.value != confirmPassword.value) {
-    alert("Error. Las contraseñas deben coincidir.");
-  } else 
-    // if (new Date(birthDate.value.value.getFullYear() + 18, birthDate.value.getMonth() - 1, birthDate.value.getDay) > new Date()) { // menor de 18
-      if(password.value === "asdsdfhgtrwh") {
-        alert("Error. Debes ser mayor de edad para registrarte.")
+    bTriggerErrorAlert.value = true;
+    sAlertMessage.value ="Las contraseñas deben coincidir.";
+  } else if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now())) ) {
+      bTriggerErrorAlert.value = true;
+      sAlertMessage.value ="Debes ser mayor de edad para registrarte."
+    } else if(sProvince.value === 'Provincia') {
+      bTriggerErrorAlert.value = true;
+      sAlertMessage.value = "Asegúrate de elegir una localización correcta."
     } else {
+      console.log("hola")
       axios.post("http://localhost:8000/api/register", {
         sEmail: email.value,
         sName: name.value,
         sUsername: username.value,
         sPassword: password.value,
-        tBirthDate: birthDate.value
+        tBirthDate: birthDate.value,
+        sProvince: sProvince.value
       })
         .then(response => {
-          console.log(response)
-          alert(response.data);
+          router.push('/login')
         })
         .catch(error => {
           console.log(error);
         })
     }
-  }
+}
 
 </script>
 
@@ -155,8 +250,8 @@ async function registerUser() {
 }
 
 .backgroundPattern {
-  background: rgb(180,142,0);
-background: radial-gradient(circle, rgba(180,142,0,1) 0%, rgba(179,2,172,1) 100%); 
+  background: rgb(180, 142, 0);
+  background: radial-gradient(circle, rgba(180, 142, 0, 1) 0%, rgba(179, 2, 172, 1) 100%);
 }
 
 

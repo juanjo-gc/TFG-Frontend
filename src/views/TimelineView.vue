@@ -30,7 +30,7 @@
             <div class="card-body">
               <ul class="list-unstyled">
                 <li v-for="post in aPosts">
-                  <div class="media post-border" v-if="post._tDeleteDate === null && !post._user._bIsSuspended">
+                  <!-- <div class="media post-border" v-if="post._tDeleteDate === null && !post._user._bIsSuspended">
                     <div class="row">
                       <div class="col-md-1">
                         <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
@@ -57,13 +57,13 @@
                     </router-link>
                       <div class="row">
                         <div class="col-md-3">
-                          <button class="btn float-end" style="background-color: transparent;">
+                          <button class="btn float-end" style="background-color: transparent;" @click="router.push('/post/' + post._iId)">
                             <font-awesome-icon icon="fa-regular fa-comment" size="sm" style="color: #1e3050;" /> 0
                           </button>
                         </div>
                         <div class="col-md-3">
                           <button class="btn float-end" style="background-color: transparent;" @click="setLike(post)">
-                            <font-awesome-icon icon="fa-regular fa-heart" size="sm" style="color: #1e3050;" /> {{ post._iLikes }}
+                            <font-awesome-icon icon="fa-solid fa-heart" size="sm" style="color: #1e3050;" /> {{ post._iLikes }}
                           </button>
                         </div>
                         <div class="col-md-6">
@@ -73,8 +73,8 @@
                         </div>
                       </div>
                     </div>
-                  </div>
-                </li>
+                  </div> -->
+                  <PostComponent :post="post" @report="setPopup" v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>                </li>
               </ul>
             </div>
           </div>
@@ -85,6 +85,25 @@
           <p><strong>Error.</strong> El cuerpo de la publicación debe contener al menos un carácter alfanumérico.</p>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="bTriggerEmptyPostAlert = false"></button>
       </div>
+      <Popup v-if="bTriggerReportPopup">
+      <div class="row">
+        <div class="col-md-6">
+          <h4 class="mt-4">Denunciar una publicación</h4>
+        </div>
+        <div class="col-md-6">
+          <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="sm" style="color: #000000;"
+            @click="bTriggerReportPopup = false" />
+        </div>
+      </div>
+      <Post :post="reportedPost"></Post>
+      <p class="mt-4 fw-light">En caso de que sea necesario, incluye a continuación una breve descripción que detalle los
+        motivos de la denuncia.</p>
+      <div class="mb-3">
+        <label for="report" class="form-label">Motivo de la denuncia</label>
+        <textarea class="form-control" id="report" rows="3" v-model="sReportDescription"></textarea>
+      </div>
+      <button type="button" class="btn btn-primary float-end" @click="reportPost(reportedPost)">Enviar</button>
+    </Popup>
     </div>
   </template>
   
@@ -97,6 +116,7 @@
   import axios from "axios";
   import moment from 'moment';
 import { useRouter } from "vue-router";
+import PostComponent from "@/components/PostComponent.vue";
 
 
   const userStore = useUserStore();
@@ -106,6 +126,9 @@ import { useRouter } from "vue-router";
   let iPageNumber = ref(0);
   let iTotalPages = ref(-1);
   let bTriggerEmptyPostAlert = ref(false);
+  let sReportDescription = ref("");
+  let bTriggerReportPopup = ref(false);
+  let reportedPost = ref(null);
 
   function newPost() {
     if(!isBlank(sPost.value)) {
@@ -144,39 +167,65 @@ import { useRouter } from "vue-router";
     }).catch(error => console.log(error));
   }
 
-  function findIndex(id) {
-    let i = 0;
-    let bFound = false;
-    while(!bFound) {
-      if(aPosts.value[i]._iId === id)
-        bFound = true;
-      else
-        i++;
-    }
-    return i;
-  }
+  function setPopup(post) {
+  reportedPost.value = post;
+  bTriggerReportPopup.value = true;
+}
 
-  function setLike(post) {
-    console.log(post._iId)
-    axios.post("http://localhost:8000/api/setLike/" + post._iId + "/" + userStore.person._iId)
+
+function reportPost(post) {
+  //public TicketDTO(String sSubject, String sDescription, int iIssuerId, int iReportedId, int iEventId, int iPostId, String sCategory) {
+  console.log(sReportDescription._rawValue)
+  axios.post("http://localhost:8000/api/newTicket", {
+    sSubject: "Denuncia de publicación de @" + post._user._sUsername,
+    sDescription: sReportDescription._rawValue,
+    iIssuerId: userStore.person._iId,
+    iReportedId: post._user._iId,
+    iEventId: -1,
+    iPostId: post._iId,
+    sCategory: 'Denunciar una publicación'
+  })
     .then(response => {
-      let postIndex = findIndex(post._iId);
-
-      if(response.data === true) {
-        aPosts.value[postIndex]._iLikes++;
-        if(userStore.person._iId != post._user._iId) {
-          axios.post("http://localhost:8000/api/newNotification", {
-            sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
-            iRecipientId: post._user._iId,
-            iIssuerId: userStore.person._iId,
-            iPostId: post._iId
-          })
-        }
-      } else {
-        aPosts.value[postIndex]._iLikes--;
-      }
+      console.log(response.data)
+      bTriggerReportPopup.value = false;
+      sReportDescription.value = "";
     })
-  }
+}
+
+  // function findIndex(id) {
+  //   let i = 0;
+  //   let bFound = false;
+  //   while(!bFound) {
+  //     if(aPosts.value[i]._iId === id)
+  //       bFound = true;
+  //     else
+  //       i++;
+  //   }
+  //   return i;
+  // }
+
+
+  // function setLike(post) {
+  //   console.log(post._iId)
+  //   axios.post("http://localhost:8000/api/setLike/" + post._iId + "/" + userStore.person._iId)
+  //   .then(response => {
+  //     let postIndex = findIndex(post._iId);
+
+  //     if(response.data === true) {
+  //       aPosts.value[postIndex]._iLikes++;
+  //       if(userStore.person._iId != post._user._iId) {
+  //         axios.post("http://localhost:8000/api/newNotification", {
+  //           sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
+  //           iRecipientId: post._user._iId,
+  //           iIssuerId: userStore.person._iId,
+  //           iPostId: post._iId
+  //         })
+  //       }
+  //     } else {
+  //       aPosts.value[postIndex]._iLikes--;
+  //     }
+  //   })
+  // }
 
 
 window.onscroll = () => {

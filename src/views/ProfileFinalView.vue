@@ -1,11 +1,16 @@
 <template>
     <SidebarFinal></SidebarFinal>
-    <div class="container">
+    <div class="container" v-if="!bIsFetching">
         <div class="row mt-4">
             <div class="col-md-1"></div>
             <div class="col-md-10 border border-2 mx-4 p-4">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-2" v-if="bIsBlockedByPerson || bIsPersonBlocked">
+                        <img
+                            src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
+                            alt="" class="img-min-circle mt-2 mb-2" />
+                    </div>
+                    <div class="col-md-2" v-else>
                         <img :src="sProfileImageURL
                             // 'http://localhost:8000/api/getProfileImage/' + person._iId
                             // setProfileImageURL
@@ -23,33 +28,45 @@
                     </div>
                     <div class="col-md-4 ">
                         <div class="row mt-2">
-                            <div class="col-md-8" v-if="userStore.person._iId != person._iId">
+                            <div class="col-md-8" v-if="!bIsBlockedByPerson && !bIsPersonBlocked && userStore.person._iId != person._iId">
                                 <button type="button" class="btn btn-outline-primary mt-3 float-end" v-if="!bFollowed" @click="setFollow">Seguir</button>
                                 <button type="button" class="btn btn-secondary mt-3 float-end" v-else-if="!bFollowed && bIsPending" @click="setFollow">Pendiente</button>
                                 <button type="button" class="btn btn-secondary mt-3 float-end" v-else-if="bFollowed" @click="setFollow">Siguiendo</button>
                             </div>
                             <div class="col-md-8" v-else>
-                                <button type="button" class="btn btn-primary mt-3 float-end" @click="router.push('/editProfile')">Editar perfil</button>
+                                <button type="button" class="btn btn-primary mt-3 float-end" @click="router.push('/editProfile')" v-if="userStore.person._iId === person._iId">
+                                    Editar perfil
+                                </button>
                             </div>
-                            <div class="col-md-2 clickable" @click="bShowOptions = !bShowOptions"
+                            <div class="col-md-2" @click="bShowOptions = !bShowOptions"
                                 v-if="userStore.person._iId != person._iId">
-                                <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" size="xl"
-                                    class="mt-4 clickable ms-4" />
+                                <div class="justify-content-center align-content-center d-flex mt-3 options-button p-2">
+                                    <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" size="xl"
+                                    class="" />
+                                </div>
                             </div>
                             <div class="col-md-6"></div>
-                            <div class="col-md-6 mt-2" v-if="bShowOptions">
+                            <div class="col-md-6" v-if="bShowOptions">
                                 <ul class="list-unstyled border my-2">
-                                    <li><div class="dropdown-option  p-2">Bloquear usuario</div></li>
-                                    <li><div class="dropdown-option p-2">Denunciar usuario</div></li>
+                                    <li>
+                                        <div class="dropdown-option p-2" @click="setBlockReportPopup(true)">
+                                            <p v-if="!bIsPersonBlocked">Bloquear usuario</p>
+                                            <p v-else>Desbloquear usuario</p>
+                                        </div>
+                                    </li>
+                                    <li><div class="dropdown-option p-2" @click="setBlockReportPopup(false)">Denunciar usuario</div></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <p class="mt-2 ms-2">{{ person._sDescription }}</p>
+                        <p class="mt-2 ms-2 fw-light">{{ person._sDescription }}</p>
+                        <p class="mt-4">
+                            <strong>Ublicación: </strong>{{ person._province._sName }},  {{ person._province._region._sName }}, {{ person._province._region._country._sName }}
+                        </p>
                     </div>
                     <div class="col-md-3 ms-4">
-                        <div class="row">
+                        <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
                             <div class="col-md-4">
                                 <p class="mb-1 h5">{{ iNumPosts }}</p>
                                 <p class="small text-muted mb-0">Publicaciones</p>
@@ -71,7 +88,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-4">
+                <div class="row mt-2" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
                     <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory[0] }"
                         @click="selectCategory(0)">
                         <p class="m-2 p-2 text-center opt-text">Publicaciones</p>
@@ -89,18 +106,33 @@
                         <p class="m-2 p-2 text-center">Me gusta</p>
                     </div>
                 </div>
-                <!-- Publicaciones -->
-                <div class="row mt-4" v-if="abSelectedCategory[0]">
-                    <h5 class="mt-2 fs-light">Publicaciones de {{ person._sName }}</h5>
-                    <ul class="list-unstyled mt-2">
-                        <li v-for="post in aPosts">
-                            <PostComponent :post="post" @report="setReportPopup"
-                                v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
-                        </li>
-                    </ul>
+                <div class="row mt-4" v-else>
+                    <p class="fs-5 fw-light" v-if="bIsBlockedByPerson">
+                        Este usuario te ha bloqueado
+                    </p>
+                    <p class="fs-5 fw-light" v-else>
+                        Bloqueaste a este usuario
+                    </p>
                 </div>
-                <div class="row mt-4" v-if="abSelectedCategory[1]">
-                    <div class="row">
+                <!-- Publicaciones -->
+                <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
+                    <div class="row mt-4" v-if="abSelectedCategory[0]">
+                        <div class="row" v-if="!person._bIsPrivate || bFollowed">
+                            <h5 class="mt-2 fs-light">Publicaciones de {{ person._sName }}</h5>
+                            <ul class="list-unstyled mt-2">
+                                <li v-for="post in aPosts">
+                                    <PostComponent :post="post" @report="bTriggerReportPopup = true"
+                                    v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="row" v-else>
+                            <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                        </div>
+                    </div>
+                    <!-- Eventos -->
+                    <div class="row mt-4" v-if="abSelectedCategory[1]">
+                    <div class="row" v-if="!person._bIsPrivate || bFollowed">
                         <div class="col-md-12 mt-2">
                             <ul class="list-unstyled">
                                 <li v-for="event in aEvents">
@@ -117,6 +149,12 @@
                                                     <p class="text-muted">Organizado por: @{{
                                                         event._organizer._sUsername }}</p>
                                                 </h6>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <p class="text-muted" v-if="event._location != null">
+                                                    <strong>Celebrado en: </strong>{{ event._location._province._sName }}, {{ event._location._province._region._sName }}, {{ event._location._province._region._country._sName }}
+                                                </p>
+                                                <p class="text-muted float-end" v-else><strong>Evento online</strong></p>
                                             </div>
                                         </div>
                                         <div class="media-body">
@@ -143,51 +181,69 @@
                             </ul>
                         </div>
                     </div>
+                    <div class="row" v-else>
+                        <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                    </div>
                 </div>
-                <!-- Eventos -->
                 <!-- Informacion -->
                 <div class="row mt-4" v-if="abSelectedCategory[2]">
-                    <h5 class="mt-2 fs-light">Intereses de {{ person._sName }}</h5>
-                    <ul class="list-unstyled list-group list-group-horizontal mt-2 ms-4">
-                        <li v-for="interest in person._setInterests">
-                            <p class="ms-2 interest">{{ interest._sName }}</p>
+                        <h5 class="mt-2 fs-light">Intereses de {{ person._sName }}</h5>
+                        <ul class="list-unstyled list-group list-group-horizontal mt-2 ms-4">
+                            <li v-for="interest in person._setInterests">
+                                <p class="ms-2 interest">{{ interest._sName }}</p>
                         </li>
                     </ul>
-                    <h5 class="mt-2 fs-light">Fotos de {{ person._sName }}</h5>
-                    <div class="d-flex justify-content-center mt-4">
-                        <ul class="list-group list-group-horizontal list-unstyled">
-                            <li v-for="photo in person._setImagePath">
-                                <div class="blackb d-flex justify-content-center clickable"
-                                    @click="bTriggerFullscreenImage = true; fsImage = photo">
-                                    <img class="user-image m-1" :src="'http://localhost:8000/api/getImage/' + photo._sName"
-                                        alt="">
+                    <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
+                    <div class="row">
+                        <h5 class="mt-2 fs-light">Preguntas 'Conóceme' de {{ person._sName }}</h5>
+                        <ul class="mt-4">
+                            <li v-for="answer in aAMAnswers" class="ms-4">
+                                <div class="row mt-2">
+                                    <p class="fw-bold">{{ answer._question._sQuestion }}</p>
+                                    <p class="fw-light">{{ answer._sAnswer }}</p>
                                 </div>
                             </li>
                         </ul>
                     </div>
+                    <h5 class="mt-2 fs-light">Fotos de {{ person._sName }}</h5>
+                    <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
+                        <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos" @click="bTriggerFullscreenImage = true; fsImage = photo">
+                            <img class="user-image m-1" :src="'http://localhost:8000/api/getImage/' + photo._sName" alt=""
+                            v-if="photo._tDeleteDate === null">
+                        </div>
+                    </div>
+                    <div class="row" v-else>
+                        <p class="fw-light">El usuario no ha subido ninguna foto :&#40;</p>
+                    </div>
                 </div>
                 <!-- Me gusta -->
                 <div class="row mt-4" v-if="abSelectedCategory[3]">
-                    <h5 class="mt-2 fs-light">Me gusta de {{ person._sName }}</h5>
-                    <ul class="list-unstyled mt-2">
-                        <li v-for="post in aLikedPosts">
-                            <PostComponent :post="post" @report="setReportPopup"
+                    <div class="row" v-if="!person._bIsPrivate || bFollowed">
+                        <h5 class="mt-2 fs-light">Me gusta de {{ person._sName }}</h5>
+                        <ul class="list-unstyled mt-2">
+                            <li v-for="post in aLikedPosts">
+                                <PostComponent :post="post" @report="bTriggerReportPopup"
                                 v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
-                        </li>
-                    </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row" v-else>
+                        <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                    </div>
                 </div>
+            </div>
             </div>
         </div>
         <Popup v-if="bTriggerFullscreenImage">
             <div class="row">
                 <div class="col-md-12">
                     <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="m" style="color: #000000;"
-                        @click="bTriggerFullscreenImage = false" />
+                    @click="bTriggerFullscreenImage = false" />
                 </div>
                 <div class="col-md-1 d-flex">
                     <div class="row h-100">
                         <font-awesome-icon icon="fa-solid fa-angle-left" class="align-self-center clickable" size="xl"
-                            style="color: #000000;" @click="chooseAdjacentPhoto(false)" />
+                        style="color: #000000;" @click="chooseAdjacentPhoto(false)" />
                     </div>
                 </div>
                 <div class="col-md-10">
@@ -200,13 +256,40 @@
                 <div class="col-md-1 d-flex">
                     <div class="row h-100">
                         <font-awesome-icon icon="fa-solid fa-angle-right" class="align-self-center clickable" size="xl"
-                            style="color: #000000;" @click="chooseAdjacentPhoto(true)" />
+                        style="color: #000000;" @click="chooseAdjacentPhoto(true)" />
                     </div>
-
                 </div>
             </div>
         </Popup>
-    </div>
+        <Popup v-if="bTriggerBlockPopup || bTriggerReportPopup">
+            <div class="row">
+                <div class="col-md-12">
+                    <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="m" style="color: #000000;"
+                        @click="bTriggerBlockPopup = false; bTriggerReportPopup = false" />
+                </div>
+                <p class="mt-2 fw-light">{{ sPopupMessage }}</p>
+                <div class="mb-3" v-if="bTriggerReportPopup">
+                    <label for="report" class="form-label">Motivo de la denuncia</label>
+                    <textarea class="form-control" id="report" rows="3" v-model="sReportDescription"></textarea>
+                </div>
+                <div class="col-md-9"></div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger me-4" v-if="bTriggerReportPopup"
+                    @click="sendReport()">
+                    Denunciar
+                </button>
+                <button type="button" class="btn btn-danger " @click="blockUnblockUser" v-else>Bloquear</button>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-secondary ms-4" @click="bTriggerBlockPopup = false; bTriggerReportPopup = false" >Cancelar</button>
+            </div>
+        </div>
+    </Popup>
+</div>
+<div class="alert alert-success alert-dismissible fade show" role="alert" v-if="sReportSentAlert != ''">
+  {{ sReportSentAlert }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="sReportSentAlert = ''"></button>
+</div>
 </template>
     
 
@@ -226,7 +309,7 @@ const route = useRoute();
 let sProfileImageURL = ref("");
 const person = ref("");
 let bIsFetching = ref(true);
-let bFollowed = ref(true);
+let bFollowed = ref(false);
 let bPendingFollow = ref(false);
 let bShowPosts = ref(true);
 let aPosts = ref([]);
@@ -236,7 +319,6 @@ let iNumPosts = ref(null);
 let iNumFollowing = ref(null);
 let iNumFollowers = ref(null);
 let bShouldDisplayData = ref(false);
-let bTriggerReportPopup = ref(false);
 let sReportDescription = ref("");
 let aEventsBackup = [];
 let aPhotos = ref([]);
@@ -244,20 +326,33 @@ let fsImage = ref(null);
 let bTriggerFullscreenImage = ref(false);
 let bShowOptions = ref(false);
 let abSelectedCategory = ref([false, false, true, false]);
-
+let iInterests = ref(0);
+let aAMAnswers = ref([]);
+let bTriggerBlockPopup = ref(false);
+let bTriggerReportPopup = ref(false);
+let sPopupMessage = ref("");
+let bIsBlockedByPerson = ref(false);
+let bIsPersonBlocked = ref(false);
+let sReportSentAlert = ref("");
 
 
 
 onMounted(() => {
     person.value = userStore.person;
     axios.get("http://localhost:8000/api/getUserFromUsername/" + route.params.username)
-        .then((response) => {
-            person.value = response.data;
-            if (person.value._iId != 0) { //Usuario válido
-                person.value._setImagePath.forEach(image => {
-                    aPhotos.value.push("http://localhost:8000/api/getImage/" + image._sName);
-
-                })
+    .then((response) => {
+        person.value = response.data;
+        iInterests.value = person.value._setInterests.length;
+        if (person.value._iId != 0) { //Usuario válido
+            axios.get("http://localhost:8000/api/checkBlock/" + userStore.person._iId + "/" + person.value._iId)
+            .then(response => bIsPersonBlocked.value = response.data);
+            axios.get("http://localhost:8000/api/checkBlock/" + person.value._iId + "/" + userStore.person._iId)
+            .then(response => bIsBlockedByPerson.value = response.data);
+                // person.value._setImagePath.forEach(image => {
+                //     aPhotos.value.push("http://localhost:8000/api/getImage/" + image._sName);
+                // })
+                axios.get("http://localhost:8000/api/getImageNames/" + person.value._iId)
+                .then(response => aPhotos.value = response.data);
                 if (person.value._iId != userStore.person._iId) {  //Ahorrar petición si el usuario es el mismo
                     axios.get("http://localhost:8000/api/checkFollow/" + userStore.person._iId + "/" + person.value._iId)
                         .then((response) => {
@@ -276,6 +371,8 @@ onMounted(() => {
                     if (userStore.person._iId === person.value._iId)    //Si el perfil es del propio usuario muestra datos
                         bShouldDisplayData.value = true;
                 }
+                axios.get("http://localhost:8000/api/getUserAnswers/" + person.value._iId)
+                .then(response => aAMAnswers.value = response.data);
                 axios.get("http://localhost:8000/api/getUserPosts/" + route.params.username)
                     .then(response => {
                         aPosts.value = response.data;
@@ -284,7 +381,14 @@ onMounted(() => {
                     .catch(error => console.log(error));
                 axios.get("http://localhost:8000/api/getUserEvents/" + person.value._iId)
                     .then(response => {
-                        aEvents.value = response.data;
+                        aEvents.value = response.data.sort((e1, e2) => {
+                            if(e1._tCelebratedAt < e2._tCelebratedAt)
+                                return 1;
+                            else if(e1._tCelebratedAt > e2._tCelebratedAt)
+                                return -1;
+                            else
+                                return 0;
+                        });
                         aEventsBackup = aEvents.value;
                     })
                 axios.get("http://localhost:8000/api/getNumFollows/" + person.value._iId)
@@ -299,11 +403,33 @@ onMounted(() => {
                 "http://localhost:8000/api/getProfileImage/" + person.value._iId;
             setTimeout(() => {
                 bIsFetching.value = false;
+                console.log(aLikedPosts.value)
             }, 750);
         })
         .catch((error) => console.log(error));
 
 });
+
+function sendReport() {
+    userStore.reportUser(person._iId, person._sUsername, sReportDescription); 
+    bTriggerReportPopup.value = false; 
+    bTriggerBlockPopup.value = false;
+    sReportSentAlert.value = "Se ha enviado la denuncia. La revisaremos y procesaremos lo antes posible.";
+    bShowOptions.value = false;
+}
+
+
+function setBlockReportPopup(bWantToBlock) {
+    if(bWantToBlock) {
+        bTriggerBlockPopup.value = true;
+        sPopupMessage.value = "¿Estás seguro de que quieres bloquear a @" + person.value._sUsername + "? Esto impedirá que pueda interactuar contigo, " +
+        " no podrá ver tu perfil, pero si te apuntas a un evento sí que podrá ver tu asistencia y comentarios."
+    } else {
+        bTriggerReportPopup.value = true;
+        sPopupMessage.value = "Detalla el/los motivos por lo que deseas denunciar a esta persona.";
+    }
+    bShowOptions.value = false;
+}
 
 function setFollow() {
   if (!bPendingFollow.value)
@@ -354,6 +480,16 @@ function proccessDescription(sDescription) {
     return sDescription;
 }
 
+function blockUnblockUser() {
+    axios.patch("http://localhost:8000/api/blockUnblockUser/" + userStore.person._iId + "/" + person.value._iId)
+    .then(response => {
+        bIsPersonBlocked.value = response.data;
+    })
+    bTriggerBlockPopup.value = false;
+    bTriggerReportPopup.value = false;
+}
+
+
 
 </script>
 
@@ -376,6 +512,11 @@ image {
 .dropdown-option:hover {
     background-color: #eeeeee;
     cursor: pointer;
+}
+.photos-box {
+    max-width: 60vw;
+    column-count: 3;
+    flex-wrap: wrap;
 }
 
 .user-image {
@@ -416,13 +557,25 @@ image {
     right: 0;
 }
 
+.options-button {
+    border: solid 1px rgb(97, 97, 97);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
 
+.options-button:hover {
+    background-color: #d0d0d0;
+    cursor: pointer;
+}
 .interest {
-    border: solid 2px black;
-    color: black;
+    border: solid 2px rgb(111, 22, 255);
+    color: white;
+    background-color: rgb(146, 79, 255);
     padding: 5px;
     margin-right: 15px;
-    border-radius: 5px;
+    padding: 10px;
+    border-radius: 50px;
 }
 
 .description {

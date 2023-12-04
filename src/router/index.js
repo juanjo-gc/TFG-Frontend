@@ -248,6 +248,17 @@ const routes = [
     }
   },
   {
+    path: "/help/myTickets",
+    name: "userTicketManagement",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/TicketManagementView.vue"),
+    meta: {
+      requiresAuth: true,
+      adminAuth: false,
+      userAuth: true,
+    }
+  },
+  {
     path: "/help/tickets/:ticketId",
     name: "ticketDetail",
     component: () =>
@@ -270,7 +281,7 @@ const routes = [
     }
   },
   {
-    path: "/admin/manage/users",
+    path: "/admin/manage/users/:userId?",
     name: "userManagement",
     component: () =>
       import(/* webpackChunkName "register" */ "@/views/UserManagementView.vue"),

@@ -177,8 +177,12 @@ import Popup from '@/components/Popup.vue';
 import axios from 'axios';
 import moment from 'moment';
 import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const userStore = useUserStore();
+const route = useRoute();
+const router = useRouter();
+
 let userToDisplay = ref(null);
 let sUsernameToSearch = ref("");
 let aUsers = ref([]);
@@ -196,7 +200,11 @@ let bFsImageIsDeleted = ref(false);
 
 let postsBox = ref(null);
 
-
+onMounted(() => {
+    if(route.params.userId != null)
+        axios.get("http://localhost:8000/api/getUser/" + route.params.userId)
+        .then(response => userToDisplay.value = response.data);
+})
 
 
 function searchUsers() {

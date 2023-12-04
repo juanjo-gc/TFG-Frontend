@@ -94,12 +94,6 @@
                         <p class="fs-5 mt-1">Nuevo mensaje</p>
                     </div>
                 </div>
-                
-
-
-
-
-
                 <!-- Listado de chats -->
                 <div class="row">
                     <div v-if="aLastMessages.length === 0">
@@ -139,13 +133,18 @@
             </div>
             <div class="col-md-8 private-chat" v-if="currentUserChat != null">
                 <div class="row  header-chat">
-                    <div class="col-md-2">
+                    <div class="col-md-2" style="cursor: pointer;" @click="router.push('/profile/' + currentUserChat._sUsername)">
                         <img class="mr-3 mt-4 avatar "
                             :src="`http://localhost:8000/api/getProfileImage/${currentUserChat._iId}`" alt="User avatar">
                     </div>
                     <div class="col-md-10">
                         <h3 class="mt-4">{{ currentUserChat._sName }}</h3>
                         <h5 class="mt-2 text-muted">@{{ currentUserChat._sUsername }}</h5>
+                    </div>
+                    <div class="bg-dark pt-2" v-if="bIsBlockedByPerson || bIsPersonBlocked">
+                        <p class="text-light text-center" v-if="bIsBlockedByPerson">No puedes enviar mensajes a este usuario porque te ha bloqueado</p>
+                        <p class="text-light text-center" v-else>No puedes enviar mensajes a este usuario porque lo has bloqueado</p>
+
                     </div>
                 </div>
                 <div class="row scroller" ref="chatContainer">
@@ -174,7 +173,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="row">
+                <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
                     <div class="col-md-10">
                         <div class="message-wrapper">
                             <textarea class="mt-3" v-model="sMessage" @keyup.enter="submitMessage"></textarea>
@@ -246,8 +245,6 @@ const router = useRouter();
 let sUsernameToMessage = ref("");
 let sNewMessage = ref("");
 let aUsers = ref([]);
-let selectedUser = ref(null);
-let bActivateAlert = ref(false);
 let bIsFetching = ref(true);
 let sErrorMessage = ref("");
 let aLastMessages = ref([]);
@@ -256,10 +253,18 @@ let aMessages = ref([]);
 let bShowNewMessage = ref(false);
 let currentUserChat = ref(null);
 let sMessage = ref("");
+let aBlockedBy = ref([]);
+let bIsBlockedByPerson = ref(false);
+let bIsPersonBlocked = ref(false);
+let aFollowers = ref([]);
 
 let chatContainer = ref(null);
 
 onMounted(() => {
+    axios.get("http://localhost:8000/api/getBlockedByUsers/" + userStore.person._iId)
+    .then(response => aBlockedBy.value = response.data);
+    axios.get("http://localhost:8000/api/getFollowers/" + userStore.person._sUsername)
+    .then(response => aFollowers.value = response.data);
     axios.get("http://localhost:8000/api/getLastMessages/" + userStore.person._iId)
         .then(response => {
             aLastMessages.value = response.data;
@@ -285,13 +290,22 @@ onMounted(() => {
 
 function getUsersFromUsername() {
     if (sUsernameToMessage.value.length > 3) {
-        axios.get("http://localhost:8000/api/findFirst7Users/" + sUsernameToMessage.value)
-            .then(response => aUsers.value = response.data)
-            .catch(error => console.log(error));
+        // console.log(aFollowers.value)
+        // axios.get("http://localhost:8000/api/findFirst7Users/" + sUsernameToMessage.value)
+        //     .then(response => {
+            let regex = new RegExp("^" + sUsernameToMessage.value + ".*$")
+            aUsers.value = aFollowers.value.filter(follower => follower._sUsername.match(regex));
+            console.log(aUsers.value)
+            aUsers.value = aUsers.value.filter(user => {
+                if(!aBlockedBy.value.some(blockedBy => blockedBy._iId === user._iId))
+                return user;
+           })
+        // })
     } else {
         aUsers.value = [];
     }
 }
+
 
 // function sendMessage() {
 //     if (sNewMessage.value.length === 0) {
@@ -313,6 +327,10 @@ function getUsersFromUsername() {
 
 function loadChat(user) {
     currentUserChat.value = user;
+    axios.get("http://localhost:8000/api/checkBlock/" + userStore.person._iId + "/" + currentUserChat.value._iId)
+        .then(response => bIsPersonBlocked.value = response.data);
+    axios.get("http://localhost:8000/api/checkBlock/" + currentUserChat.value._iId + "/" + userStore.person._iId)
+        .then(response => bIsBlockedByPerson.value = response.data);
     bShowNewMessage.value = false;
     axios.get("http://localhost:8000/api/getConversation/" + userStore.person._iId + "/" + user._iId)
         .then(response => {
@@ -359,30 +377,18 @@ function submitMessage() {
             })
             if(!aiRecentMessagedUsers.value.find(iId => iId === currentUserChat.value._iId)) {
                 aLastMessages.value.unshift(response.data)
+                aiRecentMessagedUsers.value.push(response.data._recipient._iId)
             } else {
                 let messageToReplace = response.data;
-                console.log(messageToReplace)
-                console.log(aLastMessages.value)
-                let bFound = false;
-                let i = 0;
-                while(!bFound && i < aLastMessages.value.length) {
-                    console.log(aLastMessages.value[i])
-                    i++;
-                    // if(aLastMessages.value[i]._issuer._iId === messageToReplace._issuer._iId && aLastMessages.value[i]._recipient._iId === messageToReplace._recipient._iId)
-                    //     bFound = true;
-                    // else
-                    //     i++;
-                }
-                aLastMessages.value[i]._sText = messageToReplace._sText;
-                aLastMessages.value = aLastMessages.value.unshift(aLastMessages.value[i]);
-                // aLastMessages.value.forEach(msg => {
-                //     console.log("Emisor nuevo: " + messageToReplace._issuer._iId + " Emisor last: " + msg._issuer._iId + " Rec nuevo: " + messageToReplace._recipient._iId + " Rec last: " + msg._recipient._iId)
-                //     if(msg._issuer._iId === messageToReplace._issuer._iId && msg._recipient._iId === messageToReplace._recipient._iId)
-                //         bFound = true;
-                // })
-                // console.log("Se encontro ? " + bFound)
+                messageToReplace._bIsSeen = true;
+                console.log("prueba")
+                aLastMessages.value = aLastMessages.value.filter(message => {
+                    if(!(message._issuer._iId === messageToReplace._issuer._iId && message._recipient._iId === messageToReplace._recipient._iId) &&
+                    !(message._issuer._iId === messageToReplace._recipient._iId && message._recipient._iId === messageToReplace._issuer._iId))
+                        return message;
+                })
+                aLastMessages.value.unshift(messageToReplace);
             }
-            // console.log(aMessages.value)
         })
         .catch(error => console.log(error));
     }

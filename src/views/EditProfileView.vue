@@ -59,7 +59,7 @@
                   <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                     <div class="mb-3">
                       <label for="description" class="form-label">Descripción</label>
-                      <textarea class="form-control" name="sDescription" v-model="sDescription" id="description"
+                      <textarea class="form-control" v-model="sDescription" id="description"
                         rows="3"></textarea>
                     </div>
                   </div>
@@ -155,7 +155,6 @@ let userStore = useUserStore();
 let formData = new FormData();
 let sUsername = ref(userStore.person._sUsername);
 let sName = ref(userStore.person._sName);
-let sDescription = ref(userStore.person._sDescripcion);
 let sEmail = ref(userStore.person._sEmail);
 let uploadImage = ref(null);
 let profileImg = ref(null);
@@ -284,7 +283,7 @@ function uploadProfileImage() {
       },
     })
       .then(response => {
-        alertSuccess = true;
+        alertSuccess.value = true;
         // userStore.profileImage = response.data;
         console.log(response.data);
       })

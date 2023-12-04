@@ -73,6 +73,18 @@
                     </div> -->
                     </div>
                 </div>
+                <div class="row" v-if="event._setInterest != null">
+                    <div class="col-md-4">
+                        <p class="fw-bold">Intereses del evento:</p>
+                        <ul class="list-group list-group-horizontal list-unstyled">
+                            <li v-for="interest in event._setInterest">
+                                <div class="border border-dark rounded-pill ms-2">
+                                    <span class="m-2 p-1">{{ interest._sName }}</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="row mt-4 mb-4 bg-dark" v-if="bIsFinished">
                     <p class="text-white mt-2">Este evento ya se ha celebrado.</p>
                 </div>
@@ -294,6 +306,7 @@ onMounted(() => {
     axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
         .then(response => {
             event.value = response.data;
+            console.log(event.value)
             console.log("Fecha evento: " + event.value._tCelebratedAt + " Fecha hoy: " + Date.now())
             if (moment(event.value._tCelebratedAt).isBefore(moment(Date.now()))) {
                 bIsFinished = true;

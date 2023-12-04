@@ -38,7 +38,7 @@ export const useUserStore = defineStore({
         setFollow(user) {
             axios.patch("http://localhost:8000/api/setFollow/" + this.person._iId + "/" + user._iId)
             .then(response => {
-                bFollowed = response.data;
+                let bFollowed = response.data;
                 if(bFollowed) {
                     let notificationParams = {
                     sInfo: "¡Ahora " + this.person._sName + " te está siguiendo!",
