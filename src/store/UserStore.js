@@ -15,7 +15,7 @@ export const useUserStore = defineStore({
         return {
             person: {},
             aiShownUserIds: [],
-            tUpdatedUsersToShow: new Date(),
+            tUpdatedUsersToShow: null,
             router: useRouter()
         };
       },

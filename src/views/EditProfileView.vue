@@ -196,22 +196,15 @@ const setProfileImg = computed(() => {
 async function updateUserDetails() {
   console.log(sEmail.value)
   if (sName.value != "" && /^[a-zA-Z]*$/.test(sName.value)) {
-    console.log("Entra en primer if")
     if (sUsername.value != "" && /^[a-zA-Z0-9]*$/.test(sUsername.value)) {
       if (sEmail.value != "") {
         let userDetailsFormData = new FormData();
-
         userDetailsFormData.append("id", userStore.person._iId);
         userDetailsFormData.append("name", sName.value);
         userDetailsFormData.append("username", sUsername.value);
         userDetailsFormData.append("email", sEmail.value);
         userDetailsFormData.append("description", sDescription.value);
-
-        axios
-          .post(
-            "http://localhost:8000/api/updateUserDetails",
-            userDetailsFormData
-          )
+        axios.post("http://localhost:8000/api/updateUserDetails",userDetailsFormData)
           .then((response) => {
             if (response.data._iId === 0) {
               alertUserDetails = true;

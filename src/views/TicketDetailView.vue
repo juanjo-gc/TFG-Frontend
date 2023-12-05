@@ -53,16 +53,18 @@
                                 <p class="fs-5">{{ ticket._event._sTitle }}</p>
                             </div>
                             <div class="col-md-4">
-                                <p class="mt-2">Fecha evento: {{ moment(ticket._event._tCelebratedAt).format("DD/MM/YYYY") }}</p>
+                                <p class="mt-2">Fecha evento: {{ moment(ticket._event._tCelebratedAt).format("DD/MM/YYYY")
+                                }}</p>
                             </div>
                             <p class="fw-light mt-2">{{ ticket._event._sDescription }}</p>
                         </div>
                     </div>
-                    </div>
-                    <div class="col-md-5"></div>
-                    <div class="col-md-2" v-if="userStore.person._sRole === 'Admin'">
-                        <button type="button" class="btn btn-primary mt-3" @click="router.push('/events/' + ticket._event._iId)">Moderar evento</button>
-                    </div>
+                </div>
+                <div class="col-md-5"></div>
+                <div class="col-md-2" v-if="userStore.person._sRole === 'Admin'">
+                    <button type="button" class="btn btn-primary mt-3"
+                        @click="router.push('/events/' + ticket._event._iId)">Moderar evento</button>
+                </div>
             </div>
             <div class="row mt-2" v-if="ticket._reported != null && ticket._category._sName === 'Denunciar un usuario'">
                 <div class="d-flex justify-content-center">
@@ -70,15 +72,18 @@
                         <p class="fw-bold">Datos del usuario:</p>
                         <div class="row">
                             <div class="col-md-2"><strong>ID: </strong>{{ ticket._reported._iId }}</div>
-                            <div class="col-md-6"><strong>Nombre de usuario: </strong> @{{ ticket._reported._sUsername }}</div>
+                            <div class="col-md-6"><strong>Nombre de usuario: </strong> @{{ ticket._reported._sUsername }}
+                            </div>
                             <div class="col-md-4"><strong>Nombre: </strong>{{ ticket._reported._sName }}</div>
                         </div>
-                            <p class="mt-4" v-if="ticket._reported._sDescription != null"><strong>Descripción: </strong>{{ ticket._reported._sDescription }}</p>
+                        <p class="mt-4" v-if="ticket._reported._sDescription != null"><strong>Descripción: </strong>{{
+                            ticket._reported._sDescription }}</p>
                     </div>
                 </div>
                 <div class="col-md-5"></div>
                 <div class="col-md-2 mt-4">
-                    <button type="button" class="btn btn-primary" @click="router.push('/admin/manage/users/' + ticket._reported._iId)">Gestionar perfil</button>
+                    <button type="button" class="btn btn-primary"
+                        @click="router.push('/admin/manage/users/' + ticket._reported._iId)">Gestionar perfil</button>
                 </div>
             </div>
             <!-- <div class="d-flex mt-2 justify-content-center" v-if="ticket._event != null">
@@ -144,7 +149,6 @@
                         <img :src="'http://localhost:8000/api/getReplyImage/' + reply._iId" alt="img"
                             class="ticket-reply-image" v-if="reply._imagePath != null"
                             @click="setFsImage(false, reply._iId)" />
-
                     </div>
                 </li>
             </ul>
@@ -228,11 +232,9 @@ let fsImage = ref({
 })
 
 onMounted(() => {
-    console.log(ticket._imagePath != null)
     axios.get("http://localhost:8000/api/getTicket/" + route.params.ticketId)
         .then(response => {
             ticket.value = response.data;
-            console.log(ticket.value)
             if (ticket.value._iId != 0) {
                 axios.get("http://localhost:8000/api/getTicketReplies/" + ticket.value._iId)
                     .then(response => {
@@ -271,8 +273,7 @@ function deleteRestorePost(bWantToDelete) {
     //     ticket.value._tDeleteDate = null;
 }
 
-function sendReply() {
-    console.log("Se envia " + console.log(ticket.value._bIsOpen))
+async function sendReply() {
     if (ticket.value._bIsOpen && !isBlank(sReply.value))
         axios.post("http://localhost:8000/api/newReply", {
             sText: sReply.value,
@@ -281,14 +282,20 @@ function sendReply() {
         })
             .then(response => {
                 let reply = response.data;
-                let replyImage = null;
                 sReply.value = '';
-                if (uploadImage.value.files[0] != null) 
-                    replyImage = uploadImg(response.data._iId);
-                if(replyImage != null)
-                    reply._imagePath = replyImage;
-                aReplies.value.push(reply);
-                console.log(reply);
+                if (uploadImage.value.files[0] != null) {
+                    formData.append('id', response.data._iId)
+                    axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
+                        'content-type': 'form-data'
+                    })
+                    .then(response => {
+                        reply._imagePath = response.data;
+                        aReplies.value.push(reply);
+
+                    })
+                } else {
+                    aReplies.value.push(reply);
+                }
                 setTimeout(() => {
                     main.value.scrollTop = main.value.scrollHeight;
                 }, 500);
@@ -323,9 +330,9 @@ function onImageUpload() {
 }
 
 async function uploadImg(iId) {
-    formData.append('id', iId);
+    formData.append('id', iId)
     let image = await axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
-         'content-type': 'form-data'
+        'content-type': 'form-data'
     });
     // axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
     //     'content-type': 'form-data'
@@ -337,15 +344,15 @@ async function uploadImg(iId) {
     // setTimeout(() => {
     //     return image;
     // }, 250);
-
+    console.log(image.data)
     return image.data;
 }
 
 function isBlank(str) {
     let bIsBlank = true;
     let i = 0;
-    while(i < str.length && bIsBlank) {
-        if(str.charAt(i) != ' ')
+    while (i < str.length && bIsBlank) {
+        if (str.charAt(i) != ' ')
             bIsBlank = false;
         i++;
     }

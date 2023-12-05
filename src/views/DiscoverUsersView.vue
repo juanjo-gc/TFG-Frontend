@@ -9,9 +9,9 @@
             <div class="col-md-3 ms-5">
                 <h5 class="fw-bold">Filtros</h5>
                 <div class="mt-3">
-                    <p>Intereses en común</p>
+                    <p>Intereses</p>
                     <ul class="list-unstyled" v-if="userStore.person._setInterests.length != 0">
-                        <li v-for="interest in userStore.person._setInterests">
+                        <li v-for="interest in aInterests">
                             <input type="checkbox" :value="interest._sName" v-model="aCheckedInterests"> <span
                                 class="small text-muted">{{ interest._sName }}</span>
                         </li>
@@ -20,22 +20,22 @@
                         <p class="text-muted">Selecciona al menos un interés para poder usar el filtro</p>
                     </div>
                     <p>País</p>
-                    <select v-model="sSelectedCountry">
+                    <select class="form-select w-75" v-model="sSelectedCountry">
                         <option :value="null">Cualquiera</option>
                         <option v-for="country in aCountries" :value="country._sName">{{ country._sName }}</option>
                     </select>
                     <p class="mt-3">Comunidad Autónoma</p>
-                    <select v-model="sSelectedRegion">
+                    <select class="form-select w-75" v-model="sSelectedRegion">
                         <option :value="null">Cualquiera</option>
                         <option v-for="region in aRegions" :value="region._sName">{{ region._sName }}</option>
                     </select>
                     <p class="mt-3">Provincia</p>
-                    <select v-model="sSelectedProvince">
+                    <select class="form-select w-75" v-model="sSelectedProvince">
                         <option :value="null">Cualquiera</option>
                         <option v-for="province in aProvinces" :value="province._sName">{{ province._sName }}</option>
                     </select>
                 </div>
-                <button type="button" class="btn btn-primary mt-3" @click="sendInterestsFilter">Filtrar</button>
+                <button type="button" class="btn btn-primary mt-3" @click="sendFilter">Filtrar</button>
             </div>
             <div class="col-md-6 rounded-border m-4" v-if="aiUserIds.length != 0 || currentPerson != null">
                 <div class="text-center" v-if="aPhotos.length === 0">
@@ -128,6 +128,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
+import moment from 'moment';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -139,7 +140,9 @@ let aCountries = ref([]);
 let aRegions = ref([]);
 let aProvinces = ref([]);
 let aPhotos = ref([]);
+let aInterests = ref([]);
 let aiUserIds = ref([]);
+let aFollowing = ref([]);
 // let sSelectedProvince = ref(userStore.person._province._sName);
 // let sSelectedRegion = ref(userStore.person._province._region._sName);
 // let sSelectedCountry = ref(userStore.person._province._region._country._sName);
@@ -154,6 +157,11 @@ let iTotalPages = 1;
 onMounted(() => {
     aCountries.value.push(userStore.person._province._region._country); //findall para este valor inicial
     setUserIds();
+    axios.get("http://localhost:8000/api/getFollowing/" + userStore.person._sUsername)
+    .then(response => aFollowing.value = response.data);
+
+    axios.get("http://localhost:8000/api/getAllInterests")
+    .then(response => aInterests.value = response.data);
     axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
         .then(response => aRegions.value = response.data)
         .catch(error => console.log(error));
@@ -162,13 +170,14 @@ onMounted(() => {
         .then(response => aProvinces.value = response.data)
         .catch(error => console.log(error));
 
-    
-    while(currentId === -1)
-        bIsFetching.value = true;
-    bIsFetching.value = false;
+    setTimeout(() => {
+        bIsFetching.value = false;
+        
+    }, 750);
 })
 
 function setUserIds() {
+    aiUserIds.value = [];
     axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
         asInterests: [],
         sCountry: sSelectedCountry.value,
@@ -176,32 +185,33 @@ function setUserIds() {
         sProvince: sSelectedProvince.value
     })
         .then(response => {
-            console.log(response.data)
+            console.log(response.data.content)
             iTotalPages = response.data.totalPages;
             aiUserIds.value = response.data.content;
-            const tDateToday = new Date();
-            if (Math.abs(tDateToday - userStore.tUpdatedUsersToShow) / 1000 * 60 * 60 * 24 * 7 >= 1) { // Si la diferencia entre dos fechas es mayor o igual a una semana, refresca
+            const tDateToday = moment(new Date());
+            // userStore.tUpdatedUsersToShow = tDateToday;
+            if(userStore.tUpdatedUsersToShow === null || tDateToday.isAfter(userStore.tUpdatedUsersToShow)) {
+            // if (Math.abs(tDateToday - userStore.tUpdatedUsersToShow) / 1000 * 60 * 60 * 24 * 7 >= 1) { // Si la diferencia entre dos fechas es mayor o igual a una semana, refresca
                 userStore.tUpdatedUsersToShow = tDateToday;
                 userStore.aiShownUserIds = [];
-                aiUserIds.value = response.data;
+                aiUserIds.value = response.data.content;
             } else {
-                aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iExcludedId === iId));
+                aiUserIds.value = aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iExcludedId === iId));
             }
             if (aiUserIds.value.length != 0) {
                 do {
                     currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
-                } while (currentId.value === userStore.person._iId);
+                } while (currentId.value === userStore.person._iId && aFollowing.value.some(following => following._iId === currentId.value));
                 setCurrentPersonData();
             }
         })
 }
 
-
-
 function setCurrentPersonData() {
     iShownUsers++;
     console.log("CurrentId en setperson: " + currentId.value)
-    userStore.aiShownUserIds.push(currentId.value)
+    userStore.aiShownUserIds.push(currentId.value);
+    console.log(aiUserIds.value);
     aiUserIds.value.splice(aiUserIds.value.indexOf(currentId.value), 1);
     axios.get("http://localhost:8000/api/getUser/" + currentId.value)
         .then(response => {
@@ -220,8 +230,9 @@ function setCurrentPersonData() {
         })
         .catch(error => console.log(error));
     if(iShownUsers >= 10) {
+        iShownUsers = 0;
         iPageNumber++;
-        setUserIds();
+        sendFilter();
     }
 }
 
@@ -237,7 +248,7 @@ function proccessDiscardOrFollow(bWantToFollow) {
 
 }
 
-function sendInterestsFilter() {
+function sendFilter() {
     iPageNumber = 0;
     axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
         asInterests: aCheckedInterests.value,
@@ -248,12 +259,14 @@ function sendInterestsFilter() {
         .then(response => {
             if (response.data.length != 0) {
                 aiUserIds.value = response.data.content;
+                console.log("En sendFilter")
+                console.log(aiUserIds.value);
                 iTotalPages = response.data.totalPages;
                 aiUserIds.value = aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iId === iExcludedId));    // Elimina las ocurrencias de las ids filtradas con las que se han mostrado recientemente
                 if(aiUserIds.value.length != 0) {
                     do {
                         currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
-                    } while (currentId.value === userStore.person._iId);
+                    } while (currentId.value === userStore.person._iId && aFollowing.value.some(following => following._iId === currentId.value));
                     console.log("A la hora de filtrar: " + currentId.value)
                     setCurrentPersonData();
                 }

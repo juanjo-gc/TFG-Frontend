@@ -34,7 +34,7 @@
 <script setup>
 
 import { useUserStore } from '@/store/UserStore.js';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
@@ -90,14 +90,11 @@ onMounted(() => {
     })
 })
 
-// function waitForRender() {
-//     // bToggleSidebar.value = !bToggleSidebar.value;
-//     document.getElementById('sidebar').style;
-//     setTimeout(() => {
-//         bShow.value = !bShow.value;
-//         console.log(bShow.value)
-//     }, 500);
-// }
+function updateUsername(sUsername) {
+    console.log("Se cambia username")
+    aUserRoutes.value[1].route = '/profile/' + sUsername;
+}
+
 </script>
 
 <style scoped>

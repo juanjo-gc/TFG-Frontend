@@ -1,5 +1,5 @@
 <template>
-    <SidebarFinal></SidebarFinal>
+    <SidebarFinal id="sidebar" @updateUsername="updateUsername(sUsername)"></SidebarFinal>
     <div class="container" v-if="!bIsFetching">
         <div class="row mt-4">
             <div class="col-md-3">
@@ -62,8 +62,8 @@
                 </div>
                 <div class="row mt-4" v-if="sSelectedCategory === 'Información sobre el usuario'">
                     <div class="mb-3">
-                        <label for="exampleFormControlTextarea1" class="form-label">Descripción</label>
-                        <textarea class="form-control" maxlength="256" id="exampleFormControlTextarea1" rows="3"
+                        <label for="description" class="form-label fw-bold">Descripción</label>
+                        <textarea class="form-control" maxlength="256" id="description" rows="3"
                             v-model="sDescription"></textarea>
                         <div class="row">
                             <div class="col-md-10">
@@ -76,21 +76,26 @@
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <ul class="ks-cboxtags">
+                        <label for="interests" class="form-label fw-bold">Intereses</label>
+                        <p class="small">Selecciona aquellos intereses que creas que te representan en mayor medida. Puedes seleccionar 4 como máximo, ¡así que piensa bien cuáles eliges!</p>
+                        <ul class="ks-cboxtags" id="interests">
                             <li v-for="(interest, index) in aInterests">
                                 <input type="checkbox" :id="'checkbox' + index" :value="interest._sName" v-model="aCheckedInterests" /><label
                                     :for="'checkbox' + index">{{ interest._sName }}</label>
                             </li>
                         </ul>
                     </div>
-                    <p class="text-center small">A continuación puedes responder preguntas sobre tu personalidad. No es
-                        necesario responderlas todas. Deja en blanco aquellas que
-                        no quieras que se muestren en tu perfil.
-                    </p>
-                    <div class="mb-3" v-for="(question, index) in aAMQuestions">
-                        <label :for="'question' + index" class="form-label">{{ question._sQuestion }}</label>
-                        <input type="text" class="form-control" :id="'question' + index"
+                    <div class="row mb-3">
+                        <p class="fw-bold">Preguntas 'Conóceme'</p>
+                        <p class="text-center small">A continuación puedes responder preguntas sobre tu personalidad. No es
+                            necesario responderlas todas. Deja en blanco aquellas que
+                            no quieras que se muestren en tu perfil.
+                        </p>
+                        <div class="mb-3" v-for="(question, index) in aAMQuestions">
+                            <label :for="'question' + index" class="form-label">{{ question._sQuestion }}</label>
+                            <input type="text" class="form-control" :id="'question' + index"
                             v-model="aAMQuestions[index]._sAnswer">
+                        </div>
                     </div>
                     <div class="col-md-1">
                         <button type="button" class="btn btn-primary" @click="sendUserInformation">Enviar</button>
@@ -264,7 +269,10 @@ let sNewPasswordConfirmation = ref("");
 let aInterests = ref([]);
 let aCheckedInterests = ref([]);
 
+let sidebar = ref(null);
+
 onMounted(() => {
+    sidebar.value = document.getElementById('sidebar');
     axios.get("http://localhost:8000/api/getAllProvinces")
         .then(response => aProvinces = response.data);
         axios.get("http://localhost:8000/api/getAllInterests")
@@ -344,6 +352,7 @@ function sendAccountDetails() {
                 if (response.data._iId != 0) {
                     userStore.person._sName = response.data._sName;
                     userStore.person._sUsername = response.data._sUsername;
+                    sidebar.value.dispatchEvent(new CustomEvent('updateUsername'), userStore.person._sUsername);
                     userStore.person._province = response.data._province;
                     bTriggerSuccessAlert.value = true;
                     sAlertMessage.value = "Los cambios se han aplicado correctamente.";
