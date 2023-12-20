@@ -120,9 +120,9 @@ let asInterests = ref([]);
 let aCountries = ref([]);
 let aRegions = ref([]);
 let aProvinces = ref([]);
-let sSelectedCountry = ref(userStore.person._province._region._country._sName);
-let sSelectedRegion = ref(userStore.person._province._region._sName);
-let sSelectedProvince = ref(userStore.person._province._sName);
+let sSelectedCountry = ref(userStore.person._province != null ? userStore.person._province._region._country._sName : null);
+let sSelectedRegion = ref(userStore.person._province != null ? userStore.person._province._region._sName : null);
+let sSelectedProvince = ref(userStore.person._province != null ? userStore.person._province._sName : null);
 let aInterests = ref(null);
 let iPageNumber = 0;
 let iTotalPages = 0;
@@ -136,14 +136,13 @@ onMounted(() => {
     axios.get("http://localhost:8000/api/getAllCountries")
         .then(response => aCountries.value = response.data)
 
-    axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
+    if(userStore.person._province != null) {
+        axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
         .then(response => aRegions.value = response.data)
-
-    axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
+        
+        axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
         .then(response => aProvinces.value = response.data)
-
-    console.log("Region: " + sSelectedRegion.value);
-    console.log("Provincia: " + sSelectedProvince.value)
+    }
     axios.post("http://localhost:8000/api/getFilteredEvents/" + iPageNumber, {
         sTitle: "",
         asInterests: [],

@@ -1,5 +1,5 @@
 <template>
-    <SidebarFinal id="sidebar" @updateUsername="updateUsername(sUsername)"></SidebarFinal>
+    <SidebarFinal id="sidebar" :key="componentKey"></SidebarFinal>
     <div class="container" v-if="!bIsFetching">
         <div class="row mt-4">
             <div class="col-md-3">
@@ -34,14 +34,19 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="provinceName" class="form-label">Provincia</label>
+                            <label for="provinceName" class="form-label">Localización</label>
                             <input type="text" class="form-control" id="provinceName" v-model="sProvince"
                                 @keyup="filterProvinces">
-                            <div id="provinceName" class="form-text">Escribe tu provincia y selecciona de entre las
+                            <div id="provinceName" class="form-text" >Escribe tu provincia y selecciona de entre las
                                 disponibles.</div>
                         </div>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-7 mt-2" v-if="aFilteredProvinces.length === 0">
+                        <button type="button" class="btn btn-outline-primary mt-4" @click="bTriggerLocationPopup = true;">No mostrar localización</button>
+                            <div class="form-text" v-if="userProvince != null">Localización seleccionada: {{ userProvince._sName }}, {{ userProvince._region._sName }}, {{
+                                            userProvince._region._country._sName }}</div>
+                    </div>
+                    <div class="col-md-7" v-else>
                         <ul class="list-unstyled mt-4">
                             <li v-for="province in aFilteredProvinces">
                                 <div class="row province-info mt-2"
@@ -213,6 +218,26 @@
                 </div>
             </div>
         </Popup>
+        <Popup v-if="bTriggerLocationPopup">
+            <div class="row mx-4">
+                <p class="mt-4 fs-5 fw-bold">¿Estás seguro de que no quieres mostrar tu localización?</p>
+                <p class="mt-2 fw-light">Sin localización, los demás usuarios no podrán saber de donde eres, y por tanto solo aparecerás para los demás usuarios cuando decidan usar la función de buscar personas si no filtran por localización.</p>
+                <p class="mt-1">¿Quieres continuar sin mostrar tu localización?</p>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-primary float-end" @click="userProvince = null; sProvince = ''; bTriggerLocationPopup = false">Continuar</button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-secondary" @click="bTriggerLocationPopup = false">Volver</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Popup>
         <div class="alert alert-success alert-dismissible fade show fixed-bottom" role="alert" v-if="bTriggerSuccessAlert">
             {{ sAlertMessage }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
@@ -248,7 +273,7 @@ let aProvinces = [];
 let aFilteredProvinces = ref([]);
 let sUsername = ref(userStore.person._sUsername);
 let sName = ref(userStore.person._sName);
-let sProvince = ref(userStore.person._province._sName);
+let sProvince = ref(userStore.person._province != null ? userStore.person._province._sName : "");
 let userProvince = ref(null);
 let sDescription = ref(userStore.person._sDescription != null ? userStore.person._sDescription : "");
 let sEmail = ref(userStore.person._sEmail);
@@ -268,8 +293,10 @@ let sNewPassword = ref("");
 let sNewPasswordConfirmation = ref("");
 let aInterests = ref([]);
 let aCheckedInterests = ref([]);
+let bTriggerLocationPopup = ref(false);
 
 let sidebar = ref(null);
+let componentKey = ref(0);
 
 onMounted(() => {
     sidebar.value = document.getElementById('sidebar');
@@ -335,13 +362,13 @@ function isBlank(sStr) {
 }
 
 function sendAccountDetails() {
-    if (!isBlank(sName.value) && !isBlank(sUsername.value) && userProvince.value != null) {
+    if (!isBlank(sName.value) && !isBlank(sUsername.value)) {
         axios.post("http://localhost:8000/api/updateUserAccountDetails", {
             iUserId: userStore.person._iId,
             sName: sName.value,
             sUsername: sUsername.value,
             sDescription: sDescription.value,
-            iProvinceId: userProvince.value._iId,
+            iProvinceId: userProvince.value != null ? userProvince.value._iId : -1,
             sCurrentPassword: "",
             sNewPasswordConfirmation: "",
             sNewPassword: "",
@@ -352,7 +379,7 @@ function sendAccountDetails() {
                 if (response.data._iId != 0) {
                     userStore.person._sName = response.data._sName;
                     userStore.person._sUsername = response.data._sUsername;
-                    sidebar.value.dispatchEvent(new CustomEvent('updateUsername'), userStore.person._sUsername);
+                    componentKey.value += 1;
                     userStore.person._province = response.data._province;
                     bTriggerSuccessAlert.value = true;
                     sAlertMessage.value = "Los cambios se han aplicado correctamente.";
@@ -363,7 +390,7 @@ function sendAccountDetails() {
             })
     } else {
         bTriggerErrorAlert.value = true;
-        sAlertMessage.value = "Ninguno de los campos puede quedar vacío."
+        sAlertMessage.value = "Los campos de nombre de cuenta y de usuario no pueden quedar vacíos."
     }
 }
 
@@ -440,10 +467,11 @@ function uploadProfileImage() {
                 if (response.data._iId != 0) {
                     userStore.person._profileImagePath = response.data;
                     bTriggerSuccessAlert.value = true;
-                    sAlertMessage.value = "Los cambios se han aplicado correctamente.";
+                    bTriggerErrorAlert.value = false;
+                    sAlertMessage.value = "Los cambios se han aplicado correctamente. Recarga la página para visualizar los cambios.";
                 } else {
                     bTriggerErrorAlert.value = true;
-                    sAlertMessage.value = "No se ha podido subir la foto de perfil.";
+                    sAlertMessage.value = "No se ha podido subir la foto de perfil. Inténtalo de nuevo más tarde.";
                 }
             })
             .catch(error => console.log(error))

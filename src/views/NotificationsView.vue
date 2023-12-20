@@ -7,16 +7,16 @@
             <!-- <div class="col-md-1"></div> -->
             <div class="col-md-12">
                 <ul class="list-unstyled">
-                    <li v-for="notification in aNotifications">
+                    <li v-for="(notification, key) in aNotifications">
                         <div class="row mt-2 notification" @click="router.push(generateLink(notification))"
-                        v-if="shouldBeShown(notification)">
+                        v-if="shouldBeShown(notification)" @mouseover="setSeen(key)">
                             <div class="col-sm-1 mt-3" v-if="notification._issuer._iId != 0">
                                 <img :src="'http://localhost:8000/api/getProfileImage/' + notification._issuer._iId"
                                     class="avatar-mini float-end">
                             </div>
                             <div class="col-sm-6 mt-2">
                                 <div class="row mt-2">
-                                    <p class="">{{ notification._sInfo }}</p>
+                                    <p :class="{'fw-bold': !notification._bSeen}">{{ notification._sInfo }}</p>
                                 </div>
                                 <div class="row mt-2" v-if="notification._type._sName === 'NewPostComment'">
                                     <p class="ms-2 text-muted small">
@@ -32,8 +32,9 @@
                                 <button type="button" class="btn btn-primary" @click="proccessFollow(notification)"
                                     v-else>Siguiendo</button>
                             </div>
-                            <div class="col-sm-2" v-else v-if="notification._type._sName === 'FollowRequest'">
-                                <div class="row mt-2" v-if="!checkFollow(notification)">
+                            <div class="col-sm-2" v-else-if="notification._type._sName === 'FollowRequest'">
+                                <!-- <div class="row mt-2" v-if="!checkFollow(notification)"> -->
+                                <div class="row mt-2" v-if="aNotifications.some(receivedNotification => receivedNotification._type === 'NewFollow' && receivedNotification._issuer._iId === Notification._issuer._iId)">
                                     <div class="col-sm-6">
                                         <button type="button" class="btn btn-outline-primary"
                                             @click="acceptIgnoreFollowRequest(notification, true)">
@@ -92,6 +93,7 @@ function getNotificationsPage() {
             aLoadedNotificationPages.push({ iPageNumber, aNotifications: aNotifications.value })
             iTotalPages = response.data.totalPages;
             iPageNumber++;
+            console.log(aNotifications.value[0])
         })
 }
 
@@ -101,7 +103,7 @@ onMounted(() => {
 
 function shouldBeShown(notification) {
     let bShouldBeShown = true;
-    console.log(notification)
+    // console.log(notification)
 
     if(notification._issuer._sRole === 'User')
         if(notification._issuer._bIsSuspended)
@@ -115,6 +117,18 @@ function shouldBeShown(notification) {
     
     return bShouldBeShown;
 }
+
+function setSeen(i) {
+    if(aNotifications.value[i]._bSeen != true) {
+        aNotifications.value[i]._bSeen = true;
+        axios.patch("http://localhost:8000/api/setSeen/" + aNotifications.value[i]._iId);
+    }
+}
+
+// function showAcceptIgnoreOptions(notification) {
+//     let bShow = false;
+//     if()
+// }
 
 // async function checkIfFollowing(user) {
 //     const bIsFollowing = await axios.get("http://localhost:8000/checkFollow/" + userStore.person._iId + "/" + user._iId)

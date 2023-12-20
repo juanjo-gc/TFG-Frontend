@@ -15,7 +15,8 @@
                   </div>
 
                   <!-- <form @submit.prevent="userStore.registerUser(email, name, username, password, confirmPassword, birthDate)"> -->
-                  <form @submit.prevent="registerUser">
+                  <!-- <form @submit.prevent="registerUser"> -->
+                  <form>
                     <!-- <p>Please login to your account</p> -->
                     <label class="form-label" for="email">Correo electrónico</label>
                     <div class="form-outline mb-4">
@@ -48,7 +49,7 @@
                     <div class="form-outline mb-4">
                       <input type="date" id="birthDate" class="form-control" v-model="birthDate" required />
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label class="form-label" for="province">Localización</label>
                         <div class="row">
                           <div class="col-md-4">
@@ -70,10 +71,10 @@
                           </select>
                         </div>
                       </div>
-                    </div>
+                    </div> -->
                     <div class="text-center pt-1 mb-5 pb-1">
                       <!-- <router-link to="/"> -->
-                      <button class="btn btn-primary btn-block fa-lg gradient-custom mb-3 btnLogin" type="submit">
+                      <button class="btn btn-primary btn-block fa-lg gradient-custom mb-3 btnLogin" type="button" @click="registerUser">
                         Regístrate
                       </button>
                       <!-- </router-link> -->
@@ -89,7 +90,7 @@
         </div>
       </div>
     </section>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="bTriggerErrorAlert">
       <strong>Error. </strong>{{ sAlertMessage }}
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="bTriggerErrorAlert = false;"></button>
 </div>
@@ -206,9 +207,9 @@ async function registerUser() {
   } else if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now())) ) {
       bTriggerErrorAlert.value = true;
       sAlertMessage.value ="Debes ser mayor de edad para registrarte."
-    } else if(sProvince.value === 'Provincia') {
-      bTriggerErrorAlert.value = true;
-      sAlertMessage.value = "Asegúrate de elegir una localización correcta."
+    // } else if(sProvince.value === 'Provincia') {
+    //   bTriggerErrorAlert.value = true;
+    //   sAlertMessage.value = "Asegúrate de elegir una localización correcta."
     } else {
       console.log("hola")
       axios.post("http://localhost:8000/api/register", {
@@ -217,7 +218,7 @@ async function registerUser() {
         sUsername: username.value,
         sPassword: password.value,
         tBirthDate: birthDate.value,
-        sProvince: sProvince.value
+        sProvince: null
       })
         .then(response => {
           router.push('/login')

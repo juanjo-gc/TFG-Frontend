@@ -44,11 +44,11 @@ import {
      faPlusMinus,
      faTicket,
      faList,
-     faHeart
-
+     faHeart,
+     faBell
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload, faAngleLeft,
+library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocationDot, faClock, faCalendar, faUpload, faAngleLeft, faArrowDown, faBell,
           faAngleRight, faArrowUp, faArrowDown, faReply, faPen, faFlag, faTrashArrowUp, faBars, faHouse, faUser, faPeopleRobbery, faMessage,
           faRightFromBracket, faEnvelopeOpenText, faPaperPlane, faEllipsisVertical, faCircleQuestion, faTableColumns, faPlusMinus, faTicket, faList, faHeart);
 

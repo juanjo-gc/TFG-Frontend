@@ -1,88 +1,6 @@
 <template>
     <SidebarFinal></SidebarFinal>
-    <!-- <div class="container" v-if="!bIsFetching">
-        <div class="row">
-            <h2 class="mt-3">Mensajes privados</h2>
-        </div>
-        <div class="row">
-            <div class="col-md-7">
-                <h4 class="mt-3">Mensajes recientes</h4>
-                <div v-if="aLastMessages.length === 0">
-                    <p class="lead fw-formal mt-4">No hay mensajes recientes :&#40;</p>
-                </div>
-                <div class="pt-2 me-5" v-else>
-                    <ul class="list-unstyled">
-                        <li v-for="message in aLastMessages">
-                                <div class="row message-preview" :class="{newmessage: !message._bIsSeen}" @click="navigateToChat(message)"
-                                v-if="!message._issuer._bIsSuspended && !message._recipient._bIsSuspended">
-                                    <div class="col-sm-1">
-                                        <img v-if="message._issuer._iId != userStore.person._iId" class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${message._issuer._iId}`"  alt="User avatar">
-                                        <img v-else class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${message._recipient._iId}`"  alt="User avatar">
-                                    </div>
-                                    <div class="col-sm-7">
-                                        <h6 v-if="message._issuer._iId != userStore.person._iId">{{ message._issuer._sName }}</h6>
-                                        <h6 v-else>{{ message._recipient._sName }}</h6>
-                                        <p class="small text-muted">{{ message._sText }}</p>
-                                    </div>
-                                    <div class="col-sm-4  align-self-center">
-                                        <div v-if="message._issuer._iId != userStore.person._iId && !message._bSeen" class="circle float-end"></div>
-                                    </div>
-                                </div>
-                            </router-link> ESTABA COMENTADA
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-1">
-                <div class="vline"></div>
-            </div>
-            <div class="col-md-4">
-                <h4 class="mt-3">Nuevo mensaje</h4>
-                <div class="form-group field mt-3">
-                    <div class="row">
-                        <div class="col-sm-10">
-                            <input type="input" class="form-field" placeholder="Buscar usuario" name="name" id='name'
-                            v-model="sUsernameToMessage" @keyup="getUsersFromUsername"/>
-                            <label for="name" class="form-label">Buscar usuario</label>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-primary mt-2" @click="deselectUser">Limpiar</button>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="aUsers.length != 0">
-                    <ul class="list-unstyled">
-                        <li v-for="user in aUsers" @click="selectUser(user)">
-                            <div class="row user-data" v-if="user._iId != userStore.person._iId && !user._bIsSuspended">
-                                <div class="col-ms-1">
-                                    <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${user._iId}`"  alt="User avatar">
-                                </div>
-                                <div class="col-ms-11">
-                                    <h5 class="mt-0 mb-1">
-                                        {{ user._sName }}
-                                    </h5>
-                                    <h6>
-                                        <p class="text-muted">@{{ user._sUsername }}</p>
-                                    </h6>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <div class="mt-5" v-if="selectedUser != null"> ESTABA COMENTADA
-                <div class="mt-5" v-if="selectedUser != null">
-                    <p class="text-muted">Mensaje para @{{ selectedUser._sUsername }}</p>
-                    <textarea cols="55" rows="4" placeholder="Escribe tu mensaje aquí" v-model="sNewMessage"></textarea>
-                    <button type="button" class="btn btn-primary float-end mt-2" @click="sendMessage">Enviar</button>
-                </div>
-            </div>
-        </div>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="bActivateAlert">
-          <strong>Error.</strong> {{ sErrorMessage }}.
-          <button type="button" class="btn-close" aria-label="Close" @click="bActivateAlert = false"></button>
-        </div>
-    </div> -->
-    <div class="container" style="border-bottom: solid 2px #777;">
+    <div class="container border h-100">
         <div class="row">
             <div class="col-md-4 recents-col">
                 <h3 class="mt-4 text-center mb-2">Chats recientes</h3>
@@ -103,7 +21,7 @@
                         <ul class="list-unstyled">
                             <li v-for="message in aLastMessages">
                                 <!-- Al hacer click se carga el chat con el usuario -->
-                                <div class="row message-preview" :class="{ newmessage: !message._bIsSeen }"
+                                <div class="row message-preview border" :class="{ newmessage: !message._bIsSeen }"
                                     @click="loadChat(message._issuer._iId === userStore.person._iId ? message._recipient : message._issuer)"    
                                     v-if="!message._issuer._bIsSuspended && !message._recipient._bIsSuspended">
                                     <div class="col-sm-2">
@@ -116,10 +34,10 @@
                                             alt="User avatar">
                                     </div>
                                     <div class="col-sm-6">
-                                        <h6 v-if="message._issuer._iId != userStore.person._iId">{{ message._issuer._sName
-                                        }}</h6>
+                                        <h6 v-if="message._issuer._iId != userStore.person._iId">{{ message._issuer._sName}}</h6>
                                         <h6 v-else>{{ message._recipient._sName }}</h6>
-                                        <p class="small text-muted">{{ message._sText }}</p>
+                                        <p class="small text-muted" v-if="message._issuer._iId === userStore.person._iId">{{ message._sText }}</p>
+                                        <p class="small" :class="{'fw-bold': !message._bSeen, 'text-muted': message._bSeen}" v-else>{{ message._sText }}</p>
                                     </div>
                                     <div class="col-sm-4  align-self-center">
                                         <div v-if="message._issuer._iId != userStore.person._iId && !message._bSeen"
@@ -132,7 +50,7 @@
                 </div>
             </div>
             <div class="col-md-8 private-chat" v-if="currentUserChat != null">
-                <div class="row  header-chat">
+                <div class="row header-chat">
                     <div class="col-md-2" style="cursor: pointer;" @click="router.push('/profile/' + currentUserChat._sUsername)">
                         <img class="mr-3 mt-4 avatar "
                             :src="`http://localhost:8000/api/getProfileImage/${currentUserChat._iId}`" alt="User avatar">
@@ -147,7 +65,7 @@
 
                     </div>
                 </div>
-                <div class="row scroller" ref="chatContainer">
+                <div class="row scroller border" ref="chatContainer">
                     <ul class="list-unstyled">
                         <li v-for="message in aMessages">
                             <div class="row" v-if="message._iIssuerId === currentUserChat._iId">
@@ -173,7 +91,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
+                <div class="row border" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
                     <div class="col-md-10">
                         <div class="message-wrapper">
                             <textarea class="mt-3" v-model="sMessage" @keyup.enter="submitMessage"></textarea>
@@ -186,6 +104,11 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                <div class="row border" v-else>
+                    <p class="p-4 fs-4">
+                        No puedes enviar mensajes a este usuario
+                    </p>
                 </div>
             </div>
         </div>
@@ -233,6 +156,7 @@
 
 <script setup>
 import SidebarFinal from '@/components/SidebarFinal.vue';
+import NavigationComponent from '@/components/NavigationComponent.vue';
 import Popup from '@/components/Popup.vue';
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';
@@ -269,6 +193,8 @@ onMounted(() => {
         .then(response => {
             aLastMessages.value = response.data;
             bIsFetching.value = false;
+            console.log("Ultimos mensajes:")
+            console.log(aLastMessages.value);
             aLastMessages.value.forEach(message => {
                 if (message._issuer._iId != userStore.person._iId) {
                     message._bIsSeen = false;
@@ -327,6 +253,9 @@ function getUsersFromUsername() {
 
 function loadChat(user) {
     currentUserChat.value = user;
+    let i = aLastMessages.value.findIndex(message => (message._issuer._iId === userStore.person._iId && message._recipient._iId === currentUserChat.value._iId) || 
+                                                    (message._issuer._iId === currentUserChat.value._iId && message._recipient._iId === userStore.person._iId)) ;
+    aLastMessages.value[i]._bSeen = true;                                                
     axios.get("http://localhost:8000/api/checkBlock/" + userStore.person._iId + "/" + currentUserChat.value._iId)
         .then(response => bIsPersonBlocked.value = response.data);
     axios.get("http://localhost:8000/api/checkBlock/" + currentUserChat.value._iId + "/" + userStore.person._iId)
@@ -342,6 +271,7 @@ function loadChat(user) {
                 }
             });
             axios.patch("http://localhost:8000/api/setSeenMessages/" + userStore.person._iId + "/" + user._iId)
+            .then(response => aMessages.value.forEach(message => message._bSeen = true))
 
             setTimeout(() => {
                 chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
@@ -387,6 +317,7 @@ function submitMessage() {
                     !(message._issuer._iId === messageToReplace._recipient._iId && message._recipient._iId === messageToReplace._issuer._iId))
                         return message;
                 })
+                console.log(messageToReplace)
                 aLastMessages.value.unshift(messageToReplace);
             }
         })
@@ -420,8 +351,8 @@ function submitMessage() {
 .message-preview {
     padding: 10px;
     /*margin-top: 10px;*/
-    border-top: solid 1px #777;
-    border-bottom: solid 1px #777;
+    /* border-top: solid 1px #777;
+    border-bottom: solid 1px #777; */
 }
 
 .message-preview:hover {
@@ -430,16 +361,16 @@ function submitMessage() {
 }
 
 .scroller {
-    max-height: 60vh;
-    min-height: 60vh;
+    max-height: 70vh;
+    min-height: 70vh;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
-    border-bottom: solid 2px #777;
+    /* border-bottom: solid 2px #777; */
 }
 
 .header-chat {
-    border-bottom: solid 2px #777;
+    /* border-bottom: solid 2px #777; */
 }
 
 .newmessage h6 {
@@ -447,9 +378,9 @@ function submitMessage() {
 }
 
 .recents-col {
-    border-left: solid 2px #777;
+    /* border-left: solid 2px #777;
     border-right: solid 2px #777;
-    height: 90vh;
+    height: 100vh; */
 }
 
 .circle {
@@ -571,9 +502,9 @@ body {
     padding: 5px;
 }
 
-.private-chat {
+/* .private-chat {
     border-right: solid 2px #777;
-}
+} */
 
 .message-wrapper {
     margin-left: 20px;

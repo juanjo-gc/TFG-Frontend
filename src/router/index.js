@@ -6,7 +6,9 @@ const routes = [
   {
     path: "/",
     name: "home",
-    component: HomeView,
+    // component: HomeView,
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/HomeFinalView.vue"),
     meta: {
       requiresAuth: false,
       adminAuth: false,
@@ -300,6 +302,17 @@ const routes = [
       requiresAuth: false,
       adminAuth: true,
       userAuth: true,
+    }
+  },
+  {
+    path: "/admin/operations",
+    name: "adminOperations",
+    component: () =>
+      import(/* webpackChunkName "register" */ "@/views/AdminOperationsView.vue"),
+    meta: {
+      requiresAuth: false,
+      adminAuth: true,
+      userAuth: false,
     }
   },
   {

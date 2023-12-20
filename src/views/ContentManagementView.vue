@@ -705,7 +705,7 @@ function modifyEntity(sEntityType) {
                                 item = updatedEntity;
                             return item;
                         })
-                        currentEntity = {};
+                        currentEntity.value = {};
                         bIsBeingModified.value = false;
                     }
                 })
@@ -729,7 +729,7 @@ function modifyEntity(sEntityType) {
                                 item = updatedEntity;
                             return item;
                         })
-                        currentEntity = {};
+                        currentEntity.value = {};
                         bIsBeingModified.value = false;
                     }
                 })
@@ -755,7 +755,7 @@ function modifyEntity(sEntityType) {
                                     item = updatedEntity;
                                 return item;
                             })
-                            currentEntity = {};
+                            currentEntity.value = {};
                             bIsBeingModified.value = false;
                         }
                     })
@@ -784,7 +784,7 @@ function modifyEntity(sEntityType) {
                                     item = updatedEntity;
                                 return item;
                             })
-                            currentEntity = {};
+                            currentEntity.value = {};
                             bIsBeingModified.value = false;
                         }
                     })
@@ -811,7 +811,7 @@ function modifyEntity(sEntityType) {
                                 item = updatedEntity;
                             return item;
                         })
-                        currentEntity = {};
+                        currentEntity.value = {};
                         bIsBeingModified.value = false;
                     }
                 })
@@ -837,7 +837,7 @@ function modifyEntity(sEntityType) {
                                 item = updatedEntity;
                             return item;
                         })
-                        currentEntity = {};
+                        currentEntity.value = {};
                         bIsBeingModified.value = false;
                     }
                 })
@@ -859,7 +859,7 @@ function modifyEntity(sEntityType) {
                                 item = updatedEntity;
                             return item;
                         })
-                        currentEntity = {};
+                        currentEntity.value = {};
                         bIsBeingModified.value = false;
                         // let updatedEntity = response.data;
                         // let sInformation = "Se ha modificado la FAQ con id " + updatedEntity._iId + ". Antes de modificar: " +

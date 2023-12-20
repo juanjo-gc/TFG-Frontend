@@ -3,26 +3,22 @@
     <div class="container">
         <h2 class="mt-4">Gestionar usuarios</h2>
         <div class="hline"></div>
-        <div class="row">
-            <div class="col-md-5">
-                <h4 class="mt-4">Datos del usuario</h4>
-                <div class="hline"></div>
-                <div class="form-group field mt-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="input" class="form-field ms-2" placeholder="Asunto" name="username" id='username'
-                                v-model="sUsernameToSearch" @keyup="searchUsers()" />
-                            <label for="username" class="form-label">Nombre del usuario...</label>
+        <div class="row" v-if="userToDisplay === null">
+            <p class="mt-3"><strong>IMPORTANTE:</strong> Cualquier acción que se aplique sobre un usuario exceptuando la de carga del mismo tendrá consecuencias para dicho usuario y quedará registrada en el sistema con objeto de realizar un seguimiento para evitar malos comportamientos y, en caso de que sucedan, asegurar las conscuencias del responsable.</p>
+            <div class="col-md-6">
+                <div class="my-2">
+                    <!-- <p class="">Nombre de usuario</p>
+                        <input type="text" class="form-control w-50"> -->
+                        <label for="userToSearch" class="m-1 mb-2">Nombre de usuario</label>
+                        <div class="input-group mb-3" id="userToSearch">
+                            <span class="input-group-text" id="basic-addon1">@</span>
+                            <input type="text" class="form-control" placeholder="Nombre de usuario" aria-label="Username" aria-describedby="basic-addon1" v-model="sUsernameToSearch" @keyup="searchUsers">
                         </div>
-                        <div class="col-md-6" v-if="userToDisplay != null">
-                            <button type="button" class="btn btn-danger mt-2 float-end" v-if="!userToDisplay._bIsSuspended"
-                                @click="suspendReactivateAccount(1)">Suspender cuenta</button>
-                            <button type="button" class="btn btn-primary mt-2 float-end" v-else
-                                @click="suspendReactivateAccount(0)">Reactivar cuenta</button>
-                        </div>
-                    </div>
+                    <p class="small text-muted ms-1">Escribe en el campo el nombre del usuario que deseas cargar, y a continuación selecciona uno de los que aparece en la lista para mostrar sus datos.</p>
                 </div>
-                <div v-if="aUsers.length != 0 && sUsernameToSearch != ''">
+            </div>
+            <div class="col-md-6">
+                <div class="my-2" v-if="aUsers.length != 0 && sUsernameToSearch != ''">
                     <ul class="list-unstyled">
                         <li v-for="user in aUsers">
                             <div class="row user-data" @click="loadUserData(user)"
@@ -43,6 +39,27 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+        </div>
+        <div class="row" v-else>
+            <div class="col-md-5">
+                <h4 class="mt-4">Datos del usuario</h4>
+                <div class="hline"></div>
+                <!-- <div class="form-group field mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="input" class="form-field ms-2" placeholder="Asunto" name="username" id='username'
+                                v-model="sUsernameToSearch" @keyup="searchUsers()" />
+                            <label for="username" class="form-label">Nombre del usuario...</label>
+                        </div>
+                        <div class="col-md-6" v-if="userToDisplay != null">
+                            <button type="button" class="btn btn-danger mt-2 float-end" v-if="!userToDisplay._bIsSuspended"
+                                @click="suspendReactivateAccount(1)">Suspender cuenta</button>
+                            <button type="button" class="btn btn-primary mt-2 float-end" v-else
+                                @click="suspendReactivateAccount(0)">Reactivar cuenta</button>
+                        </div>
+                    </div>
+                </div> -->
                 <div class="row mt-4 ms-2" v-if="userToDisplay != null">
                     <div class="col-md-4">
                         <p class="mt-2"><strong>Id del usuario: </strong>{{ userToDisplay._iId }}</p>
@@ -50,6 +67,13 @@
                     <div class="col-md-8">
                         <p class="mt-2"><strong>Nombre de usuario: </strong>{{ userToDisplay._sUsername }}</p>
                     </div>
+                    <div class="col-md-4">
+                        <p class="mt-2"><strong>Nombre: </strong>{{ userToDisplay._sName }}</p>
+                    </div>
+                    <div class="col-md-8">
+                        <p class="mt-2"><strong>Correo electrónico: </strong>{{ userToDisplay._sEmail }}</p>
+                    </div>
+                    <p class="mt-2"><strong>Descripción: </strong>{{ userToDisplay._sDescription }}</p>
                 </div>
                 <div class="row mt-2" v-if="userToDisplay != null">
                     <div class="col-md-6 mt-4">
@@ -64,9 +88,18 @@
                             <p class="mt-2 text-white fs-4 d-flex justify-content-center">Avisos</p>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-danger mt-4 float-start" v-if="!userToDisplay._bIsSuspended"
+                            @click="suspendReactivateAccount(1)">Suspender cuenta</button>
+                            <button type="button" class="btn btn-primary mt-2 float-end" v-else
+                            @click="suspendReactivateAccount(0)">Reactivar cuenta</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-primary mt-4 float-end" @click="userToDisplay = null; ">Cargar otro usuario</button>
+                    </div>
                 </div>
                 <div class="row mt-2" v-if="userToDisplay != null && !userToDisplay._bIsSuspended">
-                    <h5 class="mt-4">Motivo del aviso/suspensión</h5>
+                    <h5 class="mt-4">Enviar aviso</h5>
                     <div class="hline"></div>
                     <div class="mb-3 mt-4">
                         <textarea class="form-control" id="textbody" rows="3" v-model="sReason"></textarea>
@@ -101,7 +134,7 @@
                 </div>
                 <div class="row d-flex justify-content-center" v-if="bShowPosts">
                     <div class="posts-box mt-4" ref="postsBox">
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled" v-if="aPosts.length > 0">
                             <li v-for="post in aPosts">
                                 <div class="row mt-2 post p-2" :class="{ selected: selectedPost._iId === post._iId }"
                                     @click="selectedPost = post">
@@ -111,6 +144,7 @@
                                 </div>
                             </li>
                         </ul>
+                        <p v-else>El usuario no tiene publicaciones</p>
                     </div>
                     <div class="col-md-6"></div>
                     <div class="col-md-4" v-if="selectedPost._iId != -1">
@@ -134,7 +168,7 @@
                         </ul>
                     </div> -->
                 <div class="d-flex justify-content-center mt-4" v-else>
-                    <ul class="list-group list-group-horizontal list-unstyled">
+                    <ul class="list-group list-group-horizontal list-unstyled" v-if="aUserPhotos.length > 0">
                         <li v-for="photo in aUserPhotos">
                             <div class="blackb d-flex justify-content-center clickable"
                                 @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
@@ -143,6 +177,7 @@
                             </div>
                         </li>
                     </ul>
+                    <p v-else>El usuario no tiene fotos</p>
                 </div>
                 <!-- </div> -->
             </div>
@@ -201,11 +236,11 @@ let bFsImageIsDeleted = ref(false);
 let postsBox = ref(null);
 
 onMounted(() => {
-    if(route.params.userId != null)
+    if(route.params.userId != null) {
         axios.get("http://localhost:8000/api/getUser/" + route.params.userId)
         .then(response => userToDisplay.value = response.data);
+    }
 })
-
 
 function searchUsers() {
     if (sUsernameToSearch.value.length > 3)

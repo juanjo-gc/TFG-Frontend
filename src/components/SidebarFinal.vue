@@ -2,9 +2,12 @@
     <div id="header" class="row header">
         <!-- Logo pagina centrado -->
     </div>
-        <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="black" class="m-2 p-2 hamburger"/>
+    <div class="hamburger-wrapper">
+        <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="black" class="m-2 p-2 pe-3 pb-3" />
+    </div>
     <div id="sidebar" class="sidebar">
-        <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="white" class="m-2 p-2" style="cursor: pointer" id="togglerIn"/>
+        <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="white" class="m-2 p-2" style="cursor: pointer"
+            id="togglerIn" />
         <ul class="list-unstyled m-2 mt-4" v-show="bShow">
             <li v-for="route in aFinalRoutes">
                 <div class="row mt-2 py-2 option" @mouseenter="route.color = 'rgb(103, 73, 238)'"
@@ -13,7 +16,10 @@
                         <font-awesome-icon :icon="route.icon" size="xl" :color="route.color" />
                     </div>
                     <div class="col-md-10">
-                        {{ route.name }}
+                        <span> {{ route.name }}</span>
+                        <!-- <div class="new-notif-wrapper" v-if="route.name === 'Notificaciones' && iNewNotifications > 0"> -->
+                            <span class="bg-light px-2 ms-2 rounded" style="color: rgb(103, 73, 238);" v-if="route.name === 'Notificaciones' && iNewNotifications > 0">{{ iNewNotifications }}</span>
+                        <!-- </div> -->
                     </div>
                 </div>
             </li>
@@ -21,7 +27,8 @@
         <div class="row mt-4 option p-1" v-show="bShow" @mouseenter="logoutColor = 'rgb(103, 73, 238)'"
             @mouseleave="logoutColor = 'white'" @click="userStore.logout">
             <div class="row">
-                <font-awesome-icon icon="fa-solid fa-right-from-bracket" size="xl" :color="logoutColor" style="justify-self: center;" />
+                <font-awesome-icon icon="fa-solid fa-right-from-bracket" size="xl" :color="logoutColor"
+                    style="justify-self: center;" />
             </div>
             <div class="row">
                 <p class="text-center ms-2">Cerrar sesión</p>
@@ -34,6 +41,7 @@
 <script setup>
 
 import { useUserStore } from '@/store/UserStore.js';
+import axios from 'axios';
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -48,10 +56,11 @@ let bg = null;
 let aUserRoutes = ref([
     { name: 'Inicio', route: '/timeline', icon: "fa-solid fa-house", color: 'white' },
     { name: 'Ver perfil', route: '/profile/' + userStore.person._sUsername, icon: "fa-solid fa-user", color: 'white' },
+    { name: 'Notificaciones', route: '/notifications', icon: "fa-solid fa-bell", color: 'white' },
     { name: 'Explorar eventos', route: '/events/explore', icon: "fa-solid fa-calendar", color: 'white' },
     { name: 'Descubrir personas', route: '/discover', icon: "fa-solid fa-people-robbery", color: 'white' },
     { name: 'Mensajes privados', route: '/messages', icon: "fa-solid fa-message", color: 'white' },
-    {name: 'Ayuda', route: '/help', icon:'fa-regular fa-circle-question', color: 'white'}
+    { name: 'Ayuda', route: '/help', icon: 'fa-regular fa-circle-question', color: 'white' }
 ]);
 
 let aAdminRoutes = ref([
@@ -70,24 +79,30 @@ let bTriggerLogoutPopup = ref(false);
 let bShow = ref(false);
 let bToggleSidebar = ref(false);
 
+let iNewNotifications = ref(0);
+
 onMounted(() => {
     togglerIn = document.getElementById('togglerIn');
     sidebar = document.getElementById('sidebar');
     bg = document.getElementById('bg');
     togglerIn.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
+        sidebar.classList.toggle('open-h');
+        sidebar.classList.toggle('open-w');
         bg.classList.toggle('bg-appear');
         setTimeout(() => {
             bShow.value = !bShow.value;
         }, 100);
     })
     bg.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
+        sidebar.classList.toggle('open-h');
+        sidebar.classList.toggle('open-w');
         bg.classList.toggle('bg-appear');
         setTimeout(() => {
             bShow.value = !bShow.value;
         }, 100);
     })
+    axios.get("http://localhost:8000/api/countNewNotifications/" + userStore.person._iId)
+    .then(response => iNewNotifications.value = response.data);
 })
 
 function updateUsername(sUsername) {
@@ -102,12 +117,15 @@ function updateUsername(sUsername) {
     border: solid 3px black;
 }
 
-.hamburger {
+.hamburger-wrapper {
     position: fixed;
     left: 0;
     top: 0;
     cursor: pointer;
     z-index: 98;
+    background-color: rgb(103, 73, 238);
+    border-bottom-right-radius: 50%;
+    /* width: 3vw; */
 }
 
 .sidebar {
@@ -116,20 +134,28 @@ function updateUsername(sUsername) {
     margin: 0px;
     left: 0;
     top: 0;
-    height: 100vh;
+    /* height: 100vh; */
+    height: 0px;
     width: 0px;
     background-color: rgb(103, 73, 238);
     transition-duration: 400ms;
-    transition-property: width, opacity;
+    transition-property: height, width, opacity;
     transition-timing-function: ease-out;
     /* transition: width, opacity 200ms;
 transition-timing-function: ease-out; */
     color: white;
     opacity: 0;
     z-index: 98;
+    border-bottom-right-radius: 50%;
 }
 
-.open {
+.open-h {
+    height: 100vh;
+    opacity: 1;
+    border-bottom-right-radius: 0;
+}
+
+.open-w {
     width: 375px;
     opacity: 1;
 }
@@ -157,8 +183,14 @@ transition-timing-function: ease-out; */
     top: 0;
     width: 100%;
     height: 65px;
-    background-color: rgb(103, 73, 238);
+    /* background-color: rgb(103, 73, 238); */
     z-index: 98;
+}
+
+.new-notif-wrapper {
+    border: solid 1px white;
+    margin-left: 5px;
+    padding: 3px;
 }
 
 .option:hover {

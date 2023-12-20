@@ -11,7 +11,7 @@
             <PostComponent :post="post" :clickable="false" @report="setPopup" v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
             <div class="row mt-2" v-else>
               <p class="fs-4 fw-light mt-2" v-if="post._tDeleteDate != null">Esta publicación ha sido eliminada.</p>
-              <p class="fs-4 fw-light mt-2" v-if="post._user._bIsSuspended">Esta pertenece a una cuenta que ha sido eliminada.</p>
+              <p class="fs-4 fw-light mt-2" v-if="post._user._bIsSuspended">Esta publicación pertenece a una cuenta que ha sido eliminada.</p>
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
           </div>
         </div>
         <div class="card" v-else>
-          <p class="lead fw-formal" style="margin=20px;">Aún no hay respuestas para esta publicación :&#40;</p>
+          <p class="lead fw-formal p-2" style="margin=20px;">Aún no hay respuestas para esta publicación :&#40;</p>
         </div>
 
       </div>

@@ -1,7 +1,6 @@
 <template>
 <SidebarFinal></SidebarFinal>
 <div class="container" v-if="!bIsFetching">
-
         <div class="mt-3 text-center">
             <h3>Descubrir personas</h3>
         </div>
@@ -10,15 +9,12 @@
                 <h5 class="fw-bold">Filtros</h5>
                 <div class="mt-3">
                     <p>Intereses</p>
-                    <ul class="list-unstyled" v-if="userStore.person._setInterests.length != 0">
+                    <ul class="list-unstyled">
                         <li v-for="interest in aInterests">
                             <input type="checkbox" :value="interest._sName" v-model="aCheckedInterests"> <span
                                 class="small text-muted">{{ interest._sName }}</span>
                         </li>
                     </ul>
-                    <div class="col-6" v-else>
-                        <p class="text-muted">Selecciona al menos un interés para poder usar el filtro</p>
-                    </div>
                     <p>País</p>
                     <select class="form-select w-75" v-model="sSelectedCountry">
                         <option :value="null">Cualquiera</option>
@@ -107,7 +103,7 @@
                     aparecer usuarios que ya se han mostrado</p>
                 <div class="text-center">
                     <button type="button" class="btn btn-primary mt-2 float-center"
-                        @click="userStore.aiShownUserIds = []">Limpiar</button>
+                        @click="refreshUserList()">Limpiar</button>
                 </div>
             </div>
         </div>
@@ -155,26 +151,32 @@ let iTotalPages = 1;
 
 
 onMounted(() => {
-    aCountries.value.push(userStore.person._province._region._country); //findall para este valor inicial
+    axios.get("http://localhost:8000/api/getAllCountries")
+    .then(response => aCountries.value = response.data);
     setUserIds();
     axios.get("http://localhost:8000/api/getFollowing/" + userStore.person._sUsername)
     .then(response => aFollowing.value = response.data);
 
     axios.get("http://localhost:8000/api/getAllInterests")
     .then(response => aInterests.value = response.data);
-    axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
+
+    if(userStore.person._province != null) {
+        axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
         .then(response => aRegions.value = response.data)
         .catch(error => console.log(error));
-
-    axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
+        
+        axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
         .then(response => aProvinces.value = response.data)
         .catch(error => console.log(error));
+    }
 
     setTimeout(() => {
         bIsFetching.value = false;
         
     }, 750);
 })
+
+
 
 function setUserIds() {
     aiUserIds.value = [];
@@ -205,6 +207,11 @@ function setUserIds() {
                 setCurrentPersonData();
             }
         })
+}
+
+function refreshUserList() {
+    userStore.aiShownUserIds = []; 
+    location.reload();
 }
 
 function setCurrentPersonData() {

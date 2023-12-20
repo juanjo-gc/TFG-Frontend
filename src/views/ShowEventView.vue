@@ -55,6 +55,9 @@
                                 <button type="button" class="btn btn-primary me-5" v-else @click="setAssist">No
                                     participar</button>
                             </div>
+                            <div class="row" v-else>
+                                <button type="button" class="btn btn-primary me-5" @click="router.push('/events/edit/' + event._iId)">Editar</button>
+                            </div>
                         </div>
                         <div class="row d-flex align-items-center justify-content-end"
                             v-if="!bIsFinished && userStore.person._sRole === 'User' && userStore.person._iId != event._organizer._iId">

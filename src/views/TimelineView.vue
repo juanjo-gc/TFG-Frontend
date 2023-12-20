@@ -28,7 +28,12 @@
         <div class="col-md-8">
           <div class="card mt-4">
             <div class="card-body">
-              <ul class="list-unstyled">
+              <div class="row" v-if="aPosts.length === 0">
+                <p class="fs-5 fw-light">Parece que no hay nada por aquí... </p>
+                <p class="fs-5 fw-light text-center">Puedes probar a buscar personas con las que interactuar pulsando <a href="/discover">aquí</a> o
+                  apuntarte a un evento pulsando <a href="/events/explore">aquí</a>. ¡Comienza a conocer nuevas personas y a interactuar con ellas!</p>
+                </div>
+              <ul class="list-unstyled" v-else>
                 <li v-for="post in aPosts">
                   <!-- <div class="media post-border" v-if="post._tDeleteDate === null && !post._user._bIsSuspended">
                     <div class="row">
