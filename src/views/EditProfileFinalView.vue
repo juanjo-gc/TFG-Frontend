@@ -131,7 +131,7 @@
                                 general de cómo eres.
                             </div>
                         </div>
-                        <div class="col-md-2 mb-3">
+                        <div class="col-md-3 mb-3">
                             <button type="button" class="btn btn-primary" @click="sendImages">Subir fotos</button>
                         </div>
                         <div class="mb-3">
@@ -139,7 +139,7 @@
                             <input class="form-control" type="file" id="profileImage" ref="profileImg"
                                 accept="image/png, image/jpeg" @change="onProfileImageUpload">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <button type="button" class="btn btn-primary" @click="uploadProfileImage">Cambiar foto de
                                 perfil</button>
                         </div>
@@ -167,8 +167,8 @@
                             serán visibles para todos los usuarios.
                         </div>
                     </div>
-                    <div class="col-md-3 mb-3">
-                        <button type="button" class="btn btn-primary mb-3"
+                    <div class="col-md-4 mb-3">
+                        <button type="button" class="btn btn-outline-primary mb-3"
                             @click="bShowPasswordChange = !bShowPasswordChange">
                             <!-- <p class="mt-1" >Cambiar contraseña</p>
                             <p v-else>No cambiar contraseña</p> -->

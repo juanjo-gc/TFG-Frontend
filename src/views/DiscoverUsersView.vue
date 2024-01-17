@@ -55,6 +55,11 @@
                         </div>
                         <div class="row">
                             <p class="card-text">@{{ currentPerson._sUsername }}</p>
+                            <p class="card-text" v-if="currentPerson._province != null">
+                                <strong>Localización: </strong>{{ currentPerson._province._sName }}, 
+                                {{ currentPerson._province._region._sName }}, {{ currentPerson._province._region._country._sName }}
+                            </p>
+                            <p class="card-text" v-else>El usuario no ha seleccionado localización.</p>
                             <ul class="list-group list-group-horizontal" style="list-style-type: none">
                                 <li class="litem" v-for="interest in currentPerson._setInterests" :key="interest._iId">
                                     {{ interest._sName }}
@@ -187,9 +192,13 @@ function setUserIds() {
         sProvince: sSelectedProvince.value
     })
         .then(response => {
-            console.log(response.data.content)
+            // console.log(response.data.content)
+            console.log("Antes de cambiar")
+            console.log(aiUserIds.value)
             iTotalPages = response.data.totalPages;
             aiUserIds.value = response.data.content;
+            console.log("Después de cambiar")
+            console.log(aiUserIds.value)
             const tDateToday = moment(new Date());
             // userStore.tUpdatedUsersToShow = tDateToday;
             if(userStore.tUpdatedUsersToShow === null || tDateToday.isAfter(userStore.tUpdatedUsersToShow)) {
@@ -201,9 +210,12 @@ function setUserIds() {
                 aiUserIds.value = aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iExcludedId === iId));
             }
             if (aiUserIds.value.length != 0) {
+                let province = {};
                 do {
                     currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
-                } while (currentId.value === userStore.person._iId && aFollowing.value.some(following => following._iId === currentId.value));
+                    axios.get("http://localhost:8000/api/getUserProvince/" + currentId.value)
+                    .then(response => province = response.data);
+                } while (currentId.value === userStore.person._iId && aFollowing.value.some(following => following._iId === currentId.value) && province._sName != sSelectedProvince.value);
                 setCurrentPersonData();
             }
         })
@@ -216,9 +228,9 @@ function refreshUserList() {
 
 function setCurrentPersonData() {
     iShownUsers++;
-    console.log("CurrentId en setperson: " + currentId.value)
+    // console.log("CurrentId en setperson: " + currentId.value)
     userStore.aiShownUserIds.push(currentId.value);
-    console.log(aiUserIds.value);
+    // console.log(aiUserIds.value);
     aiUserIds.value.splice(aiUserIds.value.indexOf(currentId.value), 1);
     axios.get("http://localhost:8000/api/getUser/" + currentId.value)
         .then(response => {
@@ -265,16 +277,19 @@ function sendFilter() {
     })
         .then(response => {
             if (response.data.length != 0) {
+                console.log("Antes de cambiar")
+                console.log(aiUserIds.value)
                 aiUserIds.value = response.data.content;
-                console.log("En sendFilter")
-                console.log(aiUserIds.value);
+                // console.log("En sendFilter")
+                console.log("Después de cambiar")
+                console.log(aiUserIds.value)
                 iTotalPages = response.data.totalPages;
                 aiUserIds.value = aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iId === iExcludedId));    // Elimina las ocurrencias de las ids filtradas con las que se han mostrado recientemente
                 if(aiUserIds.value.length != 0) {
                     do {
                         currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
                     } while (currentId.value === userStore.person._iId && aFollowing.value.some(following => following._iId === currentId.value));
-                    console.log("A la hora de filtrar: " + currentId.value)
+                    // console.log("A la hora de filtrar: " + currentId.value)
                     setCurrentPersonData();
                 }
             }

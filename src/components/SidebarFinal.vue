@@ -58,7 +58,7 @@ let aUserRoutes = ref([
     { name: 'Ver perfil', route: '/profile/' + userStore.person._sUsername, icon: "fa-solid fa-user", color: 'white' },
     { name: 'Notificaciones', route: '/notifications', icon: "fa-solid fa-bell", color: 'white' },
     { name: 'Explorar eventos', route: '/events/explore', icon: "fa-solid fa-calendar", color: 'white' },
-    { name: 'Descubrir personas', route: '/discover', icon: "fa-solid fa-people-robbery", color: 'white' },
+    { name: 'Descubrir personas', route: '/users/explore', icon: "fa-solid fa-people-robbery", color: 'white' },
     { name: 'Mensajes privados', route: '/messages', icon: "fa-solid fa-message", color: 'white' },
     { name: 'Ayuda', route: '/help', icon: 'fa-regular fa-circle-question', color: 'white' }
 ]);
@@ -139,7 +139,7 @@ function updateUsername(sUsername) {
     width: 0px;
     background-color: rgb(103, 73, 238);
     transition-duration: 400ms;
-    transition-property: height, width, opacity;
+    transition-property: width, height opacity;
     transition-timing-function: ease-out;
     /* transition: width, opacity 200ms;
 transition-timing-function: ease-out; */

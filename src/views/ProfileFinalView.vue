@@ -65,31 +65,32 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-8">
-                        <p class="mt-2 ms-2 fw-light">{{ person._sDescription }}</p>
+                    <div class="col-md-7">
+                        <p class="mt-2 ms-2 fw-light text-break">{{ person._sDescription }}</p>
                         <p class="mt-4" v-if="person._province != null">
                             <strong>Ubicación: </strong>{{ person._province._sName }}, {{ person._province._region._sName
                             }}, {{ person._province._region._country._sName }}
                         </p>
                     </div>
-                    <div class="col-md-3 ms-4">
+                    <div class="col-md-1"></div>
+                    <div class="col-md-4 ">
                         <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
-                            <div class="col-md-4">
-                                <p class="mb-1 h5">{{ iNumPosts }}</p>
-                                <p class="small text-muted mb-0">Publicaciones</p>
+                            <div class="col-md-4" style="word-wrap: keep-all;">
+                                <p class="mb-1 h5 text-center">{{ iNumPosts }}</p>
+                                <p class="small text-muted mb-0 text-center">Publicaciones</p>
                             </div>
                             <div class="col-md-4">
                                 <router-link :to="`/${person._sUsername}/following`"
                                     style="text-decoration: none; color: inherit;">
-                                    <p class="mb-1 h5">{{ iNumFollowing }}</p>
-                                    <p class="small text-muted mb-0">Siguiendo</p>
+                                    <p class="mb-1 h5 text-center">{{ iNumFollowing }}</p>
+                                    <p class="small text-muted mb-0 text-center">Siguiendo</p>
                                 </router-link>
                             </div>
                             <div class="col-md-4">
                                 <router-link :to="`/${person._sUsername}/followers`"
                                     style="text-decoration: none; color: inherit;">
-                                    <p class="mb-1 h5">{{ iNumFollowers }}</p>
-                                    <p class="small text-muted mb-0">Seguidores</p>
+                                    <p class="mb-1 h5 text-center">{{ iNumFollowers }}</p>
+                                    <p class="small text-muted mb-0 text-center">Seguidores</p>
                                 </router-link>
                             </div>
                         </div>
@@ -257,7 +258,7 @@
                         <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
                         <div class="row">
                             <h5 class="mt-2 fs-light">Preguntas 'Conóceme' de {{ person._sName }}</h5>
-                            <ul class="mt-4">
+                            <ul class="mt-4" v-if="shouldShowAnswers()">
                                 <li v-for="answer in aAMAnswers" class="ms-4">
                                     <div class="row mt-2">
                                         <p class="fw-bold">{{ answer._question._sQuestion }}</p>
@@ -265,7 +266,9 @@
                                     </div>
                                 </li>
                             </ul>
-                        </div>
+                            <div class="row" v-else>
+                            <p class="fw-light">El usuario no ha indicado ninguna respuesta a las preguntas :&#40;</p>
+                        </div>                        </div>
                         <h5 class="mt-2 fs-light">Fotos de {{ person._sName }}</h5>
                         <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
                             <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos"
@@ -504,6 +507,13 @@ function sendReport() {
     bShowOptions.value = false;
 }
 
+function shouldShowAnswers() {
+    if(aAMAnswers.value.length === 0) {
+        return false;
+    } else {
+        return aAMAnswers.value.some(answer => answer._sAnswer != '');
+    }
+}
 
 function setBlockReportPopup(bWantToBlock) {
     if (bWantToBlock) {
@@ -580,6 +590,8 @@ function blockUnblockUser() {
 
 
 <style scoped>
+
+
 image {
     object-fit: contain;
 }

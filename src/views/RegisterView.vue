@@ -34,7 +34,8 @@
                         placeholder="Debe ser único y servirá para identificarte" v-model="username"
                         @keyup="checkUsername" required />
                       <small class="text-muted" v-if="isUsernameTaken">Ese nombre de usuario ya está en uso</small>
-                      <small class="text-muted" v-if="bIsUsernameIncorrect">El nombre de usuario no puede contener caracteres especiales ni espacios.</small>
+                      <small class="text-muted" v-if="bIsUsernameIncorrect">El nombre de usuario no puede contener
+                        caracteres especiales ni espacios.</small>
                     </div>
                     <label class="form-label" for="password">Contraseña</label>
                     <div class="form-outline mb-4">
@@ -74,7 +75,8 @@
                     </div> -->
                     <div class="text-center pt-1 mb-5 pb-1">
                       <!-- <router-link to="/"> -->
-                      <button class="btn btn-primary btn-block fa-lg gradient-custom mb-3 btnLogin" type="button" @click="registerUser">
+                      <button class="btn btn-primary btn-block fa-lg gradient-custom mb-3 btnLogin" type="button"
+                        @click="registerUser">
                         Regístrate
                       </button>
                       <!-- </router-link> -->
@@ -92,13 +94,21 @@
     </section>
     <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="bTriggerErrorAlert">
       <strong>Error. </strong>{{ sAlertMessage }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="bTriggerErrorAlert = false;"></button>
-</div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
+        @click="bTriggerErrorAlert = false;"></button>
+    </div>
+    <Popup v-if="bTriggerSuccessPopup">
+      <div class="row">
+        <h4 class="mt-4">¡Felicidades! Te has registrado.</h4>
+      </div>
+      <p class="mt-4 fw-light">Te estamos redirigiendo para que inicies sesión.</p>
+    </Popup>
   </div>
 </template>
 
 <script setup>
 import { useUserStore } from '@/store/UserStore';
+import Popup from '@/components/Popup.vue';
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import moment from 'moment';
@@ -125,6 +135,7 @@ let aFilteredRegions = ref([]);
 let aFilteredProvinces = ref([]);
 let bTriggerErrorAlert = ref(false);
 let sAlertMessage = ref("");
+let bTriggerSuccessPopup = ref(false);
 
 onMounted(() => {
   axios.get("http://localhost:8000/api/getAllCountries")
@@ -156,7 +167,7 @@ function getProvinces() {
 }
 
 function selectProvince(province) {
-  if(province._region._country._sName != sCountry.value) {
+  if (province._region._country._sName != sCountry.value) {
     sRegion.value = province._region._sName;
     sCountry.value = province._region._country._sName;
     getRegions();
@@ -177,19 +188,19 @@ async function checkEmail() {
 async function checkUsername() {
   let whiteSpaceRegex = new RegExp(/\W+/);
   let alphanumericRegex = new RegExp(/[a-zA-Z0-9]/);
-  if(username.value.match(whiteSpaceRegex) || !username.value.match(alphanumericRegex))
+  if (username.value.match(whiteSpaceRegex) || !username.value.match(alphanumericRegex))
     bIsUsernameIncorrect.value = true;
   else
     bIsUsernameIncorrect.value = false;
 
-  if(!bIsUsernameIncorrect.value) { //Enviar peticion si el mensaje es correcto
+  if (!bIsUsernameIncorrect.value) { //Enviar peticion si el mensaje es correcto
     axios.post("http://localhost:8000/api/checkUser", {
       sUsername: username.value
     })
-    .then(response => {
-      isUsernameTaken.value = response.data
-    })
-    .catch(error => console.log(error))
+      .then(response => {
+        isUsernameTaken.value = response.data
+      })
+      .catch(error => console.log(error))
   }
 }
 
@@ -200,33 +211,36 @@ async function registerUser() {
     sAlertMessage.value = isUsernameTaken.value ? "El nombre de usuario ya se encuentra en uso." : "Escribe un nombre de usuario correcto de acuerdo a las indicaciones";
   } else if (isEmailTaken.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value ="La dirección de correo ya se encuentra en uso."
+    sAlertMessage.value = "La dirección de correo ya se encuentra en uso."
   } else if (password.value != confirmPassword.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value ="Las contraseñas deben coincidir.";
-  } else if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now())) ) {
-      bTriggerErrorAlert.value = true;
-      sAlertMessage.value ="Debes ser mayor de edad para registrarte."
+    sAlertMessage.value = "Las contraseñas deben coincidir.";
+  } else if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now()))) {
+    bTriggerErrorAlert.value = true;
+    sAlertMessage.value = "Debes ser mayor de edad para registrarte."
     // } else if(sProvince.value === 'Provincia') {
     //   bTriggerErrorAlert.value = true;
     //   sAlertMessage.value = "Asegúrate de elegir una localización correcta."
-    } else {
-      console.log("hola")
-      axios.post("http://localhost:8000/api/register", {
-        sEmail: email.value,
-        sName: name.value,
-        sUsername: username.value,
-        sPassword: password.value,
-        tBirthDate: birthDate.value,
-        sProvince: null
+  } else {
+    console.log("hola")
+    axios.post("http://localhost:8000/api/register", {
+      sEmail: email.value,
+      sName: name.value,
+      sUsername: username.value,
+      sPassword: password.value,
+      tBirthDate: birthDate.value,
+      sProvince: null
+    })
+      .then(response => {
+        bTriggerSuccessPopup.value = true;
+        setTimeout(() => {
+          router.push('/');
+        }, 4500);
       })
-        .then(response => {
-          router.push('/login')
-        })
-        .catch(error => {
-          console.log(error);
-        })
-    }
+      .catch(error => {
+        console.log(error);
+      })
+  }
 }
 
 </script>
@@ -262,5 +276,4 @@ async function registerUser() {
   right: 0;
   left: 0;
   z-index: 1030;
-} */
-</style>
+} */</style>

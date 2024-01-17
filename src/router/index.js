@@ -140,10 +140,10 @@ const routes = [
     }
   },
   {
-    path: "/discover/",
-    name: "discoverUsers",
+    path: "/users/explore",
+    name: "exploreUssers",
     component: () =>
-      import(/* webpackChunkName "register" */ "@/views/DiscoverUsersView.vue"),
+      import(/* webpackChunkName "register" */ "@/views/ExploreUsersView.vue"),
     meta: {
       requiresAuth: true,
       adminAuth: false,
