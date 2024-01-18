@@ -6,8 +6,7 @@
             <div class="col-md-10 border border-2 mx-4 p-4">
                 <div class="row">
                     <div class="col-md-2" v-if="bIsBlockedByPerson || bIsPersonBlocked">
-                        <img src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
-                            alt="" class="img-min-circle mt-2 mb-2" />
+                        <img src="http://localhost:8000/api/getProfileImage/0" alt="" class="img-min-circle mt-2 mb-2" />
                     </div>
                     <div class="col-md-2" v-else>
                         <img :src="sProfileImageURL
@@ -15,20 +14,24 @@
                             // setProfileImageURL
                             " alt="ProfileImg" class="img-min-circle mt-2 mb-2"
                             v-if="person._iId != 0 && sProfileImageURL" />
-                        <img v-else
-                            src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
-                            alt="" class="img-min-circle mt-2 mb-2" />
+                        <img v-else src="http://localhost:8000/api/getProfileImage/0" alt=""
+                            class="img-min-circle mt-2 mb-2" />
                     </div>
                     <div class="col-md-6">
-                        <div class="row">
+                        <div class="row" v-if="person._iId != 0">
                             <p class="mt-4 fs-4">{{ person._sName }}</p>
                             <p class="text-muted">@{{ person._sUsername }}</p>
+                        </div>
+                        <div class="row" v-else>
+                            <p class="mt-4 fs-4">Esta cuenta no existe</p>
+                            <p class="text-muted">@{{ route.params.username }}</p>
+
                         </div>
                     </div>
                     <div class="col-md-4 ">
                         <div class="row mt-2">
                             <div class="col-md-8"
-                                v-if="!bIsBlockedByPerson && !bIsPersonBlocked && userStore.person._iId != person._iId">
+                                v-if="!bIsBlockedByPerson && !bIsPersonBlocked && userStore.person._iId != person._iId && person._iId != 0">
                                 <button type="button" class="btn btn-outline-primary mt-3 float-end" v-if="!bFollowed"
                                     @click="setFollow">Seguir</button>
                                 <button type="button" class="btn btn-secondary mt-3 float-end"
@@ -43,7 +46,7 @@
                                 </button>
                             </div>
                             <div class="col-md-2" @click="bShowOptions = !bShowOptions"
-                                v-if="userStore.person._iId != person._iId">
+                                v-if="userStore.person._iId != person._iId && person._iId != 0">
                                 <div class="justify-content-center align-content-center d-flex mt-3 options-button p-2">
                                     <font-awesome-icon icon="fa-solid fa-ellipsis-vertical" size="xl" class="" />
                                 </div>
@@ -67,13 +70,13 @@
                     </div>
                     <div class="col-md-7">
                         <p class="mt-2 ms-2 fw-light text-break">{{ person._sDescription }}</p>
-                        <p class="mt-4" v-if="person._province != null">
+                        <p class="mt-4" v-if="person._province._iId != 0">
                             <strong>Ubicación: </strong>{{ person._province._sName }}, {{ person._province._region._sName
                             }}, {{ person._province._region._country._sName }}
                         </p>
                     </div>
                     <div class="col-md-1"></div>
-                    <div class="col-md-4 ">
+                    <div class="col-md-4" v-if="person._iId != 0">
                         <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
                             <div class="col-md-4" style="word-wrap: keep-all;">
                                 <p class="mb-1 h5 text-center">{{ iNumPosts }}</p>
@@ -96,207 +99,222 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mt-2" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
-                    <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory[0] }"
-                        @click="selectCategory(0)">
-                        <p class="m-2 p-2 text-center opt-text">Publicaciones</p>
-                    </div>
-                    <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory.at(1) }"
-                        @click="selectCategory(1)">
-                        <p class="m-2 p-2 text-center">Eventos</p>
-                    </div>
-                    <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory[2] }"
-                        @click="selectCategory(2)">
-                        <p class="m-2 p-2 text-center">Información</p>
-                    </div>
-                    <div class="col-md-3 border category" :class="{ selected: abSelectedCategory[3] }"
-                        @click="selectCategory(3)">
-                        <p class="m-2 p-2 text-center">Me gusta</p>
-                    </div>
-                </div>
-                <div class="row mt-4" v-else>
-                    <p class="fs-5 fw-light" v-if="bIsBlockedByPerson">
-                        Este usuario te ha bloqueado
-                    </p>
-                    <p class="fs-5 fw-light" v-else>
-                        Bloqueaste a este usuario
-                    </p>
-                </div>
-                <!-- Publicaciones -->
-                <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
-                    <div class="row mt-4" v-if="abSelectedCategory[0]">
-                        <div class="row" v-if="!person._bIsPrivate || bFollowed || userStore.person._iId === person._iId">
-                            <h5 class="mt-2 fs-light">Publicaciones de {{ person._sName }}</h5>
-                            <ul class="list-unstyled mt-2">
-                                <li v-for="post in aPosts">
-                                    <PostComponent :post="post" @report="bTriggerReportPopup = true"
-                                        v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
-                                </li>
-                            </ul>
+                <div class="row" v-if="person._iId != 0">
+                    <div class="row mt-2" v-if="!bIsBlockedByPerson && !bIsPersonBlocked && person._iId != 0">
+                        <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory[0] }"
+                            @click="selectCategory(0)">
+                            <p class="m-2 p-2 text-center opt-text">Publicaciones</p>
                         </div>
-                        <div class="row" v-else>
-                            <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                        <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory.at(1) }"
+                            @click="selectCategory(1)">
+                            <p class="m-2 p-2 text-center">Eventos</p>
+                        </div>
+                        <div class="col-md-3 border border-end-0 category" :class="{ selected: abSelectedCategory[2] }"
+                            @click="selectCategory(2)">
+                            <p class="m-2 p-2 text-center">Información</p>
+                        </div>
+                        <div class="col-md-3 border category" :class="{ selected: abSelectedCategory[3] }"
+                            @click="selectCategory(3)">
+                            <p class="m-2 p-2 text-center">Me gusta</p>
                         </div>
                     </div>
-                    <!-- Eventos -->
-                    <div class="row mt-4" v-if="abSelectedCategory[1]">
-                        <div class="row" v-if="!person._bIsPrivate || bFollowed || userStore.person._iId === person._iId">
-                            <div class="row d-flex justify-content-center">
-                                <select class="form-select justify-self-center p-2 ms-4" v-model="bEventSelector">
-                                    <option :value="true" selected>Participados</option>
-                                    <option :value="false" v-if="person._iId != userStore.person._iId">Creados por {{ person._sName }}</option>
-                                    <option :value="false" v-else>Creados por mí</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 mt-2">
-                                <ul class="list-unstyled">
-                                    <li v-for="event in aEvents" v-if="bEventSelector">
-                                        <div class="media event-card m-2" v-if="event._tDeleteDate === null">
-                                            <div class="row">
-                                                <div class="col-md-7">
-                                                    <h5 class="mt-0 mb-1">
-                                                        <router-link :to="`/events/${event._iId}`"
-                                                            style="text-decoration: none; color: inherit;">
-                                                            {{ event._sTitle }}
-                                                        </router-link>
-                                                    </h5>
-                                                    <h6>
-                                                        <p class="text-muted">Organizado por: @{{
-                                                            event._organizer._sUsername }}</p>
-                                                    </h6>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <p class="text-muted" v-if="event._location != null">
-                                                        <strong>Celebrado en: </strong>{{ event._location._province._sName }}, 
-                                                        {{ event._location._province._region._sName }}, {{ event._location._province._region._country._sName }}
-                                                    </p>
-                                                    <p class="text-muted float-end" v-else><strong>Evento online</strong>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="media-body">
-                                                <router-link :to="`/events/${event._iId}`"
-                                                    style="text-decoration: none; color: inherit;">
-                                                    <div>
-                                                        <p v-if="event._sDescription.length <= 250">{{
-                                                            event._sDescription }}</p>
-                                                        <p v-else>{{ proccessDescription(event._sDescription) }}...</p>
-                                                    </div>
-                                                </router-link>
-                                                <div class="row">
-                                                    <div class="col-md-6"></div>
-                                                    <div class="col-md-6">
-                                                        <small class="text-muted float-end" style="margin-top: 10px;">
-                                                            Fecha del evento: {{
-                                                                moment(event._tCelebratedAt).format('D-M-YYYY') }}
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li v-for="event in aCreatedEvents" v-else>
-                                        <div class="media event-card m-2" v-if="event._tDeleteDate === null">
-                                            <div class="row">
-                                                <div class="col-md-7">
-                                                    <h5 class="mt-0 mb-1">
-                                                        <router-link :to="`/events/${event._iId}`"
-                                                            style="text-decoration: none; color: inherit;">
-                                                            {{ event._sTitle }}
-                                                        </router-link>
-                                                    </h5>
-                                                    <h6>
-                                                        <p class="text-muted">Organizado por: @{{
-                                                            event._organizer._sUsername }}</p>
-                                                    </h6>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <p class="text-muted" v-if="event._location != null">
-                                                        <strong>Celebrado en: </strong>{{ event._location._province._sName }}, 
-                                                        {{ event._location._province._region._sName }}, {{ event._location._province._region._country._sName }}
-                                                    </p>
-                                                    <p class="text-muted float-end" v-else><strong>Evento online</strong>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="media-body">
-                                                <router-link :to="`/events/${event._iId}`"
-                                                    style="text-decoration: none; color: inherit;">
-                                                    <div>
-                                                        <p v-if="event._sDescription.length <= 250">{{
-                                                            event._sDescription }}</p>
-                                                        <p v-else>{{ proccessDescription(event._sDescription) }}...</p>
-                                                    </div>
-                                                </router-link>
-                                                <div class="row">
-                                                    <div class="col-md-6"></div>
-                                                    <div class="col-md-6">
-                                                        <small class="text-muted float-end" style="margin-top: 10px;">
-                                                            Fecha del evento: {{
-                                                                moment(event._tCelebratedAt).format('D-M-YYYY') }}
-                                                        </small>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                    <div class="row mt-4" v-else>
+                        <p class="fs-5 fw-light" v-if="bIsBlockedByPerson">
+                            Este usuario te ha bloqueado
+                        </p>
+                        <p class="fs-5 fw-light" v-else>
+                            Bloqueaste a este usuario
+                        </p>
+                    </div>
+                    <!-- Publicaciones -->
+                    <div class="row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
+                        <div class="row mt-4" v-if="abSelectedCategory[0]">
+                            <div class="row"
+                                v-if="!person._bIsPrivate || bFollowed || userStore.person._iId === person._iId">
+                                <h5 class="mt-2 fs-light">Publicaciones de {{ person._sName }}</h5>
+                                <ul class="list-unstyled mt-2">
+                                    <li v-for="post in aPosts" :key="post._iId">
+                                        <PostComponent :post="post" @report="bTriggerReportPopup = true"
+                                            v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
                                     </li>
                                 </ul>
                             </div>
-                        </div>
-                        <div class="row" v-else>
-                            <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
-                        </div>
-                    </div>
-                    <!-- Informacion -->
-                    <div class="row mt-4" v-if="abSelectedCategory[2]">
-                        <h5 class="mt-2 fs-light">Intereses de {{ person._sName }}</h5>
-                        <ul class="list-unstyled list-group list-group-horizontal mt-2 ms-4">
-                            <li v-for="interest in person._setInterests">
-                                <p class="ms-2 interest">{{ interest._sName }}</p>
-                            </li>
-                        </ul>
-                        <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
-                        <div class="row">
-                            <h5 class="mt-2 fs-light">Preguntas 'Conóceme' de {{ person._sName }}</h5>
-                            <ul class="mt-4" v-if="shouldShowAnswers()">
-                                <li v-for="answer in aAMAnswers" class="ms-4">
-                                    <div class="row mt-2">
-                                        <p class="fw-bold">{{ answer._question._sQuestion }}</p>
-                                        <p class="fw-light">{{ answer._sAnswer }}</p>
-                                    </div>
-                                </li>
-                            </ul>
                             <div class="row" v-else>
-                            <p class="fw-light">El usuario no ha indicado ninguna respuesta a las preguntas :&#40;</p>
-                        </div>                        </div>
-                        <h5 class="mt-2 fs-light">Fotos de {{ person._sName }}</h5>
-                        <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
-                            <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos"
-                                @click="bTriggerFullscreenImage = true; fsImage = photo">
-                                <img class="user-image m-1" :src="'http://localhost:8000/api/getImage/' + photo._sName"
-                                    alt="" v-if="photo._tDeleteDate === null">
+                                <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
                             </div>
                         </div>
-                        <div class="row" v-else>
-                            <p class="fw-light">El usuario no ha subido ninguna foto :&#40;</p>
+                        <!-- Eventos -->
+                        <div class="row mt-4" v-if="abSelectedCategory[1]">
+                            <div class="row"
+                                v-if="!person._bIsPrivate || bFollowed || userStore.person._iId === person._iId">
+                                <div class="row d-flex justify-content-center">
+                                    <select class="form-select justify-self-center p-2 ms-4" v-model="bEventSelector">
+                                        <option :value="true" selected>Participados</option>
+                                        <option :value="false" v-if="person._iId != userStore.person._iId">Creados por {{
+                                            person._sName }}</option>
+                                        <option :value="false" v-else>Creados por mí</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <ul class="list-unstyled">
+                                        <li v-for="event in aEvents" v-if="bEventSelector">
+                                            <div class="media event-card m-2" v-if="event._tDeleteDate === null">
+                                                <div class="row">
+                                                    <div class="col-md-7">
+                                                        <h5 class="mt-0 mb-1">
+                                                            <router-link :to="`/events/${event._iId}`"
+                                                                style="text-decoration: none; color: inherit;">
+                                                                {{ event._sTitle }}
+                                                            </router-link>
+                                                        </h5>
+                                                        <h6>
+                                                            <p class="text-muted">Organizado por: @{{
+                                                                event._organizer._sUsername }}</p>
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <p class="text-muted" v-if="event._location != null">
+                                                            <strong>Celebrado en: </strong>{{
+                                                                event._location._province._sName }},
+                                                            {{ event._location._province._region._sName }}, {{
+                                                                event._location._province._region._country._sName }}
+                                                        </p>
+                                                        <p class="text-muted float-end" v-else><strong>Evento
+                                                                online</strong>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="media-body">
+                                                    <router-link :to="`/events/${event._iId}`"
+                                                        style="text-decoration: none; color: inherit;">
+                                                        <div>
+                                                            <p v-if="event._sDescription.length <= 250">{{
+                                                                event._sDescription }}</p>
+                                                            <p v-else>{{ proccessDescription(event._sDescription) }}...</p>
+                                                        </div>
+                                                    </router-link>
+                                                    <div class="row">
+                                                        <div class="col-md-6"></div>
+                                                        <div class="col-md-6">
+                                                            <small class="text-muted float-end" style="margin-top: 10px;">
+                                                                Fecha del evento: {{
+                                                                    moment(event._tCelebratedAt).format('D-M-YYYY') }}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li v-for="event in aCreatedEvents" v-else>
+                                            <div class="media event-card m-2" v-if="event._tDeleteDate === null">
+                                                <div class="row">
+                                                    <div class="col-md-7">
+                                                        <h5 class="mt-0 mb-1">
+                                                            <router-link :to="`/events/${event._iId}`"
+                                                                style="text-decoration: none; color: inherit;">
+                                                                {{ event._sTitle }}
+                                                            </router-link>
+                                                        </h5>
+                                                        <h6>
+                                                            <p class="text-muted">Organizado por: @{{
+                                                                event._organizer._sUsername }}</p>
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <p class="text-muted" v-if="event._location != null">
+                                                            <strong>Celebrado en: </strong>{{
+                                                                event._location._province._sName }},
+                                                            {{ event._location._province._region._sName }}, {{
+                                                                event._location._province._region._country._sName }}
+                                                        </p>
+                                                        <p class="text-muted float-end" v-else><strong>Evento
+                                                                online</strong>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="media-body">
+                                                    <router-link :to="`/events/${event._iId}`"
+                                                        style="text-decoration: none; color: inherit;">
+                                                        <div>
+                                                            <p v-if="event._sDescription.length <= 250">{{
+                                                                event._sDescription }}</p>
+                                                            <p v-else>{{ proccessDescription(event._sDescription) }}...</p>
+                                                        </div>
+                                                    </router-link>
+                                                    <div class="row">
+                                                        <div class="col-md-6"></div>
+                                                        <div class="col-md-6">
+                                                            <small class="text-muted float-end" style="margin-top: 10px;">
+                                                                Fecha del evento: {{
+                                                                    moment(event._tCelebratedAt).format('D-M-YYYY') }}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row" v-else>
+                                <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                            </div>
                         </div>
-                    </div>
-                    <!-- Me gusta -->
-                    <div class="row mt-4" v-if="abSelectedCategory[3]">
-                        <div class="row" v-if="!person._bIsPrivate || bFollowed || userStore.person._iId === person._iId">
-                            <h5 class="mt-2 fs-light">Me gusta de {{ person._sName }}</h5>
-                            <ul class="list-unstyled mt-2">
-                                <li v-for="post in aLikedPosts">
-                                    <PostComponent :post="post" @report="bTriggerReportPopup"
-                                        v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
+                        <!-- Informacion -->
+                        <div class="row mt-4" v-if="abSelectedCategory[2]">
+                            <h5 class="mt-2 fs-light">Intereses de {{ person._sName }}</h5>
+                            <ul class="list-unstyled list-group list-group-horizontal mt-2 ms-4">
+                                <li v-for="interest in person._setInterests">
+                                    <p class="ms-2 interest">{{ interest._sName }}</p>
                                 </li>
                             </ul>
+                            <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
+                            <div class="row">
+                                <h5 class="mt-2 fs-light">Preguntas 'Conóceme' de {{ person._sName }}</h5>
+                                <ul class="mt-4" v-if="shouldShowAnswers()">
+                                    <li v-for="answer in aAMAnswers" class="ms-4">
+                                        <div class="row mt-2">
+                                            <p class="fw-bold">{{ answer._question._sQuestion }}</p>
+                                            <p class="fw-light">{{ answer._sAnswer }}</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="row" v-else>
+                                    <p class="fw-light">El usuario no ha indicado ninguna respuesta a las preguntas :&#40;
+                                    </p>
+                                </div>
+                            </div>
+                            <h5 class="mt-2 fs-light">Fotos de {{ person._sName }}</h5>
+                            <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
+                                <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos"
+                                    @click="bTriggerFullscreenImage = true; fsImage = photo">
+                                    <img class="user-image m-1" :src="'http://localhost:8000/api/getImage/' + photo._sName"
+                                        alt="" v-if="photo._tDeleteDate === null">
+                                </div>
+                            </div>
+                            <div class="row" v-else>
+                                <p class="fw-light">El usuario no ha subido ninguna foto :&#40;</p>
+                            </div>
                         </div>
-                        <div class="row" v-else>
-                            <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                        <!-- Me gusta -->
+                        <div class="row mt-4" v-if="abSelectedCategory[3]">
+                            <div class="row"
+                                v-if="!person._bIsPrivate || bFollowed || userStore.person._iId === person._iId">
+                                <h5 class="mt-2 fs-light">Me gusta de {{ person._sName }}</h5>
+                                <ul class="list-unstyled mt-2">
+                                    <li v-for="post in aLikedPosts">
+                                        <PostComponent :post="post" @report="bTriggerReportPopup"
+                                            v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="row" v-else>
+                                <p class="mt-2 fs-light fs-5">Esta cuenta es privada.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
         <Popup v-if="bTriggerFullscreenImage">
@@ -337,12 +355,13 @@
                     <label for="report" class="form-label">Motivo de la denuncia</label>
                     <textarea class="form-control" id="report" rows="3" v-model="sReportDescription"></textarea>
                 </div>
-                <div class="col-md-9"></div>
-                <div class="col-md-1">
+                <div class="col-md-8"></div>
+                <div class="col-md-2">
                     <button type="button" class="btn btn-danger me-4" v-if="bTriggerReportPopup" @click="sendReport()">
                         Denunciar
                     </button>
-                    <button type="button" class="btn btn-danger " @click="blockUnblockUser" v-else>Bloquear</button>
+                    <button type="button" class="btn btn-danger float-end" @click="blockUnblockUser" v-else-if="!bIsPersonBlocked">Bloquear</button>
+                    <button type="button" class="btn btn-primary me-4" @click="blockUnblockUser" v-else>Desbloquear</button>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-secondary ms-4"
@@ -358,8 +377,7 @@
             <div class="col-md-10 border border-2 mx-4 p-4">
                 <div class="row">
                     <div class="col-md-2">
-                        <img src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
-                            alt="" class="img-min-circle mt-2 mb-2" />
+                        <img src="http://localhost:8000/api/getProfileImage/0" alt="" class="img-min-circle mt-2 mb-2" />
                     </div>
                     <div class="col-md-6">
                         <div class="row">
@@ -500,15 +518,16 @@ onMounted(() => {
 });
 
 function sendReport() {
-    userStore.reportUser(person._iId, person._sUsername, sReportDescription);
+    userStore.reportUser(person.value._iId, person.value._sUsername, sReportDescription.value);
     bTriggerReportPopup.value = false;
     bTriggerBlockPopup.value = false;
     sReportSentAlert.value = "Se ha enviado la denuncia. La revisaremos y procesaremos lo antes posible.";
+    sReportDescription.value = "";
     bShowOptions.value = false;
 }
 
 function shouldShowAnswers() {
-    if(aAMAnswers.value.length === 0) {
+    if (aAMAnswers.value.length === 0) {
         return false;
     } else {
         return aAMAnswers.value.some(answer => answer._sAnswer != '');
@@ -518,7 +537,8 @@ function shouldShowAnswers() {
 function setBlockReportPopup(bWantToBlock) {
     if (bWantToBlock) {
         bTriggerBlockPopup.value = true;
-        sPopupMessage.value = "¿Estás seguro de que quieres bloquear a @" + person.value._sUsername + "? Esto impedirá que pueda interactuar contigo, " +
+        sPopupMessage.value = bIsPersonBlocked.value ? "Estás seguro de que quieres desbloquear a @" + person.value._sUsername + "?" :
+        "¿Estás seguro de que quieres bloquear a @" + person.value._sUsername + "? Esto impedirá que pueda interactuar contigo, " +
             " no podrá ver tu perfil, pero si te apuntas a un evento sí que podrá ver tu asistencia y comentarios."
     } else {
         bTriggerReportPopup.value = true;
@@ -590,8 +610,6 @@ function blockUnblockUser() {
 
 
 <style scoped>
-
-
 image {
     object-fit: contain;
 }
@@ -694,7 +712,7 @@ image {
 .event-card {
     border: solid 1px #d0d0d0;
     padding: 10px;
-    
+
 }
 
 .event-card:hover {

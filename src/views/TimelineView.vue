@@ -2,8 +2,8 @@
   <SidebarFinal></SidebarFinal>
   <div class="mx-4">
     <div class="row">
-      <div class="col-md-3">
-        <div class="fixed-top h-100 ">
+      <div class="col-md-2">
+        <div class="position-relative h-75">
           <div class="position-absolute abs-top">
               <ul class="list-unstyled">
                 <li v-for="route in aRoutes">
@@ -24,7 +24,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-7">
         <div class="card new-post">
           <div class="card-body">
             <div class="row d-flex justify-content-center">
@@ -43,7 +43,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <div class="fixed-top h-100 ">
+        <div class="position-sticky h-100">
           <div class="position-absolute abs-top abs-right">
             <p class="fw-bold text-center fs-5">Sugerencias de eventos para ti</p>
             <ul class="list-unstyled">
@@ -79,8 +79,8 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-3"></div>
-      <div class="col-md-6">
+      <div class="col-md-2"></div>
+      <div class="col-md-7">
         <div class="card mt-4">
           <div class="card-body">
             <div class="row" v-if="aPosts.length === 0">

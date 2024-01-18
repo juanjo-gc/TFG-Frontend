@@ -89,6 +89,7 @@ export const useUserStore = defineStore({
                 iPostId: -1,
                 sCategory: 'Denunciar un usuario'
             })
+            .then(response => console.log("Se ha enviado el report"))
         },
         softDeleteRestorePost(iPostId, iUserId, sUsername, sPost, bIsCurrentlyDeleted) {
             let bIsDeleted = !bIsCurrentlyDeleted;

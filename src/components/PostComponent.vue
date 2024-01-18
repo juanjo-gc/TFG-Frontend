@@ -31,7 +31,7 @@
                     </button>
                 </div>
                 <div class="col-md-3" v-if="post._user._iId != userStore.person._iId">
-                    <button class="btn float-end" style="background-color: transparent;" @click="$emit('report', post)" v-if="!bIsAdmin">
+                    <button class="btn float-end" style="background-color: transparent;" @click="$emit('report', post);" v-if="!bIsAdmin">
                         <font-awesome-icon icon="fa-solid fa-flag" size="sm" style="color: #8e0000;" />
                     </button>
                 </div>
