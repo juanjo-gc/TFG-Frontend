@@ -45,7 +45,7 @@
                                 <div class="col-md-8">
                                     <span class="ms-2 mt-1 fw-bold fw-light">{{ user._sName }}</span>
                                     <span class="text-muted ms-2 fw-light">@{{ user._sUsername }}</span>
-                                    <p class="mt-2 ms-3 small text-break" >{{ truncateDescription(user._sDescription) }}</p>
+                                    <p class="mt-2 ms-3 small text-break" v-if="sDescription != null">{{ truncateDescription(user._sDescription) }}</p>
                                 </div>
                                 <div class="col-md-4">
                                     <p class="fw-light small text-end">{{ user._province._sName }}, {{ user._province._region._sName }}, {{ user._province._region._country._sName }}</p>

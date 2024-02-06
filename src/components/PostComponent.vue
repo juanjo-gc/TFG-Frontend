@@ -1,5 +1,5 @@
 <template>
-    <div class="media post-border">
+    <div class="media post-border rounded">
         <div class="row">
             <div class="col-md-1">
                 <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
@@ -72,18 +72,7 @@ onMounted(() => {
   }
 })
 
-function reportPost(post) {
-      axios.post("http://localhost:8000/api/newTicket", {
-        sSubject: "Denuncia de publicación de @" + post._user._sUsername,
-        sDescription: sReportDescription.value,
-        iIssuerId: userStore.person._iId,
-        iReportedId: post._user._iId,
-        iEventId: -1,
-        iPostId: post._iId,
-        sCategory: 'Denunciar una publicación'
-      })
-    }
-  
+
   
     function setLike(postId) {
       if(!bIsAdmin) {

@@ -1,32 +1,43 @@
 <template>
-  <SidebarFinal></SidebarFinal>
-  <div class="mx-4">
+  <SidebarFinal ref="sidebar"></SidebarFinal>
+  <!-- <div class="mx-4"> -->
     <div class="row">
       <div class="col-md-2">
-        <div class="position-relative h-75">
-          <div class="position-absolute abs-top">
-              <ul class="list-unstyled">
-                <li v-for="route in aRoutes">
-                <div class="row option-preview rounded-pill p-2 mt-3 ms-4" @click="router.push(route.route)">
+        <div class="position-fixed w-100 mt-4" style="height: 85vh;">
+          <div class="position-absolute abs-top bg-soft rounded ms-3">
+            <ul class="list-unstyled p-4 ps-1">
+              <li v-for="route in aRoutes">
+                <div class="row option-preview rounded-pill p-2 mt-4 ms-4" @click="router.push(route.route)">
                   <div class="col-md-2">
                     <font-awesome-icon :icon="route.icon" size="xl" color="black" />
                   </div>
                   <div class="col-md-10">
                     <span> {{ route.name }}</span>
-                    <!-- <div class="new-notif-wrapper" v-if="route.name === 'Notificaciones' && iNewNotifications > 0"> -->
-                      <span class="bg-light px-2 ms-2 rounded" style="color: black;"
+                    <!-- <div class="new-notif-wrapper" v-if="route.name === 'Notificaciones' && iNewNotifications > 0">  -->
+                    <span class="bg-light px-2 ms-2 rounded" style="color: black;"
                       v-if="route.name === 'Notificaciones' && iNewNotifications > 0">{{ iNewNotifications }}</span>
-                      <!-- </div> -->
-                    </div>
+                    <!-- </div> -->
                   </div>
-                </li>
-              </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="position-absolute bottom-0" style="left: 2%;">
+            <div class="row option-preview rounded-pill p-2 mt-3 ms-4 bg-soft px-3 py-2"
+              @click="  sidebar.setLogout();">
+              <div class="col-md-2">
+                <font-awesome-icon icon="fa-solid fa-right-from-bracket" size="xl" color="black" class="fa-rotate-180"/>
+              </div>
+              <div class="col-md-9">
+                <span class="ms-2"> Cerrar sesión</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div class="col-md-7">
-        <div class="card new-post">
-          <div class="card-body">
+        <div class="card new-post ">
+          <div class="card-body bg-soft rounded">
             <div class="row d-flex justify-content-center">
               <div class="col-md-1 align-items-center d-flex">
                 <img class="mr-3 avatar" :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"
@@ -41,12 +52,31 @@
             <button class="btn btn-primary mt-2 float-end" @click="newPost">Publicar</button>
           </div>
         </div>
+
+        <div class="card mt-4">
+          <div class="card-body rounded">
+            <div class="row" v-if="aPosts.length === 0">
+              <p class="fs-5 fw-light">Parece que no hay nada por aquí... </p>
+              <p class="fs-5 fw-light text-center">Puedes probar a buscar personas con las que interactuar pulsando <a
+                  href="/discover">aquí</a> o
+                apuntarte a un evento pulsando <a href="/events/explore">aquí</a>. ¡Comienza a conocer nuevas personas y a
+                interactuar con ellas!</p>
+            </div>
+            <ul class="list-unstyled" v-else>
+              <li v-for="post in aPosts" :key="post._iId">
+                <PostComponent :post="post" @report="setPopup"
+                  v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
+              </li>
+            </ul>
+          </div>
+        </div>
+
       </div>
       <div class="col-md-3">
-        <div class="position-sticky h-100">
-          <div class="position-absolute abs-top abs-right">
-            <p class="fw-bold text-center fs-5">Sugerencias de eventos para ti</p>
-            <ul class="list-unstyled">
+        <div class="position-fixed w-100 h-100">
+          <div class="position-absolute ms-4 bg-soft rounded" style="top: 20%;">
+            <p class="fw-bold text-center fs-5 p-4">Sugerencias de eventos para ti</p>
+            <ul class="list-unstyled p-4">
               <li>
                 <div class="row">
                   <div class="col-md-8">
@@ -70,81 +100,22 @@
               </li>
             </ul>
             <p class="fw-light mt-3 text-center">¿Quieres hacer una búsqueda más específica?</p>
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center p-4">
               <button type="button" class="btn btn-primary w-75 justify-self-center">Explorar eventos</button>
             </div>
           </div>
         </div>
 
       </div>
-    </div>
-    <div class="row">
-      <div class="col-md-2"></div>
-      <div class="col-md-7">
-        <div class="card mt-4">
-          <div class="card-body">
-            <div class="row" v-if="aPosts.length === 0">
-              <p class="fs-5 fw-light">Parece que no hay nada por aquí... </p>
-              <p class="fs-5 fw-light text-center">Puedes probar a buscar personas con las que interactuar pulsando <a
-                  href="/discover">aquí</a> o
-                apuntarte a un evento pulsando <a href="/events/explore">aquí</a>. ¡Comienza a conocer nuevas personas y a
-                interactuar con ellas!</p>
-            </div>
-            <ul class="list-unstyled" v-else>
-              <li v-for="post in aPosts" :key="post._iId">
-                <!-- <div class="media post-border" v-if="post._tDeleteDate === null && !post._user._bIsSuspended">
-                    <div class="row">
-                      <div class="col-md-1">
-                        <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
-                        <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`"  alt="User avatar">
-                        </router-link>
-                      </div>
-                      <div class="col-md-7"> 
-                        <h5 class="mt-0 mb-1">
-                          <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
-                          {{ post._user._sName }}
-                          </router-link>
-                        </h5>
-                        <h6><p class="text-muted">@{{ post._user._sUsername }}</p></h6>
-                      </div>
-                      <div class="col-md-4" v-if="post._repliesTo != null" @click="router.push('/post/' + post._repliesTo._iId)">
-                        <p class="small text-muted clickable">Respondiendo a @{{ post._repliesTo._user._sUsername }}</p>
-                      </div>
-                    </div>
-                    <div class="media-body">
-                      <router-link :to="`/post/${post._iId}`" style="text-decoration: none; color: inherit;">
-                      <div>
-                        <p>{{ post._sText }}</p>
-                      </div>
-                    </router-link>
-                      <div class="row">
-                        <div class="col-md-3">
-                          <button class="btn float-end" style="background-color: transparent;" @click="router.push('/post/' + post._iId)">
-                            <font-awesome-icon icon="fa-regular fa-comment" size="sm" style="color: #1e3050;" /> 0
-                          </button>
-                        </div>
-                        <div class="col-md-3">
-                          <button class="btn float-end" style="background-color: transparent;" @click="setLike(post)">
-                            <font-awesome-icon icon="fa-solid fa-heart" size="sm" style="color: #1e3050;" /> {{ post._iLikes }}
-                          </button>
-                        </div>
-                        <div class="col-md-6">
-                          <small class="text-muted float-end" style="margin-top: 10px;">
-                            Publicado el {{ moment(post._tCreatedAt).format('D-M-YYYY') }}  
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-                  </div> -->
-                <PostComponent :post="post" @report="setPopup"
-                  v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-      </div>
+      <!-- </div> -->
+      <!-- <div class="row"> -->
+      <!-- <div class="col-md-7"> -->
+
+
+
+      <!-- </div> -->
+      <!-- <div class="col-md-3"> -->
+      <!-- </div> -->
     </div>
     <div
       class="alert alert-danger alert-dismissible fade show fixed-bottom d-flex justify-content-center align-content-center"
@@ -153,8 +124,9 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
         @click="bTriggerEmptyPostAlert = false"></button>
     </div>
+
     <Popup v-if="bTriggerReportPopup">
-      <div class="row">
+      <div class="row mb-3">
         <div class="col-md-6">
           <h4 class="mt-4">Denunciar una publicación</h4>
         </div>
@@ -163,7 +135,7 @@
             @click="bTriggerReportPopup = false" />
         </div>
       </div>
-      <Post :post="reportedPost"></Post>
+      <PostComponent :post="reportedPost"></PostComponent>
       <p class="mt-4 fw-light">En caso de que sea necesario, incluye a continuación una breve descripción que detalle los
         motivos de la denuncia.</p>
       <div class="mb-3">
@@ -172,7 +144,7 @@
       </div>
       <button type="button" class="btn btn-primary float-end" @click="reportPost(reportedPost)">Enviar</button>
     </Popup>
-  </div>
+  <!-- </div> -->
 </template>
   
 <script setup>
@@ -199,6 +171,8 @@ let bTriggerReportPopup = ref(false);
 let reportedPost = ref(null);
 let aHotEvents = ref([]);
 let iNewNotifications = ref(-1);
+
+let sidebar = ref(null);
 
 let aRoutes = ref([
   { name: 'Ver perfil', route: '/profile/' + userStore.person._sUsername, icon: "fa-solid fa-user" },
@@ -333,6 +307,11 @@ window.onscroll = () => {
 </script>
   
 <style>
+
+body {
+  overflow-x: hidden;
+}
+
 .social-media-wall {
   margin-top: 20px;
 }
@@ -393,9 +372,11 @@ window.onscroll = () => {
 .abs-right {
   right: 2%;
 }
+
 .option-preview:hover {
   cursor: pointer;
-  background-color: #d0d0d0;
+  /* background-color: #d0d0d0; */
+  background-color: #d8d8ff;
 }
 
 
@@ -471,7 +452,9 @@ window.onscroll = () => {
 }
 
 
-
+.bg-soft {
+  background-color: #f6f6ff;
+}
 
 
 .blackb {

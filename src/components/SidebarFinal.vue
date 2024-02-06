@@ -18,14 +18,15 @@
                     <div class="col-md-10">
                         <span> {{ route.name }}</span>
                         <!-- <div class="new-notif-wrapper" v-if="route.name === 'Notificaciones' && iNewNotifications > 0"> -->
-                            <span class="bg-light px-2 ms-2 rounded" style="color: rgb(103, 73, 238);" v-if="route.name === 'Notificaciones' && iNewNotifications > 0">{{ iNewNotifications }}</span>
+                        <span class="bg-light px-2 ms-2 rounded" style="color: rgb(103, 73, 238);"
+                            v-if="route.name === 'Notificaciones' && iNewNotifications > 0">{{ iNewNotifications }}</span>
                         <!-- </div> -->
                     </div>
                 </div>
             </li>
         </ul>
         <div class="row mt-4 option p-1" v-show="bShow" @mouseenter="logoutColor = 'rgb(103, 73, 238)'"
-            @mouseleave="logoutColor = 'white'" @click="userStore.logout">
+            @mouseleave="logoutColor = 'white'" @click="setLogout">
             <div class="row">
                 <font-awesome-icon icon="fa-solid fa-right-from-bracket" size="xl" :color="logoutColor"
                     style="justify-self: center;" />
@@ -36,14 +37,35 @@
         </div>
     </div>
     <div id="bg" class="bg-dark-lowop"></div>
+    <Popup v-if="bTriggerLogout">
+        <div class="d-flex justify-content-center">
+            <div class="w-50">
+                <h5 class="text-center mb-2">Estás a punto de desconectarte</h5>
+                <p class="fw-light text-center">Estás seguro/a de que quieres cerrar sesión?</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-danger float-end" @click="userStore.logout()">
+                            Cerrar sesión
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-primary float-start ms-4" @click="bTriggerLogout = false;">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Popup>
 </template>
 
 <script setup>
 
 import { useUserStore } from '@/store/UserStore.js';
 import axios from 'axios';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import Popup from './Popup.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -75,13 +97,14 @@ let aFinalRoutes = ref(userStore.person._sRole === 'User' ? aUserRoutes.value : 
 
 let logoutColor = ref('white');
 
-let bTriggerLogoutPopup = ref(false);
 let bShow = ref(false);
 let bToggleSidebar = ref(false);
+let bTriggerLogout = ref(false);
 
 let iNewNotifications = ref(0);
 
 onMounted(() => {
+    
     togglerIn = document.getElementById('togglerIn');
     sidebar = document.getElementById('sidebar');
     bg = document.getElementById('bg');
@@ -102,7 +125,7 @@ onMounted(() => {
         }, 100);
     })
     axios.get("http://localhost:8000/api/countNewNotifications/" + userStore.person._iId)
-    .then(response => iNewNotifications.value = response.data);
+        .then(response => iNewNotifications.value = response.data);
 })
 
 function updateUsername(sUsername) {
@@ -110,11 +133,29 @@ function updateUsername(sUsername) {
     aUserRoutes.value[1].route = '/profile/' + sUsername;
 }
 
+function setLogout() {
+    sidebar.classList.remove('open-h');
+    sidebar.classList.remove('open-w');
+    bg.classList.remove('bg-appear');
+    bShow.value = !bShow.value;
+    bTriggerLogout.value = true;
+}
+
+defineExpose({setLogout})
+
 </script>
 
 <style scoped>
 .blackb {
     border: solid 3px black;
+}
+
+.popup-logout {
+    position: absolute;
+    background-color: white;
+    top: 50%;
+    height: 20vh;
+    width: 50vw;
 }
 
 .hamburger-wrapper {

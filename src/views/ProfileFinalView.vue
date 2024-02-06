@@ -134,7 +134,7 @@
                                 <h5 class="mt-2 fs-light">Publicaciones de {{ person._sName }}</h5>
                                 <ul class="list-unstyled mt-2">
                                     <li v-for="post in aPosts" :key="post._iId">
-                                        <PostComponent :post="post" @report="bTriggerReportPopup = true"
+                                        <PostComponent :post="post" @report="(repPost) => {reportedPost = repPost; bTriggerPostReportPopup = true;}"
                                             v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
                                     </li>
                                 </ul>
@@ -303,7 +303,7 @@
                                 <h5 class="mt-2 fs-light">Me gusta de {{ person._sName }}</h5>
                                 <ul class="list-unstyled mt-2">
                                     <li v-for="post in aLikedPosts">
-                                        <PostComponent :post="post" @report="bTriggerReportPopup"
+                                        <PostComponent :post="post" @report="(repPost) => {reportedPost = repPost; bTriggerPostReportPopup = true;}"
                                             v-if="post._tDeleteDate === null && !post._user._bIsSuspended"></PostComponent>
                                     </li>
                                 </ul>
@@ -346,7 +346,11 @@
         </Popup>
         <Popup v-if="bTriggerBlockPopup || bTriggerReportPopup">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-10">
+                    <h5 v-if="bTriggerBlockPopup">Bloquear a @{{ person._sUsername }}</h5>
+                    <h5 v-else>Denunciar a @{{ person._sUsername }}</h5>
+                </div>
+                <div class="col-md-2">
                     <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="m" style="color: #000000;"
                         @click="bTriggerBlockPopup = false; bTriggerReportPopup = false" />
                 </div>
@@ -355,19 +359,36 @@
                     <label for="report" class="form-label">Motivo de la denuncia</label>
                     <textarea class="form-control" id="report" rows="3" v-model="sReportDescription"></textarea>
                 </div>
-                <div class="col-md-8"></div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger me-4" v-if="bTriggerReportPopup" @click="sendReport()">
+                <div class="col-md-10"></div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger me-4" v-if="bTriggerReportPopup" @click="sendUserReport()">
                         Denunciar
                     </button>
-                    <button type="button" class="btn btn-danger float-end" @click="blockUnblockUser" v-else-if="!bIsPersonBlocked">Bloquear</button>
+                    <button type="button" class="btn btn-danger float-end" @click="blockUnblockUser"
+                        v-else-if="!bIsPersonBlocked">Bloquear</button>
                     <button type="button" class="btn btn-primary me-4" @click="blockUnblockUser" v-else>Desbloquear</button>
                 </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-secondary ms-4"
-                        @click="bTriggerBlockPopup = false; bTriggerReportPopup = false">Cancelar</button>
+            </div>
+        </Popup>
+        <Popup v-if="bTriggerPostReportPopup && reportedPost != null">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h4 class="mt-4">Denunciar una publicación</h4>
+                </div>
+                <div class="col-md-6">
+                    <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="sm"
+                        style="color: #000000;" @click="bTriggerPostReportPopup = false" />
                 </div>
             </div>
+            <PostComponent :post="reportedPost"></PostComponent>
+            <p class="mt-4 fw-light">En caso de que sea necesario, incluye a continuación una breve descripción que detalle
+                los
+                motivos de la denuncia.</p>
+            <div class="mb-3">
+                <label for="report" class="form-label">Motivo de la denuncia</label>
+                <textarea class="form-control" id="report" rows="3" v-model="sReportDescription"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary float-end" @click="reportPost(reportedPost)">Enviar</button>
         </Popup>
     </div>
     <div class="container" v-else-if="person._iId != 0"></div>
@@ -441,6 +462,8 @@ let bIsBlockedByPerson = ref(false);
 let bIsPersonBlocked = ref(false);
 let sReportSentAlert = ref("");
 let bEventSelector = ref(true);
+let bTriggerPostReportPopup = ref(false);
+let reportedPost = ref(null);
 
 
 onMounted(() => {
@@ -517,7 +540,7 @@ onMounted(() => {
 
 });
 
-function sendReport() {
+function sendUserReport() {
     userStore.reportUser(person.value._iId, person.value._sUsername, sReportDescription.value);
     bTriggerReportPopup.value = false;
     bTriggerBlockPopup.value = false;
@@ -525,6 +548,24 @@ function sendReport() {
     sReportDescription.value = "";
     bShowOptions.value = false;
 }
+
+function reportPost(post) {
+      axios.post("http://localhost:8000/api/newTicket", {
+        sSubject: "Denuncia de publicación de @" + post._user._sUsername,
+        sDescription: sReportDescription.value,
+        iIssuerId: userStore.person._iId,
+        iReportedId: post._user._iId,
+        iEventId: -1,
+        iPostId: post._iId,
+        sCategory: 'Denunciar una publicación'
+      })
+      bTriggerPostReportPopup.value = false;
+      reportedPost.value = null;
+      sReportSentAlert.value = "Se ha enviado la denuncia. La revisaremos y procesaremos lo antes posible.";
+      sReportDescription.value = "";
+
+    }
+  
 
 function shouldShowAnswers() {
     if (aAMAnswers.value.length === 0) {
@@ -538,7 +579,7 @@ function setBlockReportPopup(bWantToBlock) {
     if (bWantToBlock) {
         bTriggerBlockPopup.value = true;
         sPopupMessage.value = bIsPersonBlocked.value ? "Estás seguro de que quieres desbloquear a @" + person.value._sUsername + "?" :
-        "¿Estás seguro de que quieres bloquear a @" + person.value._sUsername + "? Esto impedirá que pueda interactuar contigo, " +
+            "¿Estás seguro de que quieres bloquear a @" + person.value._sUsername + "? Esto impedirá que pueda interactuar contigo, " +
             " no podrá ver tu perfil, pero si te apuntas a un evento sí que podrá ver tu asistencia y comentarios."
     } else {
         bTriggerReportPopup.value = true;

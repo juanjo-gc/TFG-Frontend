@@ -1,6 +1,6 @@
 <template>
     <SidebarFinal></SidebarFinal>
-    <div class="container border h-100">
+    <div class="container border chats-box">
         <div class="row">
             <div class="col-md-4 recents-col">
                 <h3 class="mt-4 text-center mb-2">Chats recientes</h3>
@@ -297,7 +297,7 @@ function submitMessage() {
         iIssuerId: userStore.person._iId,
         iRecipientId:currentUserChat.value._iId,
         sText: sMessage.value
-    })
+        })
     .then(response => {
             sMessage.value = "";
             aMessages.value.push({
@@ -369,8 +369,9 @@ function submitMessage() {
     /* border-bottom: solid 2px #777; */
 }
 
-.header-chat {
-    /* border-bottom: solid 2px #777; */
+.chats-box {
+    height: 93vh;
+    overflow-y: hidden;
 }
 
 .newmessage h6 {
