@@ -11,7 +11,7 @@
                 <div class="row mt-4 categories-box py-1 w-75">
                     <ul class="list-unstyled">
                         <li v-for="category in asCategoriesToSelect">
-                            <div class="row category py-2 my-2" :class="{ 'selected': category === sSelectedCategory }"
+                            <div class="row category py-2 my-2 mx-0" :class="{ 'selected': category === sSelectedCategory }"
                                 @click="sSelectedCategory = category">
                                 <p class="mx-2 pt-3 fw-light">{{ category }}</p>
                             </div>

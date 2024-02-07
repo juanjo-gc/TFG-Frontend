@@ -265,7 +265,7 @@
                             <h5 class="mt-2 fs-light">Intereses de {{ person._sName }}</h5>
                             <ul class="list-unstyled list-group list-group-horizontal mt-2 ms-4">
                                 <li v-for="interest in person._setInterests">
-                                    <p class="ms-2 interest">{{ interest._sName }}</p>
+                                    <p class="ms-2 interest rounded-pill px-3">{{ interest._sName }}</p>
                                 </li>
                             </ul>
                             <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
@@ -727,13 +727,13 @@ image {
 }
 
 .interest {
-    border: solid 2px rgb(111, 22, 255);
-    color: white;
-    background-color: rgb(146, 79, 255);
+    /* border: solid 2px rgb(111, 22, 255); */
+    border: solid 2px #FF8C00;
+    color: black;
+    /* background-color: rgb(146, 79, 255); */
+    background-color: #ffd9ab;
     padding: 5px;
     margin-right: 15px;
-    padding: 10px;
-    border-radius: 50px;
 }
 
 .description {

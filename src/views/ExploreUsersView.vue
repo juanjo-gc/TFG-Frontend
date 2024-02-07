@@ -35,7 +35,7 @@
             </div>
             <div class="col-md-8 m-4" v-if="aUsers.length != 0">
                 <h5 class="fw-light ms-4">Resultados de la búsqueda:</h5>
-                <div class="row mt-4 mx-4 border rounded user-card" v-for="user in aUsers" @click="router.push('/profile/' + user._sUsername)">
+                <div class="row mt-4 mx-4 p-2 border rounded user-card" v-for="user in aUsers" @click="router.push('/profile/' + user._sUsername)">
                     <div class="row p-2">
                         <div class="col-md-1 d-flex align-items-center">
                             <img :src="'http://localhost:8000/api/getProfileImage/' + user._iId" class="avatar" alt="">

@@ -1,9 +1,9 @@
 <template>
   <SidebarFinal ref="sidebar"></SidebarFinal>
   <!-- <div class="mx-4"> -->
-    <div class="row">
-      <div class="col-md-2">
-        <div class="position-fixed w-100 mt-4" style="height: 85vh;">
+    <!-- <div class="row"> -->
+      <div class="col-left">
+        <div class="position-fixed w-25 mt-4" style="height: 75vh; top: 15%;">
           <div class="position-absolute abs-top bg-soft rounded ms-3">
             <ul class="list-unstyled p-4 ps-1">
               <li v-for="route in aRoutes">
@@ -22,7 +22,7 @@
               </li>
             </ul>
           </div>
-          <div class="position-absolute bottom-0" style="left: 2%;">
+          <div class="position-absolute" style="left: 2%; bottom: 10%;">
             <div class="row option-preview rounded-pill p-2 mt-3 ms-4 bg-soft px-3 py-2"
               @click="  sidebar.setLogout();">
               <div class="col-md-2">
@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-7">
+      <div class="col-middle">
         <div class="card new-post ">
           <div class="card-body bg-soft rounded">
             <div class="row d-flex justify-content-center">
@@ -72,7 +72,7 @@
         </div>
 
       </div>
-      <div class="col-md-3">
+      <div class="col-right">
         <div class="position-fixed w-100 h-100">
           <div class="position-absolute ms-4 bg-soft rounded" style="top: 20%;">
             <p class="fw-bold text-center fs-5 p-4">Sugerencias de eventos para ti</p>
@@ -87,7 +87,7 @@
                   </div>
                 </div>
               </li>
-              <li v-for="event in aHotEvents">
+              <li v-for="event in aHotEvents" v-if="aHotEvents.length != 0">
                 <div class="row border rounded-pill option-preview p-2 mt-1"
                   @click="router.push('/events/' + event._iId)">
                   <div class="col-md-10">
@@ -98,6 +98,14 @@
                   </div>
                 </div>
               </li>
+              <li v-else>
+                <div class="row mt-3 text-center">
+                  <div class="col-md-1"></div>
+                  <div class="col-md-10 text-center">
+                    <span class="mt-2">No hay eventos que mostrar ahora mismo...</span>
+                  </div>
+                </div>
+                </li>
             </ul>
             <p class="fw-light mt-3 text-center">¿Quieres hacer una búsqueda más específica?</p>
             <div class="d-flex justify-content-center p-4">
@@ -116,7 +124,8 @@
       <!-- </div> -->
       <!-- <div class="col-md-3"> -->
       <!-- </div> -->
-    </div>
+
+
     <div
       class="alert alert-danger alert-dismissible fade show fixed-bottom d-flex justify-content-center align-content-center"
       role="alert" v-if="bTriggerEmptyPostAlert">
@@ -312,6 +321,28 @@ body {
   overflow-x: hidden;
 }
 
+.col-left {
+  width: 20%;
+  height: 75vh;
+  position: fixed;
+  top: 10%;
+  left: 0;
+}
+
+.col-middle {
+  width: 50%;
+  margin-left: 22%;
+}
+
+.col-right {
+  width: 25%;
+  height: 75vh;
+  position: fixed;
+  margin-right: 4%;
+  top: 10%;
+  right: 0;
+}
+
 .social-media-wall {
   margin-top: 20px;
 }
@@ -366,7 +397,7 @@ body {
 }
 
 .abs-top {
-  top: 25%;
+  top: 10%;
 }
 
 .abs-right {

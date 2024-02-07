@@ -219,7 +219,9 @@ async function authUser() {
 .options-card {
     margin-top: 30%;
     margin-bottom: 15%;
-    background-color: rgb(183, 150, 255);
+    /* background-color: rgb(183, 150, 255); */
+    background-color: #FF8C00;
+    
     border-radius: 15px;
     /* height: 65vh;  */
     width: 30vw;

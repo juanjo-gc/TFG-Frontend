@@ -8,9 +8,9 @@
     <div id="sidebar" class="sidebar">
         <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="white" class="m-2 p-2" style="cursor: pointer"
             id="togglerIn" />
-        <ul class="list-unstyled m-2 mt-4" v-show="bShow">
+        <ul class="list-unstyled me-0 ms-2 mt-4" v-show="bShow">
             <li v-for="route in aFinalRoutes">
-                <div class="row mt-2 py-2 option" @mouseenter="route.color = 'rgb(103, 73, 238)'"
+                <div class="row mt-2 py-2 option" @mouseenter="route.color = '#FF8C00'"
                     @mouseleave="route.color = 'white'" @click="router.push(route.route)">
                     <div class="col-md-2">
                         <font-awesome-icon :icon="route.icon" size="xl" :color="route.color" />
@@ -18,14 +18,14 @@
                     <div class="col-md-10">
                         <span> {{ route.name }}</span>
                         <!-- <div class="new-notif-wrapper" v-if="route.name === 'Notificaciones' && iNewNotifications > 0"> -->
-                        <span class="bg-light px-2 ms-2 rounded" style="color: rgb(103, 73, 238);"
+                        <span class="bg-light px-2 ms-2 rounded" style="color: #FF8C00;"
                             v-if="route.name === 'Notificaciones' && iNewNotifications > 0">{{ iNewNotifications }}</span>
                         <!-- </div> -->
                     </div>
                 </div>
             </li>
         </ul>
-        <div class="row mt-4 option p-1" v-show="bShow" @mouseenter="logoutColor = 'rgb(103, 73, 238)'"
+        <div class="row mt-4 option p-1" v-show="bShow" @mouseenter="logoutColor = '#FF8C00'"
             @mouseleave="logoutColor = 'white'" @click="setLogout">
             <div class="row">
                 <font-awesome-icon icon="fa-solid fa-right-from-bracket" size="xl" :color="logoutColor"
@@ -164,7 +164,8 @@ defineExpose({setLogout})
     top: 0;
     cursor: pointer;
     z-index: 98;
-    background-color: rgb(103, 73, 238);
+    background-color: #FF8C00;
+    /* background-color: rgb(103, 73, 238); */
     border-bottom-right-radius: 50%;
     /* width: 3vw; */
 }
@@ -178,7 +179,8 @@ defineExpose({setLogout})
     /* height: 100vh; */
     height: 0px;
     width: 0px;
-    background-color: rgb(103, 73, 238);
+    /* background-color: rgb(103, 73, 238); */
+    background-color: #FF8C00;
     transition-duration: 400ms;
     transition-property: width, height opacity;
     transition-timing-function: ease-out;
@@ -237,7 +239,8 @@ transition-timing-function: ease-out; */
 .option:hover {
     background-color: white;
     max-width: 375px;
-    color: rgb(103, 73, 238);
+    color: #FF8C00;
+    /* color: rgb(103, 73, 238); */
     cursor: pointer;
 }
 </style>
