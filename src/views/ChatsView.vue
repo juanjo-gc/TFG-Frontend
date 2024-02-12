@@ -1,6 +1,6 @@
 <template>
     <SidebarFinal></SidebarFinal>
-    <div class="container border chats-box">
+    <div class="container border chats-box mt-2">
         <div class="row">
             <div class="col-md-4 recents-col">
                 <h3 class="mt-4 text-center mb-2">Chats recientes</h3>

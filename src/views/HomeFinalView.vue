@@ -2,8 +2,11 @@
     <div id="main" class="main">
         <div id="login" class="bg-main">
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-7 d-flex justify-content-center align-items-center">
                     <!-- Logo, nombre, eslogan -->
+                    <div class="logo-wrapper ">
+                        <img src="https://static.vecteezy.com/system/resources/previews/009/343/883/original/half-orange-orange-free-png.png" alt="" class="logo-xl">
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <!-- Registro / login -->
@@ -21,8 +24,6 @@
                         <div class="row mt-4">
                             <div class="col-md-1"></div>
                             <div class="col-md-10">
-
-
                                 <form @submit.prevent="authUser">
                                     <!-- <label class="form-label" for="email">Correo electrónico</label> -->
                                     <div class="form-outline mb-4">
@@ -65,13 +66,12 @@
                     </div>
                 </div>
             </div>
-            <div id="showmore" class="row position-sticky bottom-0 mt-4" @click="scrollDown()">
+            <div id="showmore" class="row position-sticky bottom-0 mt-4" >
                 <div class="col-md-5"></div>
                 <div class="col-md-2 mt-4">
-                    <p class="text-white text-center show-more fw-bold">Ver más</p>
-                    <p class="text-white text-center"><font-awesome-icon icon="fa-solid fa-arrow-down" /></p>
+                    <p class="text-white text-center show-more fw-bold" @click="scrollDown()">Ver más</p>
+                    <p class="text-white text-center"><font-awesome-icon icon="fa-solid fa-arrow-down" @click="scrollDown()"/></p>
                 </div>
-                <div class="col-md-5"></div>
             </div>
         </div>
         <div class="row bg-light p-4">
@@ -203,7 +203,7 @@ async function authUser() {
     overflow-x: hidden;
 }
 .bg-main {
-    height: 100vh;
+    height: 90vh;
     width: 100vw;
     background-color: black;
     overflow-x: hidden;
@@ -242,5 +242,22 @@ async function authUser() {
 
 .show-more:hover {
     cursor: pointer;
-}</style>
+}
+
+.logo-wrapper {
+    width: 70%;
+    height: 70%;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-xl { 
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+</style>
 

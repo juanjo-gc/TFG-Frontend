@@ -1,5 +1,5 @@
 <template>
-    <SidebarFinal v-if="userStore.person != null"></SidebarFinal>
+    <SidebarFinal v-if="userStore.person._iId != null"></SidebarFinal>
     <div class="container">
         <h3 class="mt-4">Ayuda</h3>
         <div class="hline"></div>

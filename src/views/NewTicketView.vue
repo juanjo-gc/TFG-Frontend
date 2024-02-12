@@ -86,17 +86,18 @@
                 @click="bTriggerErrorPopup = false; bTriggerWarningPopup = false">Volver</button>
         </Popup>
         <Popup v-if="bTriggerSuccessPopup">
-            <div class="d-flex justify-content-center">
+            <div class="">
                 <div class="row">
-                    <h4 class="mt-4">Ticket enviado correctamente</h4>
-                </div>
-                <div class="row">
-                    <img src="https://static.vecteezy.com/system/resources/previews/014/183/770/original/green-tick-check-mark-icon-simple-style-vector.jpg"
-                        class="mt-2 success-tick" alt="">
-                </div>
-                <div class="row">
-                    <button type="button" class="btn btn-primary mt-2"
-                        @click="router.push('/help/tickets/' + iTicketId)">Ver ticket</button>
+                    <div class="col-md-1"></div>
+                        <h4 class="mt-4 text-center">Ticket enviado correctamente</h4>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4"></div>
+                        <div class="col-md-4 d-flex justify-content-center">
+                            <button type="button" class="btn btn-primary mt-2"
+                            @click="router.push('/help/tickets/' + iTicketId)">Ver ticket <font-awesome-icon icon="fa-solid fa-check" class="ms-2"/></button>
+                            
+                    </div>
                 </div>
             </div>
         </Popup>
@@ -105,6 +106,7 @@
     
 
 <script setup>
+import GenericReportPopup from '@/components/GenericReportPopup.vue';
 import Popup from '@/components/Popup.vue';
 import SidebarFinal from '@/components/SidebarFinal.vue'
 import { useUserStore } from '@/store/UserStore';
@@ -117,7 +119,7 @@ const router = useRouter();
 let iTicketId = 0;
 let sSubject = ref("");
 let sDescription = ref("");
-let sSelectedCategory = ref("");
+let sSelectedCategory = ref("Categoría");
 let aCategories = ref([]);
 let uploadImage = ref(null);
 let formData = new FormData();
@@ -126,6 +128,7 @@ let bIsFileSelected = ref(false);
 let bTriggerErrorPopup = ref(false);
 let bTriggerWarningPopup = ref(false);
 let bTriggerSuccessPopup = ref(false);
+
 
 
 onMounted(() => {

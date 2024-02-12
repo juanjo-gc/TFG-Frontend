@@ -185,16 +185,26 @@
             </div>
             <Popup v-if="fsImage.bIsTicketImage || fsImage.bIsReplyImage">
                 <div class="row mt-2">
-                    <button type="button" class="btn btn-transparent float-end" @click="fsImage.bIsTicketImage = false"
+                    <div class="col-md-10"></div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-transparent float-end" @click="fsImage.bIsTicketImage = false"
                         v-if="fsImage.bIsTicketImage">
                         <font-awesome-icon icon="fa-solid fa-xmark" />
                     </button>
+                </div>
+                <div class="col-md-10"></div>
+                    <div class="col-md-2">
                     <button type="button" class="btn btn-transparent float-end" @click="fsImage.bIsReplyImage = false"
                         v-if="fsImage.bIsReplyImage">
                         <font-awesome-icon icon="fa-solid fa-xmark" />
                     </button>
+                    </div>
                 </div>
-                <img :src="fsImage.sLink" alt="img" class="fs-image p-4" />
+                <div class="d-flex justify-content-center">
+                    <div class="img-wrapper d-flex justify-content center">
+                        <img :src="fsImage.sLink" alt="img" class="fs-image p-4" />
+                    </div>
+                </div>
             </Popup>
         </div>
     </div>
@@ -403,12 +413,22 @@ function isBlank(str) {
 }
 
 .fs-image {
-    height: 95vh;
+    height: 100%;
     width: auto;
-    object-fit: cover;
+    object-fit: contain;
     object-position: top center;
 }
 
 .ticket-reply-image:hover {
     cursor: pointer;
-}</style>
+}
+
+.img-wrapper {
+    height: 60vh;
+    width: 60vw;
+    max-height: 100%;
+    max-width: 100%;
+    justify-content: center;
+}
+
+</style>

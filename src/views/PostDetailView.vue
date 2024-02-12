@@ -78,7 +78,7 @@
       </div>
       <button type="button" class="btn btn-primary float-end" @click="reportPost(reportedPost)">Enviar</button>
     </Popup>
-
+    <GenericReportPopup v-if="bTriggerReportSentPopup" @close="bTriggerReportSentPopup = false"></GenericReportPopup>
   </div>
 </template>
     
@@ -92,7 +92,7 @@ import moment from 'moment';
 import { useRoute } from "vue-router";
 import PostComponent from "@/components/PostComponent.vue";
 import Popup from "@/components/Popup.vue";
-
+import GenericReportPopup from "@/components/GenericReportPopup.vue";
 
 
 const userStore = useUserStore();
@@ -110,6 +110,7 @@ let bTriggerReportPopup = ref(false);
 let reportedPost = ref({});
 let iPageNumber = 0;
 let iTotalPages = -1;
+let bTriggerReportSentPopup = ref(false);
 
 
 onMounted(() => {
@@ -154,6 +155,7 @@ function reportPost(post) {
       console.log(response.data)
       bTriggerReportPopup.value = false;
       sReportDescription.value = "";
+      bTriggerReportSentPopup.value = true;
     })
 }
 

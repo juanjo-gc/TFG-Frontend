@@ -70,7 +70,7 @@
                     </div>
                     <div class="col-md-7">
                         <p class="mt-2 ms-2 fw-light text-break">{{ person._sDescription }}</p>
-                        <p class="mt-4" v-if="person._province._iId != 0">
+                        <p class="mt-4" v-if="person._province != null">
                             <strong>Ubicación: </strong>{{ person._province._sName }}, {{ person._province._region._sName
                             }}, {{ person._province._region._country._sName }}
                         </p>
@@ -411,11 +411,7 @@
             </div>
         </div>
     </div>
-    <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="sReportSentAlert != ''">
-        {{ sReportSentAlert }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
-            @click="sReportSentAlert = ''"></button>
-    </div>
+    <GenericReportPopup v-if="bTriggerReportSentPopup" @close="bTriggerReportSentPopup = false"></GenericReportPopup>
 </template>
     
 
@@ -428,6 +424,7 @@ import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import moment from "moment";
 import Popup from "@/components/Popup.vue";
+import GenericReportPopup from '@/components/GenericReportPopup.vue';
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -460,7 +457,7 @@ let bTriggerReportPopup = ref(false);
 let sPopupMessage = ref("");
 let bIsBlockedByPerson = ref(false);
 let bIsPersonBlocked = ref(false);
-let sReportSentAlert = ref("");
+let bTriggerReportSentPopup = ref(false);
 let bEventSelector = ref(true);
 let bTriggerPostReportPopup = ref(false);
 let reportedPost = ref(null);
@@ -544,7 +541,7 @@ function sendUserReport() {
     userStore.reportUser(person.value._iId, person.value._sUsername, sReportDescription.value);
     bTriggerReportPopup.value = false;
     bTriggerBlockPopup.value = false;
-    sReportSentAlert.value = "Se ha enviado la denuncia. La revisaremos y procesaremos lo antes posible.";
+    bTriggerReportSentPopup.value = true;
     sReportDescription.value = "";
     bShowOptions.value = false;
 }
@@ -561,7 +558,7 @@ function reportPost(post) {
       })
       bTriggerPostReportPopup.value = false;
       reportedPost.value = null;
-      sReportSentAlert.value = "Se ha enviado la denuncia. La revisaremos y procesaremos lo antes posible.";
+      bTriggerReportSentPopup.value = true;
       sReportDescription.value = "";
 
     }

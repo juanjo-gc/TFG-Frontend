@@ -83,7 +83,19 @@ let aLoadedNotificationPages = [];
 function getNotificationsPage() {
     axios.get("http://localhost:8000/api/getUserNotifications/" + userStore.person._iId + "/" + iPageNumber)
         .then(response => {
-            aNotifications.value = response.data.content;
+            let aUnfilteredNotifications = response.data.content;
+            aUnfilteredNotifications.forEach(notification => {
+                if(notification._issuer === null || notification._issuer._sRole === "Admin") {
+                    aNotifications.value.push(notification);
+                } else {
+                    axios.get("http://localhost:8000/api/checkMutualBlock/" + userStore.person._iId + "/" + notification._issuer._iId)
+                    .then(response => {
+                        let bNeitherAreBlocked = response.data;
+                        if(bNeitherAreBlocked)
+                            aNotifications.value.push(notification);
+                    })
+                }
+            })
             aNotifications.value.forEach(notification => {
                 if (notification._type._sName === "NewFollow" || notification._type._sName === "FollowRequest") {
                     axios.get('http://localhost:8000/api/checkFollow/' + notification._recipient._iId + '/' + notification._issuer._iId)

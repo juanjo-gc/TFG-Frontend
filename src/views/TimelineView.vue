@@ -134,6 +134,8 @@
         @click="bTriggerEmptyPostAlert = false"></button>
     </div>
 
+    <GenericReportPopup v-if="bTriggerReportSentPopup" @close="bTriggerReportSentPopup = false"></GenericReportPopup>
+
     <Popup v-if="bTriggerReportPopup">
       <div class="row mb-3">
         <div class="col-md-6">
@@ -166,6 +168,7 @@ import axios from "axios";
 import moment from 'moment';
 import { useRouter } from "vue-router";
 import PostComponent from "@/components/PostComponent.vue";
+import GenericReportPopup from "@/components/GenericReportPopup.vue";
 
 
 const userStore = useUserStore();
@@ -180,6 +183,7 @@ let bTriggerReportPopup = ref(false);
 let reportedPost = ref(null);
 let aHotEvents = ref([]);
 let iNewNotifications = ref(-1);
+let bTriggerReportSentPopup = ref(false);
 
 let sidebar = ref(null);
 
@@ -265,6 +269,7 @@ function reportPost(post) {
       console.log(response.data)
       bTriggerReportPopup.value = false;
       sReportDescription.value = "";
+      bTriggerReportSentPopup.value = true;
     })
 }
 

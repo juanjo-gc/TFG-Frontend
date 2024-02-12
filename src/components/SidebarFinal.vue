@@ -1,6 +1,8 @@
 <template>
-    <div id="header" class="row header">
+    <div id="header" class="row header" v-if="userStore.person._sRole === 'User'">
         <!-- Logo pagina centrado -->
+        <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYPDUsQO5SwBdbNHuK3C68gjESyeNFGie1xg&usqp=CAU" class="logo" alt=""> -->
+        <img src="https://static.vecteezy.com/system/resources/previews/009/343/883/original/half-orange-orange-free-png.png" alt="" class="logo mt-1 clickable" @click="router.push('/timeline')">
     </div>
     <div class="hamburger-wrapper">
         <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="black" class="m-2 p-2 pe-3 pb-3" />
@@ -228,6 +230,7 @@ transition-timing-function: ease-out; */
     height: 65px;
     /* background-color: rgb(103, 73, 238); */
     z-index: 98;
+    justify-content: center;
 }
 
 .new-notif-wrapper {
@@ -243,4 +246,12 @@ transition-timing-function: ease-out; */
     /* color: rgb(103, 73, 238); */
     cursor: pointer;
 }
+
+.logo {
+    object-fit: contain;
+    height: 65px;
+    max-height: 65px;
+    width: auto;
+}
+
 </style>

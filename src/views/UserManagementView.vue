@@ -43,8 +43,15 @@
         </div>
         <div class="row" v-else>
             <div class="col-md-5">
-                <h4 class="mt-4">Datos del usuario</h4>
-                <div class="hline"></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4 class="mt-4">Datos del usuario</h4>
+                        <div class="hline"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-primary mt-4 float-end" @click="userToDisplay = null; ">Cargar otro usuario</button>
+                    </div>
+                </div>
                 <!-- <div class="form-group field mt-4">
                     <div class="row">
                         <div class="col-md-6">
@@ -88,14 +95,12 @@
                             <p class="mt-2 text-white fs-4 d-flex justify-content-center">Avisos</p>
                         </div>
                     </div>
+                    <div class="col-md-6"></div>
                     <div class="col-md-6">
-                        <button type="button" class="btn btn-danger mt-4 float-start" v-if="!userToDisplay._bIsSuspended"
+                        <button type="button" class="btn btn-danger mt-4 float-end" v-if="!userToDisplay._bIsSuspended"
                             @click="suspendReactivateAccount(1)">Suspender cuenta</button>
-                            <button type="button" class="btn btn-primary mt-2 float-end" v-else
+                            <button type="button" class="btn btn-primary mt-4 float-end" v-else
                             @click="suspendReactivateAccount(0)">Reactivar cuenta</button>
-                    </div>
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-primary mt-4 float-end" @click="userToDisplay = null; ">Cargar otro usuario</button>
                     </div>
                 </div>
                 <div class="row mt-2" v-if="userToDisplay != null && !userToDisplay._bIsSuspended">

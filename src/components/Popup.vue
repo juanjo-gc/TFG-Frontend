@@ -28,9 +28,9 @@
 }
 .popup-inner {
     min-width: 35vw;
-    max-width: 60vw;
+    max-width: 75vw;
     min-height: 15vh;
-    max-height: 60vh;
+    max-height: 75vh;
     flex-grow: 1;
     flex-basis: 50%;
     background: #FFF;
