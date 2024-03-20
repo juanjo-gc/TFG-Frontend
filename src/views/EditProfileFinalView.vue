@@ -163,8 +163,9 @@
                             no te sigan únicamente
                             podrán ver la información que has proporcionado en la pestaña "Información sobre el usuario". No
                             podrán ver tus publicaciones, eventos asistidos y creados ni "Me gusta".
-                            Sin embargo, en caso de que decidas asistir a un evento, tu participación, comentario y fotos
-                            serán visibles para todos los usuarios.
+                            Sin embargo, en caso de que decidas asistir a un evento, tu participación, comentarios y fotos
+                            que hayas publicado tras la finalización del mismo serán visibles para todos los usuarios que visiten la página del evento.
+                            Para más información acerca de esto, consulta las <strong @click="router.push('/help')">preguntas frecuentes.</strong>
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
@@ -208,12 +209,13 @@
             </div>
         </div>
         <Popup v-if="bTriggerPopup">
-            <p class="mt-4 fs-5 fw-light">¿Estás seguro de que quieres borrar la imagen?</p>
+            <p class="mt-4 fs-5 fw-light text-center">¿Estás seguro de que quieres borrar la imagen?</p>
             <div class="row mt-2">
-                <div class="col-md-6 d-flex justify-content-center">
+                <div class="col-md-8"></div>
+                <div class="col-md-2">
                     <button type="button" class="btn btn-danger" @click="deleteImage">Borrar</button>
                 </div>
-                <div class="col-md-6 d-flex justify-content-center">
+                <div class="col-md-2">
                     <button type="button" class="btn btn-secondary" @click="bTriggerPopup = false">Volver</button>
                 </div>
             </div>

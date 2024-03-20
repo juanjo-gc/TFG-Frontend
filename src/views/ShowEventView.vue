@@ -56,11 +56,12 @@
                                     participar</button>
                             </div>
                             <div class="row" v-else>
-                                <button type="button" class="btn btn-primary me-5" @click="router.push('/events/edit/' + event._iId)">Editar</button>
+                                <button type="button" class="btn btn-primary me-5"
+                                    @click="router.push('/events/edit/' + event._iId)">Editar</button>
                             </div>
                         </div>
                         <div class="row d-flex align-items-center justify-content-end"
-                            v-if="!bIsFinished && userStore.person._sRole === 'User' && userStore.person._iId != event._organizer._iId">
+                            v-if="userStore.person._sRole === 'User' && userStore.person._iId != event._organizer._iId">
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-outline-danger" @click="bTriggerReportPopup = true">
                                     <font-awesome-icon icon="fa-solid fa-flag" class="mt-1" /> Reportar
@@ -183,7 +184,8 @@
                             <!-- <div class="new-comment" contenteditable="true"></div> -->
                             <textarea v-model="sComment" v-if="userStore.person._sRole === 'User'"
                                 placeholder="Escribe tu comentario sobre el evento aquí"></textarea>
-                            <button @click="submitNewComment" class="btn btn-primary float-end mt-1" v-if="userStore.person._sRole === 'User'">
+                            <button @click="submitNewComment" class="btn btn-primary float-end mt-1"
+                                v-if="userStore.person._sRole === 'User'">
                                 Enviar
                             </button>
                         </div>
@@ -214,7 +216,8 @@
                         <div class="d-flex justify-content-center">
                             <ul class="list-group list-group-horizontal list-unstyled">
                                 <li v-for="photo in aEventPhotos">
-                                    <div class="blackb d-flex justify-content-center clickable" v-if="photo._tDeleteDate === null || userStore.person._sRole === 'Admin'"
+                                    <div class="blackb d-flex justify-content-center clickable"
+                                        v-if="photo._tDeleteDate === null || userStore.person._sRole === 'Admin'"
                                         @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
                                         <img class="event-image"
                                             :src="'http://localhost:8000/api/getEventImage/' + photo._sName" alt="">
@@ -227,22 +230,28 @@
             </div>
             <Popup v-if="bTriggerFullscreenImage">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-11"></div>
+                    <div class="col-md-1">
                         <font-awesome-icon icon="fa-solid fa-xmark" class="float-end clickable" size="m"
                             style="color: #000000;" @click="bTriggerFullscreenImage = false" />
                     </div>
-                    <div class="img-wrapper" v-if="userStore.person._sRole === 'Admin'">
-                        <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2" alt="">
-                        <button class="btn btn-danger align-self-center del-btn"
-                            v-if="!bFsImageIsDeleted" @click="softDeleteOrRestoreImage(fsImage)">
-                        Borrar
-                        </button>
-                        <button class="btn btn-primary align-self-center del-btn"
-                            v-else @click="softDeleteOrRestoreImage(fsImage)">
-                        Restaurar
-                        </button>
+                </div>
+                <div class="row mt-2">
+                    <div class="d-flex justify-content-center" v-if="userStore.person._sRole === 'Admin'">
+                        <div class="img-wrapper">
+                            <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2"
+                                alt="">
+                            <button class="btn btn-danger align-self-center del-btn" v-if="!bFsImageIsDeleted"
+                                @click="softDeleteOrRestoreImage(fsImage)">
+                                Borrar
+                            </button>
+                            <button class="btn btn-primary align-self-center del-btn" v-else
+                                @click="softDeleteOrRestoreImage(fsImage)">
+                                Restaurar
+                            </button>
+                        </div>
                     </div>
-                    <div v-else>
+                    <div class="d-flex justify-content-center" v-else>
                         <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2" alt="">
                     </div>
                 </div>
@@ -265,6 +274,8 @@
                 </div>
                 <button type="button" class="btn btn-primary float-end" @click="reportEvent()">Enviar</button>
             </Popup>
+            <GenericReportPopup v-if="bTriggerReportSentPopup" @close="bTriggerReportSentPopup = false">
+            </GenericReportPopup>
         </div>
     </div>
 </template>
@@ -280,6 +291,7 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from "vue-router";
 import moment from 'moment';
+import GenericReportPopup from '@/components/GenericReportPopup.vue';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -298,6 +310,7 @@ let sReportDescription = ref("");
 let bTriggerFullscreenImage = ref(false);
 let fsImage = ref(null);
 let bFsImageIsDeleted = ref(false);
+let bTriggerReportSentPopup = ref(false);
 
 let formData = new FormData();
 let uploadImage = ref(null);
@@ -356,6 +369,7 @@ function reportEvent() {
             console.log(response.data)
             bTriggerReportPopup.value = false;
             sReportDescription.value = "";
+            bTriggerReportSentPopup.value = true;
         })
 }
 
@@ -438,21 +452,21 @@ function softDeleteComment(comment) {
 function softDeleteOrRestoreImage(image) {
     let bIsDeleted = null;
     axios.get("http://localhost:8000/api/getUploader/" + image._iId)
-    .then(response => {
-        if(response.data._iId != 0) {
-            let iIndex = aEventPhotos.value.findIndex(item => image._iId === item._iId);
-            userStore.softDeleteOrRestoreImage(image._iId, response.data._iId, response.data._sUsername, false, event._iId);
-            //Si la imagen no tiene fecha de borrado, y se acaba de borrar, bIsDeleted debe ser true para establecer la fecha de borrado sin necesidad de petición extra para mostrar reactividad
-            let bIsDeleted = image._tDeleteDate === null ? true : false;
-            if(bIsDeleted) {
-                aEventPhotos.value[iIndex]._tDeleteDate = moment(Date.now());
-            } else {
-                aEventPhotos.value[iIndex]._tDeleteDate = null;
+        .then(response => {
+            if (response.data._iId != 0) {
+                let iIndex = aEventPhotos.value.findIndex(item => image._iId === item._iId);
+                userStore.softDeleteOrRestoreImage(image._iId, response.data._iId, response.data._sUsername, false, event._iId);
+                //Si la imagen no tiene fecha de borrado, y se acaba de borrar, bIsDeleted debe ser true para establecer la fecha de borrado sin necesidad de petición extra para mostrar reactividad
+                let bIsDeleted = image._tDeleteDate === null ? true : false;
+                if (bIsDeleted) {
+                    aEventPhotos.value[iIndex]._tDeleteDate = moment(Date.now());
+                } else {
+                    aEventPhotos.value[iIndex]._tDeleteDate = null;
+                }
+                console.log("Antes " + bFsImageIsDeleted.value)
+                bFsImageIsDeleted.value = bIsDeleted;
+                console.log("Despues s" + bFsImageIsDeleted.value)
             }
-            console.log("Antes " + bFsImageIsDeleted.value)
-            bFsImageIsDeleted.value = bIsDeleted; 
-            console.log("Despues s" + bFsImageIsDeleted.value)
-        }
         })
 }
 
@@ -555,9 +569,9 @@ function submitNewComment() {
     border-bottom: solid 1px #777;
 }
 
-.text-block {
+/* .text-block {
     white-space: pre;
-}
+} */
 
 .comments-box {
     /* border: solid 1px rgb(160, 160, 160); */
@@ -660,16 +674,19 @@ textarea {
 .fsimg {
     /* height: 70vh;
     width: auto; */
-    align-self: center;
-    justify-self: center;
+    height: 100%;
+    width: auto;
+    max-height: 65vh;
+    max-width: 65vh;
     object-fit: contain;
 }
 
 .img-wrapper {
     position: relative;
+    max-height: 70vh;
+    max-width: 70vh;
     width: 70vh;
     height: 70vh;
-    max-height: 600px;
     display: inline-block;
     display: flex;
     align-items: center;
@@ -727,5 +744,4 @@ textarea {
 
 .blackb {
     border: solid 1px black;
-}
-</style>
+}</style>

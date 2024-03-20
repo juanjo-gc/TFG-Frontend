@@ -271,10 +271,10 @@
                             <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
                             <div class="row">
                                 <h5 class="mt-2 fs-light">Preguntas 'Conóceme' de {{ person._sName }}</h5>
-                                <ul class="mt-4" v-if="shouldShowAnswers()">
+                                <ul class="mt-4 list-unstyled" v-if="shouldShowAnswers()">
                                     <li v-for="answer in aAMAnswers" class="ms-4">
-                                        <div class="row mt-2">
-                                            <p class="fw-bold">{{ answer._question._sQuestion }}</p>
+                                        <div class="row mt-2" v-if="answer._sAnswer != ''">
+                                            <p class="fw-bold">- {{ answer._question._sQuestion }}</p>
                                             <p class="fw-light">{{ answer._sAnswer }}</p>
                                         </div>
                                     </li>
@@ -331,8 +331,9 @@
                 </div>
                 <div class="col-md-10">
                     <div class="row">
-                        <!-- <div class="col-md-10"> -->
-                        <img :src="'http://localhost:8000/api/getImage/' + fsImage._sName" class="fsimg" alt="">
+                        <div class="img-wrapper">
+                            <img :src="'http://localhost:8000/api/getImage/' + fsImage._sName" class="fsimg" alt="">
+                        </div>
                         <!-- </div> -->
                     </div>
                 </div>
@@ -682,11 +683,18 @@ image {
 .fsimg {
     /* height: 70vh;
     width: auto; */
-    max-height: 70vh;
-    max-width: 70vw;
+    height: 100%;
+    width: auto;
     align-self: center;
     justify-self: center;
     object-fit: contain;
+}
+
+.img-wrapper {
+    max-height: 60vh;
+    max-width: 60vw;
+    justify-content: center;
+    display: flex;
 }
 
 .selected {

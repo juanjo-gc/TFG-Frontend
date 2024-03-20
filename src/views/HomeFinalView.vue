@@ -5,7 +5,8 @@
                 <div class="col-md-7 d-flex justify-content-center align-items-center">
                     <!-- Logo, nombre, eslogan -->
                     <div class="logo-wrapper ">
-                        <img src="https://static.vecteezy.com/system/resources/previews/009/343/883/original/half-orange-orange-free-png.png" alt="" class="logo-xl">
+                        <img src="https://static.vecteezy.com/system/resources/previews/009/343/883/original/half-orange-orange-free-png.png"
+                            alt="" class="logo-xl">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -56,10 +57,10 @@
                                 <p class="mt-2 fw-bold text-center">¿No tienes una cuenta? </p>
                                 <p class="mt-2 text-center">Regístrate en nuestra plataforma y empieza a interactuar
                                     con los demás usuarios.</p>
-                                <button type="button"
-                                    class="btn btn-outline-dark rounded-pill w-100 p-2 mt-2 mb-3 fw-bold" @click="router.push('/register')">Regístrate</button>
+                                <button type="button" class="btn btn-outline-dark rounded-pill w-100 p-2 mt-2 mb-3 fw-bold"
+                                    @click="router.push('/register')">Regístrate</button>
                                 <!-- <button type="button" class="btn btn-outline-light rounded-pill w-100 p-2 mt-2"><span
-                                class="fw-bold">Inicia sesión</span></button> -->
+                    class="fw-bold">Inicia sesión</span></button> -->
                             </div>
                             <div class="col-md-1"></div>
                         </div>
@@ -198,12 +199,12 @@ async function authUser() {
 
 
 <style scoped>
-
 .main {
     overflow-x: hidden;
 }
+
 .bg-main {
-    height: 90vh;
+    height: auto;
     width: 100vw;
     background-color: black;
     overflow-x: hidden;
@@ -221,7 +222,7 @@ async function authUser() {
     margin-bottom: 15%;
     /* background-color: rgb(183, 150, 255); */
     background-color: #FF8C00;
-    
+
     border-radius: 15px;
     /* height: 65vh;  */
     width: 30vw;
@@ -251,13 +252,12 @@ async function authUser() {
     align-items: center;
 }
 
-.logo-xl { 
+.logo-xl {
     width: 100%;
     height: auto;
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
 }
-
 </style>
 

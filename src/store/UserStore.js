@@ -148,7 +148,7 @@ export const useUserStore = defineStore({
                     iIssuerId: this.person._iId,
                     iPostId: -1,
                     iEventId: -1,
-                    sType
+                    sType: 'BehaviorWarning'
                 })
             })
         },

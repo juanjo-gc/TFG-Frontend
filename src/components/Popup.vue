@@ -30,7 +30,7 @@
     min-width: 35vw;
     max-width: 75vw;
     min-height: 15vh;
-    max-height: 75vh;
+    max-height: 90vh;
     flex-grow: 1;
     flex-basis: 50%;
     background: #FFF;
