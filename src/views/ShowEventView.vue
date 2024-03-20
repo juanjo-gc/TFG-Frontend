@@ -182,12 +182,13 @@
                             </div>
                             <!-- scrollTop: {{ commentsBox.scrollTop }} -->
                             <!-- <div class="new-comment" contenteditable="true"></div> -->
-                            <textarea v-model="sComment" v-if="userStore.person._sRole === 'User'"
+                            <div v-if="userStore.person._sRole === 'User' && aAssistantIds.some(iId => iId === userStore.person._iId)">
+                                <textarea v-model="sComment" 
                                 placeholder="Escribe tu comentario sobre el evento aquí"></textarea>
-                            <button @click="submitNewComment" class="btn btn-primary float-end mt-1"
-                                v-if="userStore.person._sRole === 'User'">
-                                Enviar
-                            </button>
+                                <button @click="submitNewComment" class="btn btn-primary float-end mt-1">
+                                    Enviar
+                                </button>
+                            </div>
                         </div>
 
                     </div>
@@ -198,7 +199,7 @@
                         </div>
 
                         <div class="col-md-9">
-                            <div class="row float-start" v-if="userStore.person._sRole === 'User'">
+                            <div class="row float-start" v-if="userStore.person._sRole === 'User' && aAssistantIds.some(iId => iId === userStore.person._iId)">
                                 <div class="col-md-8">
                                     <p class="mt-3 float-end">¿Tienes fotos del evento? ¡Compártelas con los demás!</p>
                                 </div>

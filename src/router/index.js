@@ -337,7 +337,6 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   const sRole = userStore.person._sRole;
-
   if(sRole) { 
     if(sRole.toLowerCase() === "user" && (to.name === "login" || to.name === "register")) {
       router.push({path: '/timeline'})
@@ -347,7 +346,7 @@ router.beforeEach((to, from, next) => {
       router.push({path: '/admin/dashboard'})
     }
   }
-  
+
 
   if(to.meta.requiresAuth) {
     if(!sRole) {
