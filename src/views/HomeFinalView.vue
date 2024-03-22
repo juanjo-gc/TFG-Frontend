@@ -26,31 +26,23 @@
                             <div class="col-md-1"></div>
                             <div class="col-md-10">
                                 <form @submit.prevent="authUser">
-                                    <!-- <label class="form-label" for="email">Correo electrónico</label> -->
                                     <div class="form-outline mb-4">
                                         <input type="email" id="email" class="form-control rounded-pill"
                                             placeholder="Correo electrónico" v-model="email" required />
                                     </div>
-                                    <!-- <label class="form-label" for="passw">Contraseña</label> -->
                                     <div class="form-outline mb-4">
                                         <input type="password" id="password" placeholder="Contraseña"
                                             class="form-control rounded-pill" v-model="password" required />
                                     </div>
 
                                     <div class="text-center pt-1 mb-5 pb-1">
-                                        <!-- <router-link to="/profile" tag="button"> -->
                                         <button class="btn btn-outline-light rounded-pill w-75 btn-block fa-lg "
                                             type="submit">
                                             Iniciar sesión
                                         </button>
-
-
-                                        <!-- <router-link to="#" class="text-muted">¿Olvidaste tu contraseña?</router-link> -->
                                     </div>
-
                                     <div v-if="formError" class="alert alert-danger">Error. Introduce tus datos de nuevo.
                                     </div>
-                                    <!-- <p>{{ userStore.person }}</p> -->
                                 </form>
 
                                 <p>--------------------------------------------------------</p>
@@ -59,8 +51,6 @@
                                     con los demás usuarios.</p>
                                 <button type="button" class="btn btn-outline-dark rounded-pill w-100 p-2 mt-2 mb-3 fw-bold"
                                     @click="router.push('/register')">Regístrate</button>
-                                <!-- <button type="button" class="btn btn-outline-light rounded-pill w-100 p-2 mt-2"><span
-                    class="fw-bold">Inicia sesión</span></button> -->
                             </div>
                             <div class="col-md-1"></div>
                         </div>
@@ -153,6 +143,8 @@ let main = null;
 let login = null;
 
 onMounted(() => {
+    if(userStore.person._sRole === 'Admin')
+        router.push('/admin/dashboard');
     main = document.getElementById('main');
     login = document.getElementById('login');
     axios.get("http://localhost:8000/api/loadDB")

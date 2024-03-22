@@ -6,18 +6,13 @@
           <div class="col-xl-6">
             <div class="card rounded-3 text-black">
               <div class="row g-0">
-                <!-- <div class="col-lg-6"> -->
                 <div class="card-body p-md-5 mx-md-4">
                   <div class="text-center">
                     <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
                       style="width: 185px" alt="logo" />
                     <h4 class="mt-1 mb-5 pb-1">Registrar una cuenta</h4>
                   </div>
-
-                  <!-- <form @submit.prevent="userStore.registerUser(email, name, username, password, confirmPassword, birthDate)"> -->
-                  <!-- <form @submit.prevent="registerUser"> -->
                   <form>
-                    <!-- <p>Please login to your account</p> -->
                     <label class="form-label" for="email">Correo electrónico</label>
                     <div class="form-outline mb-4">
                       <input type="email" id="email" class="form-control" v-model="email" @keyup="checkEmail" required />
@@ -50,43 +45,17 @@
                     <div class="form-outline mb-4">
                       <input type="date" id="birthDate" class="form-control" v-model="birthDate" required />
                     </div>
-                    <!-- <div class="mb-3">
-                        <label class="form-label" for="province">Localización</label>
-                        <div class="row">
-                          <div class="col-md-4">
-                          <select class="form-select" aria-label="Default select example" v-model="sCountry" @change="getRegions()">
-                            <option selected disabled>País</option>
-                            <option :value="country._sName" v-for="country in aCountries">{{ country._sName }}</option>
-                          </select>
-                        </div>
-                        <div class="col-md-4">
-                          <select class="form-select" aria-label="Default select example" v-model="sRegion" :disabled="sCountry === 'País'" @change="getProvinces(sRegionName)">
-                            <option selected disabled>Comunidad autónoma</option>
-                            <option :value="region._sName" v-for="region in aFilteredRegions">{{ region._sName }}</option>
-                          </select>
-                        </div>
-                        <div class="col-md-4">
-                          <select class="form-select" aria-label="Default select example" v-model="sProvince" :disabled="sRegion === 'Comunidad autónoma'">
-                            <option selected disabled>Provincia</option>
-                            <option :value="province._sName" v-for="province in aFilteredProvinces">{{ province._sName }}</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div> -->
                     <div class="text-center pt-1 mb-5 pb-1">
-                      <!-- <router-link to="/"> -->
                       <button class="btn btn-primary btn-block fa-lg gradient-custom mb-3 btnLogin" type="button"
                         @click="registerUser">
                         Regístrate
                       </button>
-                      <!-- </router-link> -->
                       <br />
                       <router-link to="/login" class="text-muted">¿Tienes ya una cuenta? Inicia sesión</router-link>
                     </div>
                   </form>
                 </div>
               </div>
-              <!-- </div> -->
             </div>
           </div>
         </div>
@@ -147,21 +116,12 @@ onMounted(() => {
 })
 
 function getRegions(sCountryName) {
-  // if(sCountry.value != 'País') {
-  //   sRegion.value = 'Comunidad autónoma';
-  //   sProvince.value = "Provincia";
-  // }
-  console.log(sCountry.value)
   sRegion.value = 'Comunidad autónoma';
   sProvince.value = "Provincia";
   aFilteredRegions.value = aRegions.value.filter(region => region._country._sName === sCountry.value);
-  console.log(aFilteredRegions.value)
 }
 
 function getProvinces() {
-  // if(sRegion.value != 'Comunidad autónoma') {
-  //   sProvince.value = 'Provincia';
-  // }
   sProvince.value = "Provincia";
   aFilteredProvinces.value = aProvinces.value.filter(province => province._region._sName === sRegion.value);
 }
@@ -218,11 +178,7 @@ async function registerUser() {
   } else if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now()))) {
     bTriggerErrorAlert.value = true;
     sAlertMessage.value = "Debes ser mayor de edad para registrarte."
-    // } else if(sProvince.value === 'Provincia') {
-    //   bTriggerErrorAlert.value = true;
-    //   sAlertMessage.value = "Asegúrate de elegir una localización correcta."
   } else {
-    console.log("hola")
     axios.post("http://localhost:8000/api/register", {
       sEmail: email.value,
       sName: name.value,

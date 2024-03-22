@@ -11,7 +11,7 @@
     </div>
     <div class="row mt-2">
         <div class="col-md-4"></div>
-        <div class="col-md-4 border">
+        <div class="col-md-4">
             <button type="button" class="btn btn-primary w-100" @click="router.push('/help/myTickets')">
                 Ver mis tickets
             </button>

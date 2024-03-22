@@ -17,12 +17,9 @@
             <h4 class="mb-4">Filtros</h4>
             <div class="col-md-4">
                 <div class="mb-3">
-                    <!-- <label for="ticketSubject" class="form-label">Asunto</label> -->
                     <input type="text" class="form-control form-control-lg" id="ticketSubject" placeholder="Buscar por asunto..."
                         v-model="sSubjectToSearch" @keyup="findTicketsBySubject" @click="sSubjectToSearch = ''">
                 </div>
-                <!-- <input type="input" class="form-field ms-2" :placeholder="'Buscar por asunto'" name="name" id='name'
-                    v-model="sSubjectToSearch" @keyup="findTicketsBySubject" @click="sSubjectToSearch = ''" /> -->
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-2">
@@ -38,13 +35,6 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <!-- <p class="fs-5 mt-1" style="margin-top: 6px;">Categoría</p> -->
-                <!-- <div class="select">
-                    <select name="format" id="format" v-model="sSelectedCategory" @change="filterByCategory">
-                        <option selected disabled>Categoría</option>
-                        <option v-for="category in aCategories" :value="category._sName">{{ category._sName }}</option>
-                    </select>
-                </div> -->
                 <select class="form-select mt-1" aria-label="Default select example" v-model="sSelectedCategory" @change="filterByCategory">
                     <option>Seleccionar categoría</option>
                     <option v-for="category in aCategories" :value="category._sName">{{ category._sName }}</option>
@@ -125,7 +115,6 @@ onMounted(() => {
             })
             aOpenedTicketsBackup = aOpenedTickets.value;
             aClosedTicketsBackup = aClosedTickets.value;
-            console.log(aOpenedTicketsBackup)
         });
 
     axios.get("http://localhost:8000/api/getAllCategories")
@@ -145,7 +134,6 @@ function orderAscDesc(bToggled) {
 }
 
 function filterByCategory() {
-    console.log(sSelectedCategory.value)
     if (sSelectedCategory.value != 'Seleccionar categoría') {
         aOpenedTickets.value = aOpenedTicketsBackup;
         aClosedTickets = aClosedTicketsBackup;
@@ -189,7 +177,6 @@ function findTicketsBySubject() {
         else
             aClosedTickets.value = aClosedTicketsBackup;
     }
-    console.log(aOpenedTickets.value)
 }
 
 </script>
@@ -256,11 +243,6 @@ function findTicketsBySubject() {
     color: transparent;
 }
 
-/* .form-field:placeholder-shown~.form-label {
-    font-size: 1.3rem;
-    cursor: text;
-    top: 20px;
-} */
 
 .form-label {
     position: absolute;
@@ -275,7 +257,6 @@ function findTicketsBySubject() {
     padding-bottom: 6px;
     font-weight: 700;
     border-width: 3px;
-    /* border-image: linear-gradient(to right, #11998e, #38ef7d); */
     border-image: linear-gradient(to right, #000000, #16b1a4);
     border-image-slice: 1;
 }

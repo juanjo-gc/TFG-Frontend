@@ -270,7 +270,7 @@
                             </ul>
                             <p class="fw-light" v-if="iInterests === 0">El usuario no ha indicado ningún interés :&#40;</p>
                             <div class="row">
-                                <h5 class="mt-2 fs-light">Preguntas 'Conóceme' de {{ person._sName }}</h5>
+                                <h5 class="mt-2 fs-light">Preguntas 'Sobre mí' de {{ person._sName }}</h5>
                                 <ul class="mt-4 list-unstyled" v-if="shouldShowAnswers()">
                                     <li v-for="answer in aAMAnswers" class="ms-4">
                                         <div class="row mt-2" v-if="answer._sAnswer != ''">
@@ -334,7 +334,6 @@
                         <div class="img-wrapper">
                             <img :src="'http://localhost:8000/api/getImage/' + fsImage._sName" class="fsimg" alt="">
                         </div>
-                        <!-- </div> -->
                     </div>
                 </div>
                 <div class="col-md-1 d-flex">
@@ -465,7 +464,6 @@ let reportedPost = ref(null);
 
 
 onMounted(() => {
-    // person.value = userStore.person;
     axios.get("http://localhost:8000/api/getUserFromUsername/" + route.params.username)
         .then((response) => {
             person.value = response.data;
@@ -476,9 +474,6 @@ onMounted(() => {
                     .then(response => bIsPersonBlocked.value = response.data);
                 axios.get("http://localhost:8000/api/checkBlock/" + person.value._iId + "/" + userStore.person._iId)
                     .then(response => bIsBlockedByPerson.value = response.data);
-                // person.value._setImagePath.forEach(image => {
-                //     aPhotos.value.push("http://localhost:8000/api/getImage/" + image._sName);
-                // })
                 axios.get("http://localhost:8000/api/getImageNames/" + person.value._iId)
                     .then(response => aPhotos.value = response.data);
                 if (person.value._iId != userStore.person._iId) {  //Ahorrar petición si el usuario es el mismo
@@ -681,8 +676,6 @@ image {
 }
 
 .fsimg {
-    /* height: 70vh;
-    width: auto; */
     height: 100%;
     width: auto;
     align-self: center;

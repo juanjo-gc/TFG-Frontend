@@ -151,13 +151,11 @@
                                     <label for="provinceName" class="form-label mt-2">Nombre provincia</label>
                                     <p class="mt-2 small">El nombre de la provincia a registrar</p>
                                 </div>
-                                <!-- <div class="select mt-4"> -->
                                     <select class="form-select w-75" name="format" id="format" v-model="sSelectedRegion">
                                         <option selected disabled>Comunidad autónoma</option>
                                         <option v-for="region in aRegions" :value="region._sName">{{
                                             region._sName }}</option>
                                     </select>
-                                <!-- </div> -->
                                 <p class="small mt-2">La comunidad autónoma a la que pertenece la provincia</p>
                                 <div class="col-md-10">
                                     <button type="button" class="btn btn-primary float-end"
@@ -197,13 +195,11 @@
                                             id='provinceName' v-model="currentEntity._sName" />
                                         <label for="provinceName" class="form-label mt-2">Nombre provincia</label>
                                         <p class="mt-2 small">El nombre de la provincia</p>
-                                        <!-- <div class="select mt-4 mb-3"> -->
                                             <select class="form-select w-75" name="format" id="format" v-model="sSelectedRegion">
                                                 <option selected disabled>Comunidad autónoma</option>
                                                 <option v-for="region in aRegions" :value="region._sName">{{
                                                     region._sName }}</option>
                                             </select>
-                                        <!-- </div> -->
                                         <p class="small">La comunidad autónoma a la que pertenece la provincia</p>
                                         <button type="button" class="btn btn-secondary mt-2"
                                             @click="currentEntity = {}; bIsBeingModified = false; sSelectedRegion = 'Comunidad autónoma'">Volver</button>
@@ -226,13 +222,11 @@
                                         id='regionName' v-model="sRegionName" />
                                     <label for="regionName" class="form-label mt-2">Nombre comunidad autónoma</label>
                                     <p class="mt-2 small">El nombre de la Comunidad a registrar</p>
-                                    <!-- <div class="select mt-4 mb-3"> -->
                                         <select class="form-select w-75" name="format" id="format" v-model="sSelectedCountry">
                                             <option selected disabled>País</option>
                                             <option v-for="country in aCountries" :value="country._sName">{{
                                                 country._sName }}</option>
                                         </select>
-                                    <!-- </div> -->
                                 </div>
                             </div>
                             <div class="col-md-9">
@@ -272,13 +266,11 @@
                                             id='regionName' v-model="currentEntity._sName" />
                                         <label for="regionName" class="form-label mt-2">Nombre comunidad</label>
                                         <p class="mt-2 small">El nombre de la comunidad autónoma</p>
-                                        <!-- <div class="select mt-4 mb-3"> -->
                                             <select class="form-select w-75" name="format" id="format" v-model="sSelectedCountry">
                                                 <option selected disabled>País</option>
                                                 <option v-for="country in aCountries" :value="country._sName">{{
                                                     country._sName }}</option>
                                             </select>
-                                        <!-- </div> -->
                                         <p class="small">El país al que pertenece la comunidad autónoma</p>
                                         <button type="button" class="btn btn-secondary mt-2"
                                             @click="currentEntity = {}; bIsBeingModified = false; sSelectedCountry = 'País'">Volver</button>
@@ -482,7 +474,6 @@
         </div>
         <Popup v-if="sPopupMessage != ''">
             <h4 class="mt-2 fw-bold">ATENCIÓN</h4>
-            <!-- <div class="row"> -->
             <p class="mt-4 fs-5 fw-bold">{{ sPopupMessage }}</p>
             <ul class="mt-2">
                 <li v-for="consequence in asConsequencesOfOperation">
@@ -494,7 +485,6 @@
                 @click="deleteEntity(sEntityType, currentEntity)">Continuar</button>
             <button type="button" class="btn btn-secondary me-2 float-end mt-2"
                 @click="sPopupMessage = ''; asConsequencesOfOperation = []">Cancelar</button>
-            <!-- </div> -->
         </Popup>
     </div>
 </template>
@@ -861,15 +851,6 @@ function modifyEntity(sEntityType) {
                         })
                         currentEntity.value = {};
                         bIsBeingModified.value = false;
-                        // let updatedEntity = response.data;
-                        // let sInformation = "Se ha modificado la FAQ con id " + updatedEntity._iId + ". Antes de modificar: " +
-                        //     " Pregunta -> " + currentEntity.value._sQuestion + " Después de modificar: " +
-                        //     " Pregunta -> " + updatedEntity._sQuestion + ". Respuesta -> " + currentEntity.value._sAnswer +
-                        //     " Después de modificar: Respuesta -> " + updatedEntity._sAnswer;
-                        // axios.post("http://localhost:8000/api/newOperation", {
-                        //     sInformation: sInformation,
-                        //     iAdminId: userStore.person._iId
-                        // })
                     }
                 })
             break;
@@ -879,7 +860,6 @@ function modifyEntity(sEntityType) {
 function setPopup(sType, entity) {
     currentEntity.value = entity;
     sEntityType.value = sType;
-    console.log(currentEntity.value);
     asConsequencesOfOperation.value[0] = "La entidad desaparecerá del sistema, y los cambios provocados por la misma que se puedan arreglar deberán realizarse de forma manual."
 
     switch (sType) {
@@ -920,9 +900,6 @@ function setPopup(sType, entity) {
 }
 
 function deleteEntity(sEntityType, entityToDelete) {
-    // console.log(entityToDelete._sName);
-    // console.log(entityToDelete._iId)
-    console.log(sEntityType);
     switch (sEntityType) {
         case 'category':
             axios.delete("http://localhost:8000/api/deleteCategory/" + entityToDelete._iId)
@@ -1118,28 +1095,6 @@ function deleteEntity(sEntityType, entityToDelete) {
     box-shadow: none;
 }
 
-/* 
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -ms-appearance: none;
-    appearance: none;
-    outline: 0;
-    box-shadow: none;
-    border: 0 !important;
-    background: rgb(224, 240, 255);
-    background-image: none;
-    flex: 1;
-    padding: 0 .5em;
-    color: #000000;
-    cursor: pointer;
-    font-size: 1em;
-    font-family: 'Open Sans', sans-serif;
-}
-
-select::-ms-expand {
-    display: none;
-} */
 
 .select {
     position: relative;
@@ -1167,4 +1122,27 @@ select::-ms-expand {
 .select:hover::after {
     color: #23b499;
 }
+
+/* 
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+    outline: 0;
+    box-shadow: none;
+    border: 0 !important;
+    background: rgb(224, 240, 255);
+    background-image: none;
+    flex: 1;
+    padding: 0 .5em;
+    color: #000000;
+    cursor: pointer;
+    font-size: 1em;
+    font-family: 'Open Sans', sans-serif;
+}
+
+select::-ms-expand {
+    display: none;
+} */
 </style>

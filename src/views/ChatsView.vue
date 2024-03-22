@@ -52,7 +52,7 @@
             <div class="col-md-8 private-chat" v-if="currentUserChat != null">
                 <div class="row header-chat">
                     <div class="col-md-2" style="cursor: pointer;" @click="router.push('/profile/' + currentUserChat._sUsername)">
-                        <img class="mr-3 mt-4 avatar "
+                        <img class="mr-3 mt-4 avatar"
                             :src="`http://localhost:8000/api/getProfileImage/${currentUserChat._iId}`" alt="User avatar">
                     </div>
                     <div class="col-md-10">
@@ -193,8 +193,6 @@ onMounted(() => {
         .then(response => {
             aLastMessages.value = response.data;
             bIsFetching.value = false;
-            console.log("Ultimos mensajes:")
-            console.log(aLastMessages.value);
             aLastMessages.value.forEach(message => {
                 if (message._issuer._iId != userStore.person._iId) {
                     message._bIsSeen = false;
@@ -204,7 +202,6 @@ onMounted(() => {
                     aiRecentMessagedUsers.value.push(message._recipient._iId);
                 }
             })
-            console.log(aLastMessages.value)
         })
         .catch(error => console.log(error));
     const pusher = new Pusher('56c83b0b9e4a25060b44', {
@@ -216,40 +213,16 @@ onMounted(() => {
 
 function getUsersFromUsername() {
     if (sUsernameToMessage.value.length > 3) {
-        // console.log(aFollowers.value)
-        // axios.get("http://localhost:8000/api/findFirst7Users/" + sUsernameToMessage.value)
-        //     .then(response => {
             let regex = new RegExp("^" + sUsernameToMessage.value + ".*$")
             aUsers.value = aFollowers.value.filter(follower => follower._sUsername.match(regex));
-            console.log(aUsers.value)
             aUsers.value = aUsers.value.filter(user => {
                 if(!aBlockedBy.value.some(blockedBy => blockedBy._iId === user._iId))
                 return user;
            })
-        // })
     } else {
         aUsers.value = [];
     }
 }
-
-
-// function sendMessage() {
-//     if (sNewMessage.value.length === 0) {
-//         bActivateAlert.value = true;
-//         sErrorMessage.value = "El mensaje no puede estar vacío"
-//     } else {
-//         axios.post("http://localhost:8000/api/newMessage", {
-//             iIssuerId: userStore.person._iId,
-//             iRecipientId: selectedUser.value._iId,
-//             sText: sNewMessage.value
-//         })
-//             .then(response => {
-//                 aLastMessages.value.unshift(response.data)
-//             })
-//             .catch(error => console.log(error));
-//         sNewMessage.value = "";
-//     }
-// }
 
 function loadChat(user) {
     currentUserChat.value = user;
@@ -311,13 +284,11 @@ function submitMessage() {
             } else {
                 let messageToReplace = response.data;
                 messageToReplace._bIsSeen = true;
-                console.log("prueba")
                 aLastMessages.value = aLastMessages.value.filter(message => {
                     if(!(message._issuer._iId === messageToReplace._issuer._iId && message._recipient._iId === messageToReplace._recipient._iId) &&
                     !(message._issuer._iId === messageToReplace._recipient._iId && message._recipient._iId === messageToReplace._issuer._iId))
                         return message;
                 })
-                console.log(messageToReplace)
                 aLastMessages.value.unshift(messageToReplace);
             }
         })
@@ -362,7 +333,7 @@ function submitMessage() {
 
 .scroller {
     max-height: 70vh;
-    min-height: 70vh;
+    min-height: 50vh;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;

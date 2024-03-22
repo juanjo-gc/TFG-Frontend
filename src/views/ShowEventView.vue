@@ -1,5 +1,4 @@
 <template>
-    <!-- <header-component></header-component> -->
     <SidebarFinal></SidebarFinal>
     <div class="container ps-4" v-if="!bIsFetching">
         <div v-if="event._iId === 0">
@@ -68,13 +67,6 @@
                                 </button>
                             </div>
                         </div>
-                        <!-- <div class="col-md-5 d-flex align-items-center justify-content-end" v-else>
-                        <div class="row">
-                            <a href="#photos">
-                                <button type="button" class="btn btn-primary">Ver fotos</button>
-                            </a>
-                        </div>
-                    </div> -->
                     </div>
                 </div>
                 <div class="row" v-if="event._setInterest != null">
@@ -122,9 +114,6 @@
                             <div class="row mt-2">
                                 <div class="d-flex justify-content-start">
                                     <font-awesome-icon icon="fa-solid fa-location-dot" class="mt-1" />
-                                    <!-- <router-link :to="'https://maps.google.com/?q=' + event._location._latitude + ',' + event._location._longitude">
-                                    <p class="ms-2 location-link">{{ event._location._sName }}</p>
-                                </router-link> -->
                                     <a class="ms-2" v-if="event._location != null" target="_blank"
                                         :href="'https://maps.google.com/?q=' + event._location._fLatitude + ',' + event._location._fLongitude">{{
                                             event._location._sName }}
@@ -180,8 +169,6 @@
                                     </li>
                                 </ul>
                             </div>
-                            <!-- scrollTop: {{ commentsBox.scrollTop }} -->
-                            <!-- <div class="new-comment" contenteditable="true"></div> -->
                             <div v-if="userStore.person._sRole === 'User' && aAssistantIds.some(iId => iId === userStore.person._iId)">
                                 <textarea v-model="sComment" 
                                 placeholder="Escribe tu comentario sobre el evento aquí"></textarea>
@@ -220,7 +207,7 @@
                                     <div class="blackb d-flex justify-content-center clickable"
                                         v-if="photo._tDeleteDate === null || userStore.person._sRole === 'Admin'"
                                         @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
-                                        <img class="event-image"
+                                        <img class="event-image" :class="{deleted: photo._tDeleteDate != null}"
                                             :src="'http://localhost:8000/api/getEventImage/' + photo._sName" alt="">
                                     </div>
                                 </li>
@@ -323,13 +310,9 @@ onMounted(() => {
     axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
         .then(response => {
             event.value = response.data;
-            console.log(event.value)
-            console.log("Fecha evento: " + event.value._tCelebratedAt + " Fecha hoy: " + Date.now())
             if (moment(event.value._tCelebratedAt).isBefore(moment(Date.now()))) {
                 bIsFinished = true;
-                console.log(bIsFinished)
             }
-            // console.log(response.data)
             bIsFetching.value = false;
             axios.get("http://localhost:8000/api/getEventAssistantIds/" + event.value._iId)
                 .then(response => {
@@ -367,7 +350,6 @@ function reportEvent() {
         sCategory: 'Denunciar un evento'
     })
         .then(response => {
-            console.log(response.data)
             bTriggerReportPopup.value = false;
             sReportDescription.value = "";
             bTriggerReportSentPopup.value = true;
@@ -464,9 +446,7 @@ function softDeleteOrRestoreImage(image) {
                 } else {
                     aEventPhotos.value[iIndex]._tDeleteDate = null;
                 }
-                console.log("Antes " + bFsImageIsDeleted.value)
                 bFsImageIsDeleted.value = bIsDeleted;
-                console.log("Despues s" + bFsImageIsDeleted.value)
             }
         })
 }
@@ -495,8 +475,6 @@ function setAssist() {
 
 function onImageUpload() {
     formData = new FormData();
-
-    console.log("Numero de archivos: " + uploadImage.value.files.length);
     for (let i = 0; i < uploadImage.value.files.length; i++) {
         let file = uploadImage.value.files[i];
         formData.append("file[]", file);
@@ -510,7 +488,6 @@ async function uploadImg() {
         'content-type': 'form-data'
     })
         .then(response => {
-            console.log(response.data);
             axios.get("http://localhost:8000/api/getEventPhotos/" + event.value._iId)
                 .then(response => {
                     aEventPhotos.value = response.data;
@@ -529,7 +506,6 @@ async function uploadImg() {
         })
 }
 function submitNewComment() {
-    console.log("Se envia")
     if (sComment.value != "" && bIsFinished) {
         axios.post("http://localhost:8000/api/newComment", {
             iUserId: userStore.person._iId,
@@ -570,12 +546,8 @@ function submitNewComment() {
     border-bottom: solid 1px #777;
 }
 
-/* .text-block {
-    white-space: pre;
-} */
 
 .comments-box {
-    /* border: solid 1px rgb(160, 160, 160); */
     border: none;
     background-color: white;
     height: 350px;
@@ -603,6 +575,11 @@ textarea {
 
 .clickable:hover {
     cursor: pointer;
+}
+
+.deleted {
+    opacity: 0.5;
+    z-index: 5;
 }
 
 
@@ -673,8 +650,6 @@ textarea {
 }
 
 .fsimg {
-    /* height: 70vh;
-    width: auto; */
     height: 100%;
     width: auto;
     max-height: 65vh;

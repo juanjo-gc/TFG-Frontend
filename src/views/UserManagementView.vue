@@ -7,8 +7,6 @@
             <p class="mt-3"><strong>IMPORTANTE:</strong> Cualquier acción que se aplique sobre un usuario exceptuando la de carga del mismo tendrá consecuencias para dicho usuario y quedará registrada en el sistema con objeto de realizar un seguimiento para evitar malos comportamientos y, en caso de que sucedan, asegurar las conscuencias del responsable.</p>
             <div class="col-md-6">
                 <div class="my-2">
-                    <!-- <p class="">Nombre de usuario</p>
-                        <input type="text" class="form-control w-50"> -->
                         <label for="userToSearch" class="m-1 mb-2">Nombre de usuario</label>
                         <div class="input-group mb-3" id="userToSearch">
                             <span class="input-group-text" id="basic-addon1">@</span>
@@ -52,21 +50,6 @@
                         <button type="button" class="btn btn-primary mt-4 float-end" @click="userToDisplay = null; ">Cargar otro usuario</button>
                     </div>
                 </div>
-                <!-- <div class="form-group field mt-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="input" class="form-field ms-2" placeholder="Asunto" name="username" id='username'
-                                v-model="sUsernameToSearch" @keyup="searchUsers()" />
-                            <label for="username" class="form-label">Nombre del usuario...</label>
-                        </div>
-                        <div class="col-md-6" v-if="userToDisplay != null">
-                            <button type="button" class="btn btn-danger mt-2 float-end" v-if="!userToDisplay._bIsSuspended"
-                                @click="suspendReactivateAccount(1)">Suspender cuenta</button>
-                            <button type="button" class="btn btn-primary mt-2 float-end" v-else
-                                @click="suspendReactivateAccount(0)">Reactivar cuenta</button>
-                        </div>
-                    </div>
-                </div> -->
                 <div class="row mt-4 ms-2" v-if="userToDisplay != null">
                     <div class="col-md-4">
                         <p class="mt-2"><strong>Id del usuario: </strong>{{ userToDisplay._iId }}</p>
@@ -162,16 +145,6 @@
                         </button>
                     </div>
                 </div>
-                <!-- <div class="row d-flex justify-content-center" v-else> -->
-                <!-- <div class="photos-container blackb mt-4">
-                        <ul class="list-unstyled list-group list-group-horizontal">
-                            <li v-for="photo in aUserPhotos">
-                                <div>
-                                    <img :src="'http://localhost:8000/api/getImage/' + photo._sName" alt="">
-                                </div>
-                            </li>
-                        </ul>
-                    </div> -->
                 <div class="d-flex justify-content-center mt-4" v-else>
                     <ul class="list-group list-group-horizontal list-unstyled" v-if="aUserPhotos.length > 0">
                         <li v-for="photo in aUserPhotos">
@@ -184,7 +157,6 @@
                     </ul>
                     <p v-else>El usuario no tiene fotos</p>
                 </div>
-                <!-- </div> -->
             </div>
         </div>
         <Popup v-if="bTriggerFullscreenImage">
@@ -263,8 +235,6 @@ function loadUserData(user) {
         .then(response => {
             if (response.data._iId != 0) {
                 userToDisplay.value = response.data;
-                // TODO obtener denuncias
-                // TODO obtener avisos
                 axios.get("http://localhost:8000/api/getUserPosts/" + user._sUsername)
                     .then(response => {
                         aPosts.value = response.data;
@@ -308,16 +278,12 @@ function softDeleteOrRestoreImage(image) {
     } else {
         aUserPhotos.value[iIndex]._tDeleteDate = null;
     }
-    console.log("Antes " + bFsImageIsDeleted.value)
     bFsImageIsDeleted.value = bIsDeleted;
-    console.log("Despues s" + bFsImageIsDeleted.value)
 }
 
 
 function sendWarning() {
-    console.log("hola")
     if (sReason.value != '') {
-        console.log("Antes de enviar")
         axios.post("http://localhost:8000/api/newNotification", {
             sInfo: sReason.value,
             iRecipientId: userToDisplay.value._iId,
@@ -330,8 +296,6 @@ function sendWarning() {
         sReason.value = "";
     }
 }
-
-function selectPost() { }
 
 </script>
 
@@ -421,8 +385,6 @@ function selectPost() { }
 }
 
 .fsimg {
-    /* height: 70vh;
-    width: auto; */
     align-self: center;
     justify-self: center;
     object-fit: contain;

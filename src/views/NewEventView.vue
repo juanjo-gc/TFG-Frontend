@@ -1,17 +1,7 @@
 <template>
 <SidebarFinal></SidebarFinal>
 <div class="container">
-        <!-- <input type="text" v-model="sLocationToSearch" @keyup="searchAndGetResults">
-        <ul class="list-unstyled">
-            <li v-for="location in aLocations">
-                {{ location.display_name }}
-            </li>
-        </ul>
-        <div class="m-5">
-            Buscando: {{ sLocationToSearch.replace(' ', '+') }}
-        </div> -->
         <div class="mt-4">
-            <!-- <h3 class="fw-bold">Inicia un nuevo evento</h3> -->
             <h3 class="fw-bold ">Conviértete en el anfitrión de un evento para reunir personas con tus mismos gustos.</h3>
             <div class="hline mt-2"></div>
         </div>
@@ -48,8 +38,6 @@
         <div class="row mt-4">
             <div class="col-md-6" v-if="!bIsOnline">
                 <h6 class="mt-2 fw-bold">Localización del evento*</h6>
-                <!-- TODO: poner links a cada sitio para buscar y establecerlo como localización -->
-                <!-- <input type="text" class="w-100" v-model="sLocationToSearch" @keyup="searchAndGetResults"> -->
                 <label for="inp" class="inp">
                     <input type="text" id="inp" placeholder="&nbsp;" v-model="sLocationToSearch"
                     @keyup="searchAndGetResults">
@@ -70,7 +58,6 @@
                 para que los demás usuarios puedan comunicarse contigo, o con los demás participantes del evento.</p>
             </div>
             <div class="col-md-6">
-                <!-- TODO: poner fecha con input bonito -->
                 <h6 class="mt-2 fw-bold">Hora del evento*</h6>
                 <input type="time" v-model="tCelebrationHour" required>
                 <h6 class="mt-4 fw-bold">Fecha de celebración*</h6>
@@ -81,20 +68,6 @@
             <div class="col-md-6">
 
                 <h6 class="mt-2 fw-bold">Intereses del evento</h6>
-                <!-- <ul class="ks-cboxtags">
-                    <li>
-                        <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
-                        for="checkboxOne">Música</label>
-                    </li>
-                    <li>
-                        <input type="checkbox" id="checkboxTwo" value="Videojuegos" v-model="aCheckedInterests" /><label
-                        for="checkboxTwo">Videojuegos</label>
-                </li>
-                <li>
-                    <input type="checkbox" id="checkboxThree" value="Deportes" v-model="aCheckedInterests" /><label
-                    for="checkboxThree">Deportes</label>
-                </li>
-            </ul> -->
             <ul class="ks-cboxtags">
                     <li>
                         <input type="checkbox" id="checkboxOne" value="Música" v-model="aCheckedInterests" /><label
@@ -179,14 +152,12 @@ let bIsOnline = ref(false);
 
 
 function searchAndGetResults() {
-    if(formData.get('file') != null) console.log("holasdasdsadsadas")
     if (sLocationToSearch.value.length > 3) {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
             axios.get("https://nominatim.openstreetmap.org/search?q=" + sLocationToSearch.value.replace(' ', '+') + "&format=json&limit=3&countrycodes=es")
                 .then(response => {
                     aLocations.value = response.data;
-                    //console.log(response.data);
                 })
         }, 400)
     } else {
@@ -200,8 +171,6 @@ function selectLocation(location) {
     axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.lat +"&lon=" + location.lon)
     .then(response => {
     sProvinceName = response.data.address.state_district;
-    console.log(response.data)
-    console.log(sProvinceName)
     if(sProvinceName === null) {
         sErrorMessage.value = "No se ha podido seleccionar la ubicación correctamente. Por favor, vuelva a intentarlo, y si el error persiste, seleccione otra ubicación."
     }
@@ -212,18 +181,14 @@ function selectLocation(location) {
 
 function isDatetimeValid() {
     let bIsValid = true;
-    console.log("Comprobando fecha")
     if(moment(tCelebrationDate.value).isBefore(moment(Date.now()))) 
         bIsValid = false;
-    console.log("A devolver: " + bIsValid)
     return bIsValid;
 }
 
 function submitEvent() {
     let iUserId = userStore.person._iId;
     let sLocationName = selectedLocation.value === null ? "" : selectedLocation.value.display_name;
-    console.log(sLocationName)
-    console.log(bIsOnline.value)
     if(isDatetimeValid()) {
         let eventDTO = {
             sTitle: sTitle.value,
@@ -243,7 +208,6 @@ function submitEvent() {
             .then(response => {
                 let iNewEventId = response.data;
                 formData.append('id', response.data);
-                console.log("FormData: " + formData.get('id'))
                 if(formData.get('file') != null) {
                     axios.post("http://localhost:8000/api/uploadEventHeaderImage", formData, {
                         'content-type': 'form-data'
@@ -260,7 +224,6 @@ function submitEvent() {
         }
     } else {
         sErrorMessage.value = "Error. Seleccione una fecha válida.";
-        console.log(sErrorMessage.value)
     }
 }
 
@@ -268,7 +231,6 @@ function onImageUpload(iEventId) {
     let file = imgUpload.value.files[0];
     sImageName.value = file.name;
     formData.append('file', file);
-    console.log(formData.get('file'))
 }
         
 </script>

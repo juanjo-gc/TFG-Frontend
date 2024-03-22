@@ -69,7 +69,6 @@
     <div class="row mt-4">
         <div class="row">
             <div class="col-md-2"><p class="fw-bold">Administrador</p></div>
-            <!-- <div class="col-md-1"></div> -->
             <div class="col-md-2"><p class="fw-bold">Fecha</p></div>
             <div class="col-md-8"><p class="fw-bold">Operación</p></div>
         </div>

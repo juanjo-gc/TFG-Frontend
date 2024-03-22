@@ -1,7 +1,5 @@
 <template>
   <SidebarFinal ref="sidebar"></SidebarFinal>
-  <!-- <div class="mx-4"> -->
-    <!-- <div class="row"> -->
       <div class="col-left">
         <div class="position-fixed w-25 mt-4" style="height: 75vh; top: 15%;">
           <div class="position-absolute abs-top bg-soft rounded ms-3">
@@ -13,10 +11,8 @@
                   </div>
                   <div class="col-md-10">
                     <span> {{ route.name }}</span>
-                    <!-- <div class="new-notif-wrapper" v-if="route.name === 'Notificaciones' && iNewNotifications > 0">  -->
                     <span class="bg-light px-2 ms-2 rounded" style="color: black;"
                       v-if="route.name === 'Notificaciones' && iNewNotifications > 0">{{ iNewNotifications }}</span>
-                    <!-- </div> -->
                   </div>
                 </div>
               </li>
@@ -57,10 +53,6 @@
           <div class="card-body rounded">
             <div class="row" v-if="aPosts.length === 0">
               <p class="fs-5 fw-light">Parece que no hay nada por aquí... </p>
-              <!-- <p class="fs-5 fw-light text-center">Puedes probar a buscar personas con las que interactuar pulsando <a
-                  href="/discover">aquí</a> o
-                apuntarte a un evento pulsando <a href="/events/explore">aquí</a>. ¡Comienza a conocer nuevas personas y a
-                interactuar con ellas!</p> -->
                 <p class="fs-5 fw-light text-center">¡Prueba a buscar personas que puedan tener intereses comunes contigo!</p>
                 <div class="row">
                   <div class="col-md-3"></div>
@@ -122,17 +114,6 @@
         </div>
 
       </div>
-      <!-- </div> -->
-      <!-- <div class="row"> -->
-      <!-- <div class="col-md-7"> -->
-
-
-
-      <!-- </div> -->
-      <!-- <div class="col-md-3"> -->
-      <!-- </div> -->
-
-
     <div
       class="alert alert-danger alert-dismissible fade show fixed-bottom d-flex justify-content-center align-content-center"
       role="alert" v-if="bTriggerEmptyPostAlert">
@@ -162,7 +143,6 @@
       </div>
       <button type="button" class="btn btn-primary float-end" @click="reportPost(reportedPost)">Enviar</button>
     </Popup>
-  <!-- </div> -->
 </template>
   
 <script setup>
@@ -208,13 +188,7 @@ function newPost() {
       sText: sPost.value,
       iUserId: userStore.person._iId
     }).then((response) => {
-      console.log("Antes de unshift: ")
-      console.log(aPosts.value)
-      // let returnedPost = response.data;
       aPosts.value.splice(0, 0, response.data)
-      // aPosts.value.unshift(returnedPost);
-      console.log("Despues de unshift: ")
-      console.log(aPosts.value)
       sPost.value = '';
     }).catch(error => console.log(error))
   } else {
@@ -233,7 +207,6 @@ onMounted(() => {
       axios.get("http://localhost:8000/api/countNewNotifications/" + userStore.person._iId)
         .then(response => iNewNotifications.value = response.data);
     });
-  console.log(userStore.person._iId)
 })
 
 function isBlank(sStr) {
@@ -248,7 +221,6 @@ function isBlank(sStr) {
 function getTimelinePosts(iPageNumber) {
   axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId + "/" + iPageNumber)
     .then(response => {
-      console.log(response.data)
       aPosts.value = aPosts.value.concat(response.data.content);
       iTotalPages.value = response.data.totalPages;
     }).catch(error => console.log(error));
@@ -261,8 +233,6 @@ function setPopup(post) {
 
 
 function reportPost(post) {
-  //public TicketDTO(String sSubject, String sDescription, int iIssuerId, int iReportedId, int iEventId, int iPostId, String sCategory) {
-  console.log(sReportDescription._rawValue)
   axios.post("http://localhost:8000/api/newTicket", {
     sSubject: "Denuncia de publicación de @" + post._user._sUsername,
     sDescription: sReportDescription._rawValue,
@@ -273,47 +243,11 @@ function reportPost(post) {
     sCategory: 'Denunciar una publicación'
   })
     .then(response => {
-      console.log(response.data)
       bTriggerReportPopup.value = false;
       sReportDescription.value = "";
       bTriggerReportSentPopup.value = true;
     })
 }
-
-// function findIndex(id) {
-//   let i = 0;
-//   let bFound = false;
-//   while(!bFound) {
-//     if(aPosts.value[i]._iId === id)
-//       bFound = true;
-//     else
-//       i++;
-//   }
-//   return i;
-// }
-
-
-// function setLike(post) {
-//   console.log(post._iId)
-//   axios.post("http://localhost:8000/api/setLike/" + post._iId + "/" + userStore.person._iId)
-//   .then(response => {
-//     let postIndex = findIndex(post._iId);
-
-//     if(response.data === true) {
-//       aPosts.value[postIndex]._iLikes++;
-//       if(userStore.person._iId != post._user._iId) {
-//         axios.post("http://localhost:8000/api/newNotification", {
-//           sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
-//           iRecipientId: post._user._iId,
-//           iIssuerId: userStore.person._iId,
-//           iPostId: post._iId
-//         })
-//       }
-//     } else {
-//       aPosts.value[postIndex]._iLikes--;
-//     }
-//   })
-// }
 
 
 window.onscroll = () => {
@@ -418,7 +352,6 @@ body {
 
 .option-preview:hover {
   cursor: pointer;
-  /* background-color: #d0d0d0; */
   background-color: #d8d8ff;
 }
 

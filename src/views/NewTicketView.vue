@@ -13,31 +13,21 @@
             <div class="col-md-4">
                 <h4>Asunto</h4>
                 <div class="hline"></div>
-                <!-- <div class="form-group field mt-2"> -->
                 <div class="row mt-4">
                     <input type="input" class="form-control form-control-lg ms-2" placeholder="Escribe el asunto..."
                         name="subject" id='subject' v-model="sSubject" />
-                    <!-- <label for="subject" class="form-label">Escribe el asunto...</label> -->
                 </div>
-                <!-- </div> -->
             </div>
             <div class="col-md-2"></div>
             <div class="col-md-4">
                 <h4>Categoría</h4>
                 <div class="hline"></div>
                 <div class="d-flex justify-content-center">
-                    <!-- <div class="select mt-4"> -->
-                        <!-- <select name="format" id="format" v-model="sSelectedCategory">
-                            <option selected disabled>Categoría</option>
-                            <option v-for="category in aCategories" :value="category._sName">{{
-                                category._sName }}</option>
-                        </select> -->
                         <select class="form-select form-select-lg mt-4" aria-label="Default select example" v-model="sSelectedCategory">
                             <option selected disabled>Categoría</option>
                             <option v-for="category in aCategories" :value="category._sName">{{
                                 category._sName }}</option>
                         </select>
-                    <!-- </div> -->
                 </div>
             </div>
         </div>
@@ -184,11 +174,8 @@ function sendTicket() {
 function onImageUpload() {
     formData = new FormData();
     bIsFileSelected.value = true;
-    console.log(uploadImage.value.files[0].name);
     let file = uploadImage.value.files[0];
     formData.append("file", file);
-
-    //uploadImg()
 }
 
 async function uploadImg() {
@@ -196,9 +183,7 @@ async function uploadImg() {
     axios.post("http://localhost:8000/api/uploadTicketImage", formData, {
         'content-type': 'form-data'
     })
-        .then(response => {
-            console.log(response.data);
-        })
+        .then(response => {})
 }
 </script>
 
@@ -280,28 +265,6 @@ async function uploadImg() {
 .form-field:invalid {
     box-shadow: none;
 }
-/* 
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    -ms-appearance: none;
-    appearance: none;
-    outline: 0;
-    box-shadow: none;
-    border: 0 !important;
-    background: rgb(224, 240, 255);
-    background-image: none;
-    flex: 1;
-    padding: 0 .5em;
-    color: #000000;
-    cursor: pointer;
-    font-size: 1em;
-    font-family: 'Open Sans', sans-serif;
-}
-
-select::-ms-expand {
-    display: none;
-} */
 
 .select {
     position: relative;

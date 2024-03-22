@@ -82,46 +82,10 @@
                 </div>
                 <div class="col-md-5"></div>
                 <div class="col-md-2 mt-4">
-                    <button type="button" class="btn btn-primary"
+                    <button type="button" class="btn btn-primary" v-if="userStore.person._sRole === 'Admin'"
                         @click="router.push('/admin/manage/users/' + ticket._reported._iId)">Gestionar perfil</button>
                 </div>
             </div>
-            <!-- <div class="d-flex mt-2 justify-content-center" v-if="ticket._event != null">
-                <div class="dt-element mt-2">
-                    <div class="media m-2">
-                        <div class="row">
-                            <div class="col-md-7">
-                                <h5 class="mt-0 mb-1">
-                                    <router-link :to="`/events/${ticket._event._iId}`"
-                                        style="text-decoration: none; color: inherit;">
-                                        {{ ticket.event._sTitle }}
-                                    </router-link>
-                                </h5>
-                                <h6>
-                                    <p class="text-muted">Organizado por: @{{ ticket.event._organizer._sUsername }}</p>
-                                </h6>
-                            </div>
-                        </div>
-                        <div class="media-body">
-                            <router-link :to="`/events/${ticket._event._iId}`"
-                                style="text-decoration: none; color: inherit;">
-                                <div>
-                                    <p v-if="ticket.event._sDescription.length <= 250">{{ ticket.event._sDescription }}</p>
-                                    <p v-else>{{ proccessDescription(ticket.event._sDescription) }}...</p>
-                                </div>
-                            </router-link>
-                            <div class="row">
-                                <div class="col-md-6"></div>
-                                <div class="col-md-6">
-                                    <small class="text-muted float-end" style="margin-top: 10px;">
-                                        Fecha del evento: {{ moment(ticket.event._tCelebratedAt).format('D-M-YYYY') }}
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
             <img :src="'http://localhost:8000/api/getTicketImage/' + ticket._iId" alt="img" class="ticket-reply-image"
                 v-if="ticket._imagePath != null" @click="setFsImage(true, ticket._iId)" />
             <div class="row mb-4">
@@ -276,11 +240,6 @@ function deleteRestorePost(bWantToDelete) {
         ticket.value._tDeleteDate = null;
         bIsDeleted.value = false;
     }
-    // if(userStore.softDeleteRestorePost(ticket.value._post._iId, ticket.value._post._user._iId,
-    // ticket.value._post._user._sUsername, ticket.value._post._sText, bWantToDelete ? false : true))
-    //         ticket.value._tDeleteDate = Date.now();
-    // else
-    //     ticket.value._tDeleteDate = null;
 }
 
 async function sendReply() {
@@ -320,7 +279,6 @@ function setFsImage(bIsTicketImage, iId) {
         fsImage.value.bIsReplyImage = true;
         fsImage.value.sLink = 'http://localhost:8000/api/getReplyImage/' + iId
     }
-    console.log(fsImage.sLink)
 }
 
 function openCloseTicket() {
@@ -331,12 +289,9 @@ function openCloseTicket() {
 
 function onImageUpload() {
     formData = new FormData();
-
-    // console.log(uploadImage.value.files[0].name);
     let file = uploadImage.value.files[0];
     sFilename.value = file.name;
     formData.append("file", file);
-    console.log(formData.get('file').name)
 }
 
 async function uploadImg(iId) {
@@ -344,17 +299,6 @@ async function uploadImg(iId) {
     let image = await axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
         'content-type': 'form-data'
     });
-    // axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
-    //     'content-type': 'form-data'
-    // })
-    //     .then(response => {
-    //         sFilename.value = "";
-    //         image = response.data;
-    //     })
-    // setTimeout(() => {
-    //     return image;
-    // }, 250);
-    console.log(image.data)
     return image.data;
 }
 

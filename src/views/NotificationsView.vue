@@ -4,7 +4,6 @@
         <h2 class="mt-4 fw-formal">Notificaciones</h2>
         <div class="hline"></div>
         <div class="row mt-4">
-            <!-- <div class="col-md-1"></div> -->
             <div class="col-md-12">
                 <ul class="list-unstyled">
                     <li v-for="(notification, key) in aNotifications">
@@ -33,7 +32,6 @@
                                     v-else>Siguiendo</button>
                             </div>
                             <div class="col-sm-2" v-else-if="notification._type._sName === 'FollowRequest'">
-                                <!-- <div class="row mt-2" v-if="!checkFollow(notification)"> -->
                                 <div class="row mt-2" v-if="aNotifications.some(receivedNotification => receivedNotification._type === 'NewFollow' && receivedNotification._issuer._iId === Notification._issuer._iId)">
                                     <div class="col-sm-6">
                                         <button type="button" class="btn btn-outline-primary"
@@ -105,7 +103,6 @@ function getNotificationsPage() {
             aLoadedNotificationPages.push({ iPageNumber, aNotifications: aNotifications.value })
             iTotalPages = response.data.totalPages;
             iPageNumber++;
-            console.log(aNotifications.value[0])
         })
 }
 
@@ -115,7 +112,6 @@ onMounted(() => {
 
 function shouldBeShown(notification) {
     let bShouldBeShown = true;
-    // console.log(notification)
 
     if(notification._issuer._sRole === 'User')
         if(notification._issuer._bIsSuspended)
@@ -137,15 +133,6 @@ function setSeen(i) {
     }
 }
 
-// function showAcceptIgnoreOptions(notification) {
-//     let bShow = false;
-//     if()
-// }
-
-// async function checkIfFollowing(user) {
-//     const bIsFollowing = await axios.get("http://localhost:8000/checkFollow/" + userStore.person._iId + "/" + user._iId)
-//     return bIsFollowing.data; 
-// }
 
 function shortenText(sText) {
     if (sText.length > 150)
@@ -210,7 +197,6 @@ async function acceptIgnoreFollowRequest(notification, bIsAccepted) {
 
 async function checkFollow(notification) {
     let response = await axios.get('http://localhost:8000/api/checkFollow/' + notification._issuer._iId + '/' + notification._recipient._iId);
-    console.log(response.data)
     return response.data;
 }
 
@@ -249,7 +235,6 @@ function generateLink(notification) {
 }
 
 .notification {
-    /* border: solid 1px rgb(0, 0, 0); */
     border: none;
     background-color: #e4e4e4;
 }

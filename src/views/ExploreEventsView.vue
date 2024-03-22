@@ -129,7 +129,6 @@ let iTotalPages = 0;
 let currentSearch = {};
 
 onMounted(() => {
-    //axios.get("http://localhost:8000/api/getFilteredEvents/1")
     axios.get("http://localhost:8000/api/getAllInterestNames")
         .then(response => asInterests = response.data)
 
@@ -161,13 +160,6 @@ onMounted(() => {
                 sRegion: sSelectedRegion.value,
                 sCountry: sSelectedCountry.value
             }
-            console.log("Total paginas: " + iTotalPages)
-            // aEvents.value.forEach(event => {
-            //     axios.get("http://localhost:8000/api/getEventInterests/" + event._iId)
-            //     .then(response => {
-            //         event._setInterests = response.data;
-            //     });
-            // })
         })
 })
 
@@ -194,7 +186,6 @@ function sendFilter() {
         bIsOnline: bIsOnline.value
     })
         .then(response => {
-            console.log(response.data)
             aEvents.value = response.data.content;
             aEventsBackup = aEvents.value;
             iTotalPages = response.data.totalPages;
@@ -208,7 +199,6 @@ function sendFilter() {
         })
 }
 
-//Mirar por que se envían 3 páginas en total cuando hay 6 elementos y el tamaño de pagina es 5
 window.onscroll = () => {
     //Cuando el número de píxeles que hay en el scroll sumado al número de píxeles de la pantalla sean 
     //iguales al nº de píxeles del elemento del documento habremos llegado al final
@@ -224,7 +214,6 @@ window.onscroll = () => {
         })
             .then(response => {
                 aEvents.value = aEvents.value.concat(response.data.content)
-                console.log(aEvents.value);
                 aEventsBackup = aEvents.value;
 
             })
@@ -267,20 +256,6 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
 </script>
 
 <style scoped>
-/*
-input[type=text] {
-    border: 0;
-    border-bottom: 1px solid black;
-    width: 100%;
-}
-
-input[type=text]:focus {
-    border: 0;
-    outline: 0;
-    border-bottom: solid 1px black;
-    width: 100%;
-}
-*/
 
 .interest-item {
     padding: 5px;
@@ -303,4 +278,19 @@ input[type=text]:focus {
 
 .blackb {
     border: solid 1px black;
-}</style>
+}
+/*
+input[type=text] {
+    border: 0;
+    border-bottom: 1px solid black;
+    width: 100%;
+}
+
+input[type=text]:focus {
+    border: 0;
+    outline: 0;
+    border-bottom: solid 1px black;
+    width: 100%;
+}
+*/
+</style>

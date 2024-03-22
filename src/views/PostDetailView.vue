@@ -114,7 +114,6 @@ let bTriggerReportSentPopup = ref(false);
 
 
 onMounted(() => {
-  // console.log(aReplies.value.length + " respuestas")
   axios.get("http://localhost:8000/api/getPost/" + route.params.id)
     .then(response => {
       post.value = response.data;
@@ -140,7 +139,6 @@ function resetErrors() {
 }
 
 function reportPost(post) {
-  //public TicketDTO(String sSubject, String sDescription, int iIssuerId, int iReportedId, int iEventId, int iPostId, String sCategory) {
   console.log(sReportDescription._rawValue)
   axios.post("http://localhost:8000/api/newTicket", {
     sSubject: "Denuncia de publicación de @" + post._user._sUsername,
@@ -152,7 +150,6 @@ function reportPost(post) {
     sCategory: 'Denunciar una publicación'
   })
     .then(response => {
-      console.log(response.data)
       bTriggerReportPopup.value = false;
       sReportDescription.value = "";
       bTriggerReportSentPopup.value = true;
@@ -174,7 +171,6 @@ function setLike(postId) {
 function getReplies(iPageNumber) {
   axios.get("http://localhost:8000/api/getReplies/" + post.value._iId + "/" + iPageNumber)
     .then(response => {
-      console.log(response.data)
       aReplies.value = aReplies.value.concat(response.data.content);
       iTotalPages = response.data.totalPages;
       bIsFetching.value = false;
@@ -269,7 +265,6 @@ window.onscroll = () => {
 .reply-wrapper {
   padding: 20px;
   margin: 10px;
-  /* background-color: #f4f4f4; */
 }
 
 textarea {

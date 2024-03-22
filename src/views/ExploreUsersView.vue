@@ -61,7 +61,6 @@
             </div>
             <div class="col-md-8 border rounded m-4" v-else>
                 <h4 class="text-center mt-5">No hay usuarios disponibles para mostrar :&#40;</h4>
-                <!-- <p class="text-center">Prueba a cambiar el filtro o espera unos días.</p> -->
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-10">
@@ -106,9 +105,6 @@ let aPhotos = ref([]);
 let aInterests = ref([]);
 let aUsers = ref([]);
 let aFollowing = ref([]);
-// let sSelectedProvince = ref(userStore.person._province._sName);
-// let sSelectedRegion = ref(userStore.person._province._region._sName);
-// let sSelectedCountry = ref(userStore.person._province._region._country._sName);
 let sSelectedProvince = ref(userStore.person._province !== null ? userStore.person._province._sName : null);
 let sSelectedRegion = ref(userStore.person._province !== null ? userStore.person._province._region._sName : null);
 let sSelectedCountry = ref(userStore.person._province !== null ? userStore.person._province._region._country._sName : null);
@@ -155,15 +151,8 @@ function setUsers(bNewFilter) {
         sProvince: sSelectedProvince.value
     })
         .then(response => {
-            // console.log(response.data.content)
-            console.log("Antes de cambiar")
-            console.log(aUsers.value)
             iTotalPages = response.data.totalPages;
             aUsers.value = response.data.content;
-            console.log("Después de cambiar")
-            console.log(aUsers.value)
-
-
         })
 }
 
@@ -171,34 +160,6 @@ function truncateDescription(sDescription) {
     return sDescription.length > 120 ? sDescription.slice(0, 120) + "..." : sDescription;
 }
 
-// function sendFilter() {
-//     iPageNumber = 0;
-//     axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
-//         asInterests: aCheckedInterests.value,
-//         sCountry: sSelectedCountry.value,
-//         sRegion: sSelectedRegion.value,
-//         sProvince: sSelectedProvince.value
-//     })
-//         .then(response => {
-//             if (response.data.length != 0) {
-//                 console.log("Antes de cambiar")
-//                 console.log(aiUserIds.value)
-//                 aiUserIds.value = response.data.content;
-//                 // console.log("En sendFilter")
-//                 console.log("Después de cambiar")
-//                 console.log(aiUserIds.value)
-//                 iTotalPages = response.data.totalPages;
-//                 aiUserIds.value = aiUserIds.value.filter(iId => !userStore.aiShownUserIds.some(iExcludedId => iId === iExcludedId));    // Elimina las ocurrencias de las ids filtradas con las que se han mostrado recientemente
-//                 if(aiUserIds.value.length != 0) {
-//                     do {
-//                         currentId.value = aiUserIds.value[Math.floor(Math.random() * aiUserIds.value.length)];
-//                     } while (currentId.value === userStore.person._iId && aFollowing.value.some(following => following._iId === currentId.value));
-//                     // console.log("A la hora de filtrar: " + currentId.value)
-//                     setCurrentPersonData();
-//                 }
-//             }
-//         })
-// }
 
 watch(sSelectedCountry, (newsSelectedCountry, oldsSelectedCountry) => {
     nextTick(() => {

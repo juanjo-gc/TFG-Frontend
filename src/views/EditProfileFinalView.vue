@@ -91,7 +91,7 @@
                         </ul>
                     </div>
                     <div class="row mb-3">
-                        <p class="fw-bold">Preguntas 'Conóceme'</p>
+                        <p class="fw-bold">Preguntas 'Sobre mí'</p>
                         <p class="text-center small">A continuación puedes responder preguntas sobre tu personalidad. No es
                             necesario responderlas todas. Deja en blanco aquellas que
                             no quieras que se muestren en tu perfil.
@@ -171,8 +171,6 @@
                     <div class="col-md-4 mb-3">
                         <button type="button" class="btn btn-outline-primary mb-3"
                             @click="bShowPasswordChange = !bShowPasswordChange">
-                            <!-- <p class="mt-1" >Cambiar contraseña</p>
-                            <p v-else>No cambiar contraseña</p> -->
                             <span v-if="!bShowPasswordChange">Cambiar contraseña</span>
                             <span v-else>No cambiar contraseña</span>
                         </button>
@@ -325,7 +323,6 @@ onMounted(() => {
                             question._iAnswerId = answerToQuestion._iId;
                         }
                     })
-                    console.log(aAMQuestions.value)
                 })
 
         });
@@ -335,14 +332,6 @@ onMounted(() => {
     }, 250);
 })
 
-// function selectDeselectImageToSoftDelete(iImageId) {
-//     let iImageIndex = aiSelectedImages.value.findIndex(id => iImageId === id);
-//     if(iImageIndex === -1) {
-//         aiSelectedImages.value.push(iImageId);
-//     } else {
-//         aiSelectedImages.value = aiSelectedImages.value.filter(id => id != iImageId);
-//     }
-// }
 
 function filterProvinces() {
     if (sProvince.value.length > 2) {
@@ -399,13 +388,11 @@ function sendAccountDetails() {
 function uploadInterests() {
     let interestsFormData = new FormData();
     interestsFormData.append("id", userStore.person._iId);
-    console.log("Elementos del vector: " + aCheckedInterests.value);
     interestsFormData.append("interests[]", aCheckedInterests.value);
 
     axios.post("http://localhost:8000/api/uploadInterests", interestsFormData)
       .then((response) => {
         userStore.person._setInterests = response.data;
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -433,7 +420,6 @@ function sendUserInformation() {
         .then(response => {
             userStore.person._sDescription = sDescription.value;
         })
-    //public AboutMeQuestionAnswerDTO(String sQuestion, String sAnswer, int iAdminId, int iUserId, int iQuestionId, int iAnswerId) {
     aAMQuestions.value.forEach(item => {
         if (!isBlank(item._sAnswer) || item._iAnswerId != -1) {      //Se envia si las respuestas no son blancas o ya existía la respuesta
             axios.post("http://localhost:8000/api/createOrModifyAboutMeAnswer", {
@@ -521,7 +507,6 @@ async function uploadImg() {
         },
     })
         .then((response) => {
-            console.log(response.data);
             alertSuccess.value = true;
         })
         .catch((error) => {
@@ -537,12 +522,6 @@ function sendImages() {
             currentFormData.append('file', uploadImage.value.files[i]);
             let sFilename = userStore.person._iId + "-" + uploadImage.value.files[i].name;
             let existingImage = userStore.person._setImagePath.find(image => image._sName === sFilename);
-            userStore.person._setImagePath.forEach(image => {
-                console.log("Imagen: " + image._sName + " Nueva: " + sFilename);
-                if (image._sName === sFilename)
-                    console.log("Duplicado");
-            })
-            console.log("Resultado find: " + existingImage)
             if (existingImage === undefined) {   // La imagen no existe => se guarda como nueva
                 axios({
                     url: "http://localhost:8000/api/uploadUserImage",
@@ -554,7 +533,6 @@ function sendImages() {
                     },
                 })
                     .then((response) => {
-                        console.log(response.data);
                         if (response.data._iId != 0) {
                             bTriggerSuccessAlert.value = true;
                             sAlertMessage.value = "Los cambios se han aplicado correctamente.";
@@ -591,19 +569,12 @@ function deleteImage() {
     axios.patch("http://localhost:8000/api/softDeleteOrRestoreImage/" + iImageIdToDelete.value)
         .then(response => {
             if (response.data === true) {
-                console.log("Antes de borrar: ")
-                console.log(userStore.person._setImagePath)
                 userStore.person._setImagePath = userStore.person._setImagePath.map(image => {
                     if (image._iId === iImageIdToDelete.value) {
-
-                        console.log("Dentro de set: " + image._tDeleteDate)
                         image._tDeleteDate = moment(Date.now());
-                        console.log("Dentro de set despues de cambiar fecha: " + image._tDeleteDate)
                     }
                     return image;
                 })
-                console.log("Despues de borrar: ")
-                console.log(userStore.person._setImagePath)
             }
         })
     bTriggerPopup.value = false;
@@ -624,9 +595,6 @@ function sendPrivacityOptions() {
         asInterests: [],
     }
     if (bShowPasswordChange.value) {
-        console.log(sNewPassword.value)
-        // let countCharacterTypesRegex = new RegExp(/[A-Za-z0-9]+\d+|\d+[A-Za-z0-9]+/);
-
         if (!sNewPassword.value.match(/(.*[a-z].*)/) || !sNewPassword.value.match(/(.*[A-Z].*)/) ||
             !sNewPassword.value.match(/(.*\d.*)/) || sNewPassword.value.length < 8) {
             bTriggerErrorAlert.value = true;
@@ -644,7 +612,6 @@ function sendPrivacityOptions() {
                         userStore.person._bIsPrivate = response.data._bIsPrivate;
                         userStore.person._sEmail = response.data._sEmail;
                         userStore.person._sPassword = response.data._sPassword;
-                        console.log(userStore.person)
                         bTriggerSuccessAlert.value = true;
                         sAlertMessage.value = "Los cambios se han aplicado correctamente.";
                         sCurrentPassword.value = "";
@@ -663,7 +630,6 @@ function sendPrivacityOptions() {
                 } else {
                     userStore.person._bIsPrivate = response.data._bIsPrivate;
                     userStore.person._sEmail = response.data._sEmail;
-                    console.log(userStore.person)
                     bTriggerSuccessAlert.value = true;
                     sAlertMessage.value = "Los cambios se han aplicado correctamente.";
                 }
