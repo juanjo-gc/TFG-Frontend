@@ -4,8 +4,8 @@
             <div class="row">
                 <div class="col-md-7 d-flex justify-content-center align-items-center">
                     <!-- Logo, nombre, eslogan -->
-                    <div class="logo-wrapper ">
-                        <img src="https://static.vecteezy.com/system/resources/previews/009/343/883/original/half-orange-orange-free-png.png"
+                    <div class="logo-wrapper">
+                        <img src="@/assets/img/Firelight.png"
                             alt="" class="logo-xl">
                     </div>
                 </div>
@@ -69,8 +69,10 @@
             <div class="col-md-1"></div>
             <div class="col-md-3">
                 <!-- Foto 1 -->
-                <img src="https://i.pinimg.com/564x/c5/f4/e9/c5f4e9f354ed07f9d02b68c408e7fe94.jpg"
-                    class="rounded-photo my-2" alt="">
+                <img src="@/assets/img/photo1.jpg"
+                            alt="" class="rounded-photo my-2">
+                <!-- <img src="https://i.pinimg.com/564x/c5/f4/e9/c5f4e9f354ed07f9d02b68c408e7fe94.jpg"
+                    class="rounded-photo my-2" alt=""> -->
             </div>
             <div class="col-md-7">
                 <!-- Texto 1 -->
@@ -95,16 +97,20 @@
             </div>
             <div class="col-md-3">
                 <!-- Foto 2 -->
-                <img src="https://img.freepik.com/free-photo/two-basketball-player-outdoors-court_23-2147871622.jpg?size=626&ext=jpg"
-                    class="rounded-photo my-2" alt="">
+                <img src="@/assets/img/photo2.png"
+                            alt="" class="rounded-photo my-2">
+                <!-- <img src="https://img.freepik.com/free-photo/two-basketball-player-outdoors-court_23-2147871622.jpg?size=626&ext=jpg"
+                    class="rounded-photo my-2" alt=""> -->
             </div>
         </div>
         <div class="row p-4">
             <div class="col-md-1"></div>
             <div class="col-md-3">
                 <!-- Foto 3 -->
-                <img src="https://st4.depositphotos.com/1017228/21671/i/450/depositphotos_216718526-stock-photo-portrait-delighted-young-guy-playing.jpg"
-                    class="rounded-photo my-2" alt="">
+                <img src="@/assets/img/photo3.png"
+                            alt="" class="rounded-photo my-2">
+                <!-- <img src="https://st4.depositphotos.com/1017228/21671/i/450/depositphotos_216718526-stock-photo-portrait-delighted-young-guy-playing.jpg"
+                    class="rounded-photo my-2" alt=""> -->
             </div>
             <div class="col-md-7">
                 <!-- Texto 3 -->
@@ -238,8 +244,13 @@ async function authUser() {
 }
 
 .logo-wrapper {
-    width: 70%;
-    height: 70%;
+    min-width: 75%;
+    min-height: 75%;
+    max-width: 90%;
+    min-width: 70%;
+    /* width: 70%;
+    height: 70%; */
+    flex-grow: 1;
     justify-content: center;
     align-items: center;
 }
