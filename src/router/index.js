@@ -1,6 +1,5 @@
 import { useUserStore } from "@/store/UserStore";
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
 
 const routes = [
   {
@@ -214,6 +213,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: false,
       userAuth: true,
+      
     }
   },
   {
@@ -225,6 +225,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: false,
       userAuth: true,
+      
     }
   },
   {
@@ -236,6 +237,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: true,
       userAuth: false,
+      
     }
   },
   {
@@ -247,6 +249,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: true,
       userAuth: false,
+      
     }
   },
   {
@@ -258,6 +261,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: false,
       userAuth: true,
+      
     }
   },
   {
@@ -269,6 +273,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: true,
       userAuth: true,
+      
     }
   },
   {
@@ -280,6 +285,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: true,
       userAuth: false,
+      
     }
   },
   {
@@ -291,6 +297,7 @@ const routes = [
       requiresAuth: true,
       adminAuth: true,
       userAuth: false,
+      
     }
   },
   {
@@ -302,6 +309,7 @@ const routes = [
       requiresAuth: false,
       adminAuth: true,
       userAuth: true,
+      
     }
   },
   {
@@ -313,6 +321,7 @@ const routes = [
       requiresAuth: false,
       adminAuth: true,
       userAuth: false,
+      
     }
   },
   {
@@ -324,10 +333,12 @@ const routes = [
       requiresAuth: false,
       adminAuth: true,
       userAuth: false,
+      
     }
   },
   
 ];
+
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

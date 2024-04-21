@@ -52,6 +52,12 @@ library.add(faHeart, faComment, faArrowLeft, faXmark, faUserPlus, faEye, faLocat
           faAngleRight, faArrowUp, faArrowDown, faReply, faPen, faFlag, faTrashArrowUp, faBars, faHouse, faUser, faPeopleRobbery, faMessage,
           faRightFromBracket, faEnvelopeOpenText, faPaperPlane, faEllipsisVertical, faCircleQuestion, faTableColumns, faPlusMinus, faTicket, faList, faHeart, faCheck);
 
+document.title = "Firelight";
+let icon = document.createElement('link');
+icon.rel = 'icon';
+icon.href = "/icon.ico";
+document.head.appendChild(icon);
+
 
 createApp(App)
     .use(router)

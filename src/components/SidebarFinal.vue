@@ -2,7 +2,9 @@
     <div id="header" class="row header" v-if="userStore.person._sRole === 'User'">
         <!-- Logo pagina centrado -->
         <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYPDUsQO5SwBdbNHuK3C68gjESyeNFGie1xg&usqp=CAU" class="logo" alt=""> -->
-        <img src="@/assets/img/firelight-logo.png" alt="" class="logo mt-1 clickable" @click="router.push('/timeline')">
+        <div class="logo-wrapper">
+            <img src="@/assets/img/firelight-logo.png" alt="" class="logo mt-1 clickable" @click="router.push('/timeline')">
+        </div>
     </div>
     <div class="hamburger-wrapper">
         <font-awesome-icon icon="fa-solid fa-bars" size="2xl" color="black" class="m-2 p-2 pe-3 pb-3" />
@@ -247,10 +249,16 @@ transition-timing-function: ease-out; */
     cursor: pointer;
 }
 
+.logo-wrapper {
+    height: 100%;
+    width: 10%;
+    justify-content: center;
+    align-items: center;
+}
+
 .logo {
     object-fit: contain;
-    height: 65px;
-    max-height: 65px;
+    height: 95%;
     width: auto;
 }
 
