@@ -129,20 +129,20 @@ let iTotalPages = 0;
 let currentSearch = {};
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getAllInterestNames")
+    axios.get(userStore.baseAPIurl + "getAllInterestNames")
         .then(response => asInterests = response.data)
 
-    axios.get("http://localhost:8000/api/getAllCountries")
+    axios.get(userStore.baseAPIurl + "getAllCountries")
         .then(response => aCountries.value = response.data)
 
     if(userStore.person._province != null) {
-        axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
+        axios.get(userStore.baseAPIurl + "getCountryRegions/" + userStore.person._province._region._country._iId)
         .then(response => aRegions.value = response.data)
         
-        axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
+        axios.get(userStore.baseAPIurl + "getRegionProvinces/" + userStore.person._province._region._iId)
         .then(response => aProvinces.value = response.data)
     }
-    axios.post("http://localhost:8000/api/getFilteredEvents/" + iPageNumber, {
+    axios.post(userStore.baseAPIurl + "getFilteredEvents/" + iPageNumber, {
         sTitle: "",
         asInterests: [],
         sProvince: sSelectedProvince.value,
@@ -177,7 +177,7 @@ function filterByName() {
 
 function sendFilter() {
     iPageNumber = 0;
-    axios.post("http://localhost:8000/api/getFilteredEvents/" + 0, {
+    axios.post(userStore.baseAPIurl + "getFilteredEvents/" + 0, {
         sTitle: sEventTitle.value,
         asInterests: aCheckedInterests.value,
         sProvince: sSelectedProvince.value,
@@ -205,7 +205,7 @@ window.onscroll = () => {
     let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
     if (bottomOfWindow && iPageNumber < iTotalPages) {
         iPageNumber++;
-        axios.post("http://localhost:8000/api/getFilteredEvents/" + iPageNumber, {
+        axios.post(userStore.baseAPIurl + "getFilteredEvents/" + iPageNumber, {
             bIsOnline: currentSearch.bIsOnline,
             asInterests: currentSearch.asInterests,
             sProvince: currentSearch.sProvince,
@@ -226,7 +226,7 @@ watch(sSelectedCountry, (newsSelectedCountry, oldsSelectedCountry) => {
         sSelectedRegion.value = null;
         if (newsSelectedCountry != null) {
             const foundCountry = aCountries.value.find(country => newsSelectedCountry === country._sName);
-            axios.get("http://localhost:8000/api/getCountryRegions/" + foundCountry._iId)
+            axios.get(userStore.baseAPIurl + "getCountryRegions/" + foundCountry._iId)
                 .then(response => {
                     aRegions.value = response.data;
                 })
@@ -242,7 +242,7 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
         sSelectedProvince.value = null;
         if (newsSelectedRegion != null) {
             const foundRegion = aRegions.value.find(region => newsSelectedRegion == region._sName);
-            axios.get("http://localhost:8000/api/getRegionProvinces/" + foundRegion._iId)
+            axios.get(userStore.baseAPIurl + "getRegionProvinces/" + foundRegion._iId)
                 .then(response => {
                     aProvinces.value = response.data;
                 })

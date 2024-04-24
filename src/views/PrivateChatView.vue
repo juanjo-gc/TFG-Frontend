@@ -73,7 +73,7 @@ let targetUser = ref(null);
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getUser/" + route.params.targetId)
+    axios.get(userStore.baseAPIurl + "getUser/" + route.params.targetId)
     .then(response => {
         targetUser.value = response.data;
         if(targetUser.value._bIsSuspended)
@@ -82,7 +82,7 @@ onMounted(() => {
     .catch(error => console.log(error));
 
     
-    axios.get("http://localhost:8000/api/getConversation/" + userStore.person._iId + "/" + route.params.targetId)
+    axios.get(userStore.baseAPIurl + "getConversation/" + userStore.person._iId + "/" + route.params.targetId)
     .then(response => {
         aMessages.value = response.data.map(item => {
             return {
@@ -92,7 +92,7 @@ onMounted(() => {
             }
         });
         console.log(aMessages.value)
-        axios.patch("http://localhost:8000/api/setSeenMessages/" + userStore.person._iId + "/" + targetUser.value._iId)
+        axios.patch(userStore.baseAPIurl + "setSeenMessages/" + userStore.person._iId + "/" + targetUser.value._iId)
 
         setTimeout(() => {
             chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
@@ -113,7 +113,7 @@ onMounted(() => {
 })
 
 function submitMessage() {
-    axios.post("http://localhost:8000/api/newMessage", {
+    axios.post(userStore.baseAPIurl + "newMessage", {
         iIssuerId: userStore.person._iId,
         iRecipientId: route.params.targetId,
         sText: sMessage.value

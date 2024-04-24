@@ -27,10 +27,10 @@
                                     <div class="col-sm-2">
                                         <img v-if="message._issuer._iId != userStore.person._iId"
                                             class="mr-3 avatar float-left"
-                                            :src="`http://localhost:8000/api/getProfileImage/${message._issuer._iId}`"
+                                            :src="userStore.baseAPIurl + 'getProfileImage/' + message._issuer._iId"
                                             alt="User avatar">
                                         <img v-else class="mr-3 avatar float-left"
-                                            :src="`http://localhost:8000/api/getProfileImage/${message._recipient._iId}`"
+                                            :src="userStore.baseAPIurl + 'getProfileImage/' + message._recipient._iId"
                                             alt="User avatar">
                                     </div>
                                     <div class="col-sm-6">
@@ -53,7 +53,7 @@
                 <div class="row header-chat">
                     <div class="col-md-2" style="cursor: pointer;" @click="router.push('/profile/' + currentUserChat._sUsername)">
                         <img class="mr-3 mt-4 avatar"
-                            :src="`http://localhost:8000/api/getProfileImage/${currentUserChat._iId}`" alt="User avatar">
+                            :src="userStore.baseAPIurl + 'getProfileImage/' + currentUserChat._iId" alt="User avatar">
                     </div>
                     <div class="col-md-10">
                         <h3 class="mt-4">{{ currentUserChat._sName }}</h3>
@@ -71,7 +71,7 @@
                             <div class="row" v-if="message._iIssuerId === currentUserChat._iId">
                                 <div class="col-sm-1 ">
                                     <img class="mr-3 avatar"
-                                        :src="`http://localhost:8000/api/getProfileImage/${currentUserChat._iId}`"
+                                        :src="userStore.baseAPIurl + 'getProfileImage/' + currentUserChat._iId"
                                         alt="User avatar">
                                 </div>
                                 <div class="col-sm-10 ">
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="col-sm-1">
                                     <img class="mr-3 avatar float-end"
-                                        :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"
+                                        :src="userStore.baseAPIurl + 'getProfileImage/' + userStore.person._iId"
                                         alt="User avatar">
                                 </div>
                             </div>
@@ -136,7 +136,7 @@
                             <div class="row user-data" v-if="user._iId != userStore.person._iId && !user._bIsSuspended">
                                 <div class="col-ms-1">
                                     <img class="mr-3 avatar float-left"
-                                        :src="`http://localhost:8000/api/getProfileImage/${user._iId}`" alt="User avatar">
+                                        :src="userStore.baseAPIurl + 'getProfileImage/' + user._iId" alt="User avatar">
                                 </div>
                                 <div class="col-ms-11">
                                     <h5 class="mt-0 mb-1">
@@ -185,11 +185,11 @@ let aFollowers = ref([]);
 let chatContainer = ref(null);
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getBlockedByUsers/" + userStore.person._iId)
+    axios.get(userStore.baseAPIurl + "getBlockedByUsers/" + userStore.person._iId)
     .then(response => aBlockedBy.value = response.data);
-    axios.get("http://localhost:8000/api/getFollowers/" + userStore.person._sUsername)
+    axios.get(userStore.baseAPIurl + "getFollowers/" + userStore.person._sUsername)
     .then(response => aFollowers.value = response.data);
-    axios.get("http://localhost:8000/api/getLastMessages/" + userStore.person._iId)
+    axios.get(userStore.baseAPIurl + "getLastMessages/" + userStore.person._iId)
         .then(response => {
             aLastMessages.value = response.data;
             bIsFetching.value = false;
@@ -229,12 +229,12 @@ function loadChat(user) {
     let i = aLastMessages.value.findIndex(message => (message._issuer._iId === userStore.person._iId && message._recipient._iId === currentUserChat.value._iId) || 
                                                     (message._issuer._iId === currentUserChat.value._iId && message._recipient._iId === userStore.person._iId)) ;
     aLastMessages.value[i]._bSeen = true;                                                
-    axios.get("http://localhost:8000/api/checkBlock/" + userStore.person._iId + "/" + currentUserChat.value._iId)
+    axios.get(userStore.baseAPIurl + "checkBlock/" + userStore.person._iId + "/" + currentUserChat.value._iId)
         .then(response => bIsPersonBlocked.value = response.data);
-    axios.get("http://localhost:8000/api/checkBlock/" + currentUserChat.value._iId + "/" + userStore.person._iId)
+    axios.get(userStore.baseAPIurl + "checkBlock/" + currentUserChat.value._iId + "/" + userStore.person._iId)
         .then(response => bIsBlockedByPerson.value = response.data);
     bShowNewMessage.value = false;
-    axios.get("http://localhost:8000/api/getConversation/" + userStore.person._iId + "/" + user._iId)
+    axios.get(userStore.baseAPIurl + "getConversation/" + userStore.person._iId + "/" + user._iId)
         .then(response => {
             aMessages.value = response.data.map(item => {
                 return {
@@ -243,7 +243,7 @@ function loadChat(user) {
                     _iRecipientId: item._recipient._iId
                 }
             });
-            axios.patch("http://localhost:8000/api/setSeenMessages/" + userStore.person._iId + "/" + user._iId)
+            axios.patch(userStore.baseAPIurl + "setSeenMessages/" + userStore.person._iId + "/" + user._iId)
             .then(response => aMessages.value.forEach(message => message._bSeen = true))
 
             setTimeout(() => {
@@ -266,7 +266,7 @@ function isBlank(sString) {
 function submitMessage() {
     if(sMessage.value != '' && !isBlank(sMessage.value)) {
         sMessage.value = sMessage.value.slice(0, sMessage.value.length - 1)
-        axios.post("http://localhost:8000/api/newMessage", {
+        axios.post(userStore.baseAPIurl + "newMessage", {
         iIssuerId: userStore.person._iId,
         iRecipientId:currentUserChat.value._iId,
         sText: sMessage.value

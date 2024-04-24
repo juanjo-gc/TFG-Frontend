@@ -204,12 +204,12 @@ function submitEvent() {
             bIsOnline: bIsOnline.value
         }
         if((selectedLocation.value != null && !bIsOnline.value) || (bIsOnline.value)) {
-            axios.post("http://localhost:8000/api/newEvent", eventDTO)
+            axios.post(userStore.baseAPIurl + "newEvent", eventDTO)
             .then(response => {
                 let iNewEventId = response.data;
                 formData.append('id', response.data);
                 if(formData.get('file') != null) {
-                    axios.post("http://localhost:8000/api/uploadEventHeaderImage", formData, {
+                    axios.post(userStore.baseAPIurl + "uploadEventHeaderImage", formData, {
                         'content-type': 'form-data'
                     })
                     .then(response => {

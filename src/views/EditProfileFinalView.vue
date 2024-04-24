@@ -3,7 +3,7 @@
     <div class="container" v-if="!bIsFetching">
         <div class="row mt-4">
             <div class="col-md-3">
-                <img :src="'http://localhost:8000/api/getProfileImage/' + userStore.person._iId" alt="ProfileImg"
+                <img :src="userStore.baseAPIurl + 'getProfileImage/' + userStore.person._iId" alt="ProfileImg"
                     class="img-min-circle mt-2 mb-2" v-if="userStore.person._iId != 0" />
                 <img v-else
                     src="https://camo.githubusercontent.com/eb6a385e0a1f0f787d72c0b0e0275bc4516a261b96a749f1cd1aa4cb8736daba/68747470733a2f2f612e736c61636b2d656467652e636f6d2f64663130642f696d672f617661746172732f6176615f303032322d3531322e706e67"
@@ -110,7 +110,7 @@
                 <div class="row mt-4 mb-4" v-if="sSelectedCategory === 'Fotos'">
                     <div class="d-flex justify-content-center mt-4 photos-box">
                         <div class="d-flex justify-content-center" v-for="photo in userStore.person._setImagePath">
-                            <img class="user-image m-1" :src="'http://localhost:8000/api/getImage/' + photo._sName" alt=""
+                            <img class="user-image m-1" :src="userStore.baseAPIurl + 'getImage/' + photo._sName" alt=""
                                 v-if="photo._tDeleteDate === null">
                             <div class="photo-xmark" v-if="photo._tDeleteDate === null">
                                 <font-awesome-icon icon="fa-solid fa-xmark" class="clickable" size="l"
@@ -300,17 +300,17 @@ let componentKey = ref(0);
 
 onMounted(() => {
     sidebar.value = document.getElementById('sidebar');
-    axios.get("http://localhost:8000/api/getAllProvinces")
+    axios.get(userStore.baseAPIurl + "getAllProvinces")
         .then(response => aProvinces = response.data);
-        axios.get("http://localhost:8000/api/getAllInterests")
+        axios.get(userStore.baseAPIurl + "getAllInterests")
         .then(response => aInterests.value = response.data);
     userStore.person._setInterests.forEach(interest => {
         aCheckedInterests.value.push(interest._sName)
     })
-    axios.get("http://localhost:8000/api/getAllAboutMeQuestions")
+    axios.get(userStore.baseAPIurl + "getAllAboutMeQuestions")
         .then(response => {
             aAMQuestions.value = response.data;
-            axios.get("http://localhost:8000/api/getUserAnswers/" + userStore.person._iId)
+            axios.get(userStore.baseAPIurl + "getUserAnswers/" + userStore.person._iId)
                 .then(response => {
                     aAMAnswers.value = response.data;
                     aAMQuestions.value.forEach(question => {
@@ -354,7 +354,7 @@ function isBlank(sStr) {
 
 function sendAccountDetails() {
     if (!isBlank(sName.value) && !isBlank(sUsername.value)) {
-        axios.post("http://localhost:8000/api/updateUserAccountDetails", {
+        axios.post(userStore.baseAPIurl + "updateUserAccountDetails", {
             iUserId: userStore.person._iId,
             sName: sName.value,
             sUsername: sUsername.value,
@@ -390,7 +390,7 @@ function uploadInterests() {
     interestsFormData.append("id", userStore.person._iId);
     interestsFormData.append("interests[]", aCheckedInterests.value);
 
-    axios.post("http://localhost:8000/api/uploadInterests", interestsFormData)
+    axios.post(userStore.baseAPIurl + "uploadInterests", interestsFormData)
       .then((response) => {
         userStore.person._setInterests = response.data;
       })
@@ -405,7 +405,7 @@ function sendUserInformation() {
         sAlertMessage.value = "No se han podido actualizar los intereses. Selecciona como máximo 4 intereses.";
     } else {
         uploadInterests();
-        axios.post("http://localhost:8000/api/updateUserDescription", {
+        axios.post(userStore.baseAPIurl + "updateUserDescription", {
             iUserId: userStore.person._iId,
             sName: sName.value,
             sUsername: sUsername.value,
@@ -422,7 +422,7 @@ function sendUserInformation() {
         })
     aAMQuestions.value.forEach(item => {
         if (!isBlank(item._sAnswer) || item._iAnswerId != -1) {      //Se envia si las respuestas no son blancas o ya existía la respuesta
-            axios.post("http://localhost:8000/api/createOrModifyAboutMeAnswer", {
+            axios.post(userStore.baseAPIurl + "createOrModifyAboutMeAnswer", {
                 sQuestion: item._sQuestion,
                 sAnswer: item._sAnswer,
                 iAdminId: -1,
@@ -443,7 +443,7 @@ function sendUserInformation() {
 function uploadProfileImage() {
     if (formData.get('file') != null) {
         axios({
-            url: "http://localhost:8000/api/uploadProfileImage",
+            url: userStore.baseAPIurl + "uploadProfileImage",
             method: "POST",
             data: formData,
             headers: {
@@ -498,7 +498,7 @@ function onImageUpload() {
 async function uploadImg() {
     formData.append('id', userStore.person._iId);
     axios({
-        url: "http://localhost:8000/api/uploadImages",
+        url: userStore.baseAPIurl + "uploadImages",
         method: "POST",
         data: formData,
         headers: {
@@ -524,7 +524,7 @@ function sendImages() {
             let existingImage = userStore.person._setImagePath.find(image => image._sName === sFilename);
             if (existingImage === undefined) {   // La imagen no existe => se guarda como nueva
                 axios({
-                    url: "http://localhost:8000/api/uploadUserImage",
+                    url: userStore.baseAPIurl + "uploadUserImage",
                     method: "POST",
                     data: currentFormData,
                     headers: {
@@ -544,7 +544,7 @@ function sendImages() {
                     })
             } else {    // La imagen existe => se quita soft delete
                 if (existingImage._tDeleteDate != null) {
-                    axios.patch("http://localhost:8000/api/softDeleteOrRestoreImage/" + existingImage._iId)
+                    axios.patch(userStore.baseAPIurl + "softDeleteOrRestoreImage/" + existingImage._iId)
                         .then(response => {
                             if (response.data === false) {
                                 let iImageIndex = userStore.person._setImagePath.findIndex(image => image._iId === existingImage._iId);
@@ -566,7 +566,7 @@ function setDeleteImagePopup(image) {
 }
 
 function deleteImage() {
-    axios.patch("http://localhost:8000/api/softDeleteOrRestoreImage/" + iImageIdToDelete.value)
+    axios.patch(userStore.baseAPIurl + "softDeleteOrRestoreImage/" + iImageIdToDelete.value)
         .then(response => {
             if (response.data === true) {
                 userStore.person._setImagePath = userStore.person._setImagePath.map(image => {
@@ -603,7 +603,7 @@ function sendPrivacityOptions() {
             bTriggerErrorAlert.value = true;
             sAlertMessage.value = "Las contraseñas no coinciden. Asegúrate de que has escrito bien tu nueva contraseña y su confirmación."
         } else {
-            axios.post("http://localhost:8000/api/updateUserPrivacityOptions", userDTO)
+            axios.post(userStore.baseAPIurl + "updateUserPrivacityOptions", userDTO)
                 .then(response => {
                     if (response.data._iId === 0) {
                         bTriggerErrorAlert.value = true;
@@ -622,7 +622,7 @@ function sendPrivacityOptions() {
                 })
         }
     } else {
-        axios.post("http://localhost:8000/api/updateUserPrivacityOptions", userDTO)
+        axios.post(userStore.baseAPIurl + "updateUserPrivacityOptions", userDTO)
             .then(response => {
                 if (response.data._iId === 0) {
                     bTriggerErrorAlert.value = true;

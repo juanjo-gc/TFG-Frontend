@@ -36,7 +36,7 @@
           <div class="card-body bg-soft rounded">
             <div class="row d-flex justify-content-center">
               <div class="col-md-1 align-items-center d-flex">
-                <img class="mr-3 avatar" :src="`http://localhost:8000/api/getProfileImage/${userStore.person._iId}`"
+                <img class="mr-3 avatar" :src="userStore.baseAPIurl + 'getProfileImage/' + userStore.person._iId"
                   alt="User avatar">
               </div>
               <div class="col-md-11" style="margin: auto;">
@@ -184,7 +184,7 @@ let aRoutes = ref([
 
 function newPost() {
   if (!isBlank(sPost.value)) {
-    axios.post("http://localhost:8000/api/newPost", {
+    axios.post(userStore.baseAPIurl + "newPost", {
       sText: sPost.value,
       iUserId: userStore.person._iId
     }).then((response) => {
@@ -198,13 +198,13 @@ function newPost() {
 
 onMounted(() => {
   getTimelinePosts(0);
-  axios.get("http://localhost:8000/api/findHotEvents/" + userStore.person._iId)
+  axios.get(userStore.baseAPIurl + "findHotEvents/" + userStore.person._iId)
     .then(response => {
       aHotEvents.value = response.data;
       aHotEvents.value.forEach(event =>
-        axios.get("http://localhost:8000/api/getEventAssistantsNumber/" + event._iId)
+        axios.get(userStore.baseAPIurl + "getEventAssistantsNumber/" + event._iId)
           .then(response => event._iAssistants = response.data))
-      axios.get("http://localhost:8000/api/countNewNotifications/" + userStore.person._iId)
+      axios.get(userStore.baseAPIurl + "countNewNotifications/" + userStore.person._iId)
         .then(response => iNewNotifications.value = response.data);
     });
 })
@@ -219,7 +219,7 @@ function isBlank(sStr) {
 }
 
 function getTimelinePosts(iPageNumber) {
-  axios.get("http://localhost:8000/api/getTimelinePosts/" + userStore.person._iId + "/" + iPageNumber)
+  axios.get(userStore.baseAPIurl + "getTimelinePosts/" + userStore.person._iId + "/" + iPageNumber)
     .then(response => {
       aPosts.value = aPosts.value.concat(response.data.content);
       iTotalPages.value = response.data.totalPages;
@@ -233,7 +233,7 @@ function setPopup(post) {
 
 
 function reportPost(post) {
-  axios.post("http://localhost:8000/api/newTicket", {
+  axios.post(userStore.baseAPIurl + "newTicket", {
     sSubject: "Denuncia de publicación de @" + post._user._sUsername,
     sDescription: sReportDescription._rawValue,
     iIssuerId: userStore.person._iId,

@@ -48,7 +48,7 @@ let activeItem = ref('');
 let aFAQs = ref([]);
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getAllFAQs")
+    axios.get(userStore.baseAPIurl + "getAllFAQs")
     .then(response => aFAQs.value = response.data);
 })
 

@@ -32,7 +32,7 @@
                   <div class="row">
                     <div class="col-sm-1">
                       <router-link :to="`/profile/${follower._sUsername}`" style="text-decoration: none; color: inherit;">
-                        <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${follower._iId}`"  alt="User avatar">
+                        <img class="mr-3 avatar float-left" :src="userStore.baseAPIurl +'getProfileImage/' + follower._iId"  alt="User avatar">
                       </router-link>
                     </div>
                     <div class="col-sm-11">
@@ -54,7 +54,7 @@
                   <div class="row">
                     <div class="col-sm-1">
                       <router-link :to="`/profile/${followed._sUsername}`" style="text-decoration: none; color: inherit;">
-                        <img class="mr-3 avatar float-left" :src="`http://localhost:8000/api/getProfileImage/${followed._iId}`"  alt="User avatar">
+                        <img class="mr-3 avatar float-left" :src="userStore.baseAPIurl + 'getProfileImage/' + followed._iId"  alt="User avatar">
                       </router-link>
                     </div>
                     <div class="col-sm-11">
@@ -94,11 +94,11 @@
     let aFollowers = ref([]);
 
     onMounted(() => {
-      axios.get("http://localhost:8000/api/getFollowing/" + route.params.username)
+      axios.get(userStore.baseAPIurl + "getFollowing/" + route.params.username)
       .then(response => aFollowing.value = response.data)
       .catch(error => console.log(error));
 
-      axios.get("http://localhost:8000/api/getFollowers/" + route.params.username)
+      axios.get(userStore.baseAPIurl + "getFollowers/" + route.params.username)
       .then(response => aFollowers.value = response.data)
       .catch(error => console.log(error));
       bIsFetching.value = false;

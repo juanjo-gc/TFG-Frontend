@@ -25,7 +25,7 @@
                         <div class="row mt-2 clickable" @click="router.push('/profile/' + assistant._sUsername)" v-if="!assistant._bIsSuspended">
                             <div class="col-sm-1">
                                 <img class="mr-3 avatar float-left"
-                                    :src="`http://localhost:8000/api/getProfileImage/${assistant._iId}`" alt="User avatar">
+                                    :src="`http://tfgbackend:8000/api/getProfileImage/${assistant._iId}`" alt="User avatar">
                             </div>
                             <div class="col-sm-11 mt-1">
                                 <h5 class="mt-0 mb-1">
@@ -49,7 +49,9 @@ import SidebarFinal from '@/components/SidebarFinal.vue'
 import axios from 'axios';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useUserStore } from '@/store/UserStore';
 
+const userStore = useUserStore();
 const route = useRoute();
 const router = useRouter();
 let bIsFetching = ref(true);
@@ -61,17 +63,17 @@ let aUsers = ref([]);
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
+    axios.get(userStore.baseAPIurl + "getEvent/" + route.params.eventId)
         .then(response => {
             event.value = response.data;
             console.log(response.data)
             bIsFetching.value = false;
             console.log(event.value._tCelebrationHour)
-            axios.get("http://localhost:8000/api/getEventAssistants/" + event.value._iId)
+            axios.get(userStore.baseAPIurl + "getEventAssistants/" + event.value._iId)
                 .then(response => {
                     aAssistants.value = response.data;
                     aUsers.value = aAssistants.value;
-                    //aAssistants.value.forEach(iId => aAssistantProfileImages.value.push("http://localhost:8000/api/getProfileImage/" + iId));
+                    //aAssistants.value.forEach(iId => aAssistantProfileImages.value.push(userStore.baseAPIurl + "getProfileImage/" + iId));
                 })
 
         })
@@ -79,7 +81,7 @@ onMounted(() => {
 
 function getUsersFromUsername() {
     if(sUsernamesToSearch.value.length > 3) {
-        axios.get("http://localhost:8000/api/getFilteredAssistants/" + sUsernamesToSearch.value + "/" + event.value._iId)
+        axios.get(userStore.baseAPIurl + "getFilteredAssistants/" + sUsernamesToSearch.value + "/" + event.value._iId)
         .then(response =>{ aUsers.value = response.data})
         .catch(error => console.log(error));
     } else {

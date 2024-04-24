@@ -530,25 +530,25 @@ let categoryListBox = ref(null);
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getAllCategories")
+    axios.get(userStore.baseAPIurl + "getAllCategories")
         .then(response => aCategories.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllInterests")
+    axios.get(userStore.baseAPIurl + "getAllInterests")
         .then(response => aInterests.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllProvinces")
+    axios.get(userStore.baseAPIurl + "getAllProvinces")
         .then(response => aProvinces.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllRegions")
+    axios.get(userStore.baseAPIurl + "getAllRegions")
         .then(response => aRegions.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllCountries")
+    axios.get(userStore.baseAPIurl + "getAllCountries")
         .then(response => aCountries.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllFAQs")
+    axios.get(userStore.baseAPIurl + "getAllFAQs")
         .then(response => aFAQs.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllAboutMeQuestions")
+    axios.get(userStore.baseAPIurl + "getAllAboutMeQuestions")
         .then(response => aAMQuestions.value = response.data);
 
 })
@@ -558,11 +558,11 @@ function createEntity(sEntityType) {
     switch (sEntityType) {
         case 'category':
             if (sCategoryName.value != "") {
-                axios.post("http://localhost:8000/api/createCategory", { sName: sCategoryName.value })
+                axios.post(userStore.baseAPIurl + "createCategory", { sName: sCategoryName.value })
                     .then(response => {
                         if (response.data._iId != 0) {
                             aCategories.value.push(response.data);
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: "Se ha creado una nueva categoría con nombre " + response.data._sName + " y con id " + response.data._iId,
                                 iAdminId: userStore.person._iId
                             })
@@ -574,11 +574,11 @@ function createEntity(sEntityType) {
             break;
         case 'interest':
             if (sInterestName.value != "") {
-                axios.post("http://localhost:8000/api/createInterest", { sName: sInterestName.value })
+                axios.post(userStore.baseAPIurl + "createInterest", { sName: sInterestName.value })
                     .then(response => {
                         if (response.data._iId != 0) {
                             aInterests.value.push(response.data);
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: "Se ha creado un nuevo interés con nombre " + response.data._sName + " y con id " + response.data._iId,
                                 iAdminId: userStore.person._iId
                             })
@@ -590,11 +590,11 @@ function createEntity(sEntityType) {
             break;
         case 'province':
             if (sProvinceName.value != "" && sSelectedRegion.value != "" && sSelectedRegion.value != "Comunidad autónoma") {
-                axios.post("http://localhost:8000/api/createProvince", { sName: sProvinceName.value, sRegion: sSelectedRegion.value })
+                axios.post(userStore.baseAPIurl + "createProvince", { sName: sProvinceName.value, sRegion: sSelectedRegion.value })
                     .then(response => {
                         if (response.data._iId != 0) {
                             aProvinces.value.push(response.data);
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: "Se ha creado una nueva provincia con nombre " + response.data._sName + " y con id " + response.data._iId,
                                 iAdminId: userStore.person._iId
                             })
@@ -606,11 +606,11 @@ function createEntity(sEntityType) {
             break;
         case 'region':
             if (sRegionName.value != "" && sSelectedCountry.value != "" && sSelectedCountry.value != "País") {
-                axios.post("http://localhost:8000/api/createRegion", { sName: sRegionName.value, sCountry: sSelectedCountry.value })
+                axios.post(userStore.baseAPIurl + "createRegion", { sName: sRegionName.value, sCountry: sSelectedCountry.value })
                     .then(response => {
                         if (response.data._iId != 0) {
                             aRegions.value.push(response.data);
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: "Se ha creado una nueva región con nombre " + response.data._sName + " y con id " + response.data._iId,
                                 iAdminId: userStore.person._iId
                             })
@@ -622,11 +622,11 @@ function createEntity(sEntityType) {
             break;
         case 'country':
             if (sCountryName.value != "") {
-                axios.post("http://localhost:8000/api/createCountry", { sName: sCountryName.value })
+                axios.post(userStore.baseAPIurl + "createCountry", { sName: sCountryName.value })
                     .then(response => {
                         if (response.data._iId != 0) {
                             aCountries.value.push(response.data);
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: "Se ha creado un nuevo país con nombre " + response.data._sName + " y con id " + response.data._iId,
                                 iAdminId: userStore.person._iId
                             })
@@ -638,7 +638,7 @@ function createEntity(sEntityType) {
             break;
         case 'faq':
             if (sFaqQuestion.value != "" && sFaqAnswer.value != "") {
-                axios.post("http://localhost:8000/api/newFAQ/" + userStore.person._iId, {
+                axios.post(userStore.baseAPIurl + "newFAQ/" + userStore.person._iId, {
                     sQuestion: sFaqQuestion.value,
                     sAnswer: sFaqAnswer.value
                 })
@@ -653,7 +653,7 @@ function createEntity(sEntityType) {
             break;
         case 'AMQuestion':
             if (sAMQuestion.value != "") {
-                axios.post("http://localhost:8000/api/newAboutMeQuestion", {
+                axios.post(userStore.baseAPIurl + "newAboutMeQuestion", {
                     sQuestion: sAMQuestion.value,
                     sAnswer: "",
                     iAdminId: userStore.person._iId,
@@ -677,7 +677,7 @@ function createEntity(sEntityType) {
 function modifyEntity(sEntityType) {
     switch (sEntityType) {
         case 'category':
-            axios.patch("http://localhost:8000/api/updateCategory/" + currentEntity._rawValue._iId, {
+            axios.patch(userStore.baseAPIurl + "updateCategory/" + currentEntity._rawValue._iId, {
                 sName: currentEntity._rawValue._sName
             })
                 .then(response => {
@@ -686,7 +686,7 @@ function modifyEntity(sEntityType) {
                         let sInformation = "Se ha modificado la categoría con id " + updatedEntity._iId + ". Antes de modificar: " +
                             " nombre -> " + currentEntity.value._sName + ". Después de modificar: " +
                             " nombre -> " + updatedEntity._sName;
-                        axios.post("http://localhost:8000/api/newOperation", {
+                        axios.post(userStore.baseAPIurl + "newOperation", {
                             sInformation: sInformation,
                             iAdminId: userStore.person._iId
                         })
@@ -701,7 +701,7 @@ function modifyEntity(sEntityType) {
                 })
             break;
         case 'interest':
-            axios.patch("http://localhost:8000/api/updateInterest/" + currentEntity._rawValue._iId, {
+            axios.patch(userStore.baseAPIurl + "updateInterest/" + currentEntity._rawValue._iId, {
                 sName: currentEntity._rawValue._sName
             })
                 .then(response => {
@@ -710,7 +710,7 @@ function modifyEntity(sEntityType) {
                         let sInformation = "Se ha modificado el interés con id " + updatedEntity._iId + ". Antes de modificar: " +
                             " nombre -> " + currentEntity.value._sName + ". Después de modificar: " +
                             " nombre -> " + updatedEntity._sName;
-                        axios.post("http://localhost:8000/api/newOperation", {
+                        axios.post(userStore.baseAPIurl + "newOperation", {
                             sInformation: sInformation,
                             iAdminId: userStore.person._iId
                         })
@@ -726,7 +726,7 @@ function modifyEntity(sEntityType) {
             break;
         case 'province':
             if (sSelectedRegion.value != "" && sSelectedRegion.value != "Comunidad autónoma") {
-                axios.patch("http://localhost:8000/api/updateProvince/" + currentEntity._rawValue._iId, {
+                axios.patch(userStore.baseAPIurl + "updateProvince/" + currentEntity._rawValue._iId, {
                     sName: currentEntity._rawValue._sName,
                     sRegion: sSelectedRegion.value
                 })
@@ -736,7 +736,7 @@ function modifyEntity(sEntityType) {
                             let sInformation = "Se ha modificado la provincia con id " + updatedEntity._iId + ". Antes de modificar: " +
                                 " nombre -> " + currentEntity.value._sName + ", comunidad autónoma -> " + currentEntity.value._region._sName + ". Después de modificar: " +
                                 " nombre -> " + updatedEntity._sName + ", comunidad autónoma -> " + updatedEntity._region._sName;
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: sInformation,
                                 iAdminId: userStore.person._iId
                             })
@@ -755,7 +755,7 @@ function modifyEntity(sEntityType) {
             break;
         case 'region':
             if (sSelectedCountry.value != "" && sSelectedCountry.value != "País") {
-                axios.patch("http://localhost:8000/api/updateRegion/" + currentEntity._rawValue._iId, {
+                axios.patch(userStore.baseAPIurl + "updateRegion/" + currentEntity._rawValue._iId, {
                     sName: currentEntity._rawValue._sName,
                     sCountry: sSelectedCountry.value
                 })
@@ -765,7 +765,7 @@ function modifyEntity(sEntityType) {
                             let sInformation = "Se ha modificado la región con id " + updatedEntity._iId + ". Antes de modificar: " +
                                 " nombre -> " + currentEntity.value._sName + ", país -> " + currentEntity.value._country._sName + ". Después de modificar: " +
                                 " nombre -> " + updatedEntity._sName + ", país -> " + updatedEntity._country._sName;
-                            axios.post("http://localhost:8000/api/newOperation", {
+                            axios.post(userStore.baseAPIurl + "newOperation", {
                                 sInformation: sInformation,
                                 iAdminId: userStore.person._iId
                             })
@@ -783,7 +783,7 @@ function modifyEntity(sEntityType) {
             }
             break;
         case 'country':
-            axios.patch("http://localhost:8000/api/updateCountry/" + currentEntity._rawValue._iId, {
+            axios.patch(userStore.baseAPIurl + "updateCountry/" + currentEntity._rawValue._iId, {
                 sName: currentEntity._rawValue._sName
             })
                 .then(response => {
@@ -792,7 +792,7 @@ function modifyEntity(sEntityType) {
                         let sInformation = "Se ha modificado el país con id " + updatedEntity._iId + ". Antes de modificar: " +
                             " nombre -> " + currentEntity.value._sName + ". Después de modificar: " +
                             " nombre -> " + updatedEntity._sName;
-                        axios.post("http://localhost:8000/api/newOperation", {
+                        axios.post(userStore.baseAPIurl + "newOperation", {
                             sInformation: sInformation,
                             iAdminId: userStore.person._iId
                         })
@@ -807,7 +807,7 @@ function modifyEntity(sEntityType) {
                 })
             break;
         case 'faq':
-            axios.patch("http://localhost:8000/api/updateFAQ/" + currentEntity._rawValue._iId, {
+            axios.patch(userStore.baseAPIurl + "updateFAQ/" + currentEntity._rawValue._iId, {
                 sQuestion: currentEntity._rawValue._sQuestion,
                 sAnswer: currentEntity._rawValue._sAnswer
             })
@@ -818,7 +818,7 @@ function modifyEntity(sEntityType) {
                             " Pregunta -> " + currentEntity.value._sQuestion + " Después de modificar: " +
                             " Pregunta -> " + updatedEntity._sQuestion + ". Respuesta -> " + currentEntity.value._sAnswer +
                             " Después de modificar: Respuesta -> " + updatedEntity._sAnswer;
-                        axios.post("http://localhost:8000/api/newOperation", {
+                        axios.post(userStore.baseAPIurl + "newOperation", {
                             sInformation: sInformation,
                             iAdminId: userStore.person._iId
                         })
@@ -833,7 +833,7 @@ function modifyEntity(sEntityType) {
                 })
             break;
         case 'AMQuestion':
-            axios.patch("http://localhost:8000/api/updateAboutMeQuestion", {
+            axios.patch(userStore.baseAPIurl + "updateAboutMeQuestion", {
                 sQuestion: currentEntity._rawValue._sQuestion,
                 sAnswer: "",
                 iAdminId: userStore.person._iId,
@@ -902,9 +902,9 @@ function setPopup(sType, entity) {
 function deleteEntity(sEntityType, entityToDelete) {
     switch (sEntityType) {
         case 'category':
-            axios.delete("http://localhost:8000/api/deleteCategory/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteCategory/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado la categoría con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
@@ -916,9 +916,9 @@ function deleteEntity(sEntityType, entityToDelete) {
                 })
             break;
         case 'interest':
-            axios.delete("http://localhost:8000/api/deleteInterest/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteInterest/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado el interés con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
@@ -930,9 +930,9 @@ function deleteEntity(sEntityType, entityToDelete) {
                 })
             break;
         case 'province':
-            axios.delete("http://localhost:8000/api/deleteProvince/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteProvince/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado la provincia con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
@@ -944,9 +944,9 @@ function deleteEntity(sEntityType, entityToDelete) {
                 })
             break;
         case 'region':
-            axios.delete("http://localhost:8000/api/deleteRegion/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteRegion/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado la comunidad autónoma con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
@@ -958,9 +958,9 @@ function deleteEntity(sEntityType, entityToDelete) {
                 })
             break;
         case 'country':
-            axios.delete("http://localhost:8000/api/deleteCountry/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteCountry/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado el país con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId
                     })
@@ -972,9 +972,9 @@ function deleteEntity(sEntityType, entityToDelete) {
                 })
             break;
         case 'FAQ':
-            axios.delete("http://localhost:8000/api/deleteFAQ/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteFAQ/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado la FAQ con los siguientes datos: Pregunta: " + entityToDelete._sQuestion + " Respuesta: " +
                         entityToDelete._sAnswer,
                         iAdminId: userStore.person._iId
@@ -986,9 +986,9 @@ function deleteEntity(sEntityType, entityToDelete) {
                 })
             break;
         case 'AMQuestion':
-            axios.delete("http://localhost:8000/api/deleteAboutMeQuestion/" + entityToDelete._iId)
+            axios.delete(userStore.baseAPIurl + "deleteAboutMeQuestion/" + entityToDelete._iId)
                 .then(response => {
-                    axios.post("http://localhost:8000/api/newOperation", {
+                    axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado la pregunta 'Conóceme' con los siguientes datos: Pregunta: " + entityToDelete._sQuestion,
                         iAdminId: userStore.person._iId
                     })

@@ -128,7 +128,7 @@ onMounted(() => {
             bShow.value = !bShow.value;
         }, 100);
     })
-    axios.get("http://localhost:8000/api/countNewNotifications/" + userStore.person._iId)
+    axios.get(userStore.baseAPIurl + "countNewNotifications/" + userStore.person._iId)
         .then(response => iNewNotifications.value = response.data);
 })
 

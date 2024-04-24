@@ -122,7 +122,7 @@ let bTriggerSuccessPopup = ref(false);
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getAllCategories").then(response => {
+    axios.get(userStore.baseAPIurl + "getAllCategories").then(response => {
         aCategories.value = response.data;
         aCategories.value = aCategories.value.filter((category) => {
             return category._sName != 'Denunciar un usuario' && category._sName != 'Denunciar un evento' && category._sName != 'Denunciar una publicación' && category._sName != 'Borrada previamente';
@@ -141,7 +141,7 @@ function isBlankString(sString) {
 }
 
 function confirmSend() {
-    axios.post("http://localhost:8000/api/newTicket", {
+    axios.post(userStore.baseAPIurl + "newTicket", {
         sSubject: sSubject.value,
         sDescription: sDescription.value,
         iIssuerId: userStore.person._iId,
@@ -180,7 +180,7 @@ function onImageUpload() {
 
 async function uploadImg() {
     formData.append('id', iTicketId);
-    axios.post("http://localhost:8000/api/uploadTicketImage", formData, {
+    axios.post(userStore.baseAPIurl + "uploadTicketImage", formData, {
         'content-type': 'form-data'
     })
         .then(response => {})

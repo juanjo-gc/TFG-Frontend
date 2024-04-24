@@ -4,7 +4,7 @@
             <div class="col-md-1">
                 <router-link :to="`/profile/${post._user._sUsername}`" style="text-decoration: none; color: inherit;">
                     <img class="mr-3 avatar float-left"
-                        :src="`http://localhost:8000/api/getProfileImage/${post._user._iId}`" alt="User avatar">
+                        :src="userStore.baseAPIurl + 'getProfileImage/' + post._user._iId" alt="User avatar">
                 </router-link>
             </div>
             <div class="col-md-7">
@@ -65,7 +65,7 @@ let sLikeColor = ref(null);
 
 onMounted(() => {
   if(bIsLiked === undefined) {
-    axios.get("http://localhost:8000/api/checkLike/" + post._iId + "/" + userStore.person._iId)
+    axios.get(userStore.baseAPIurl + "checkLike/" + post._iId + "/" + userStore.person._iId)
     .then(response => sLikeColor.value = response.data ? '#8e0000' : '#1e3050')
   } else {
     sLikeColor.value = bIsLiked ? '#8e0000' : '#1e3050';
@@ -76,13 +76,13 @@ onMounted(() => {
   
     function setLike(postId) {
       if(!bIsAdmin) {
-        axios.post("http://localhost:8000/api/setLike/" + postId + "/" + userStore.person._iId)
+        axios.post(userStore.baseAPIurl + "setLike/" + postId + "/" + userStore.person._iId)
         .then(response => {
         if(response.data === true) {
           post._iLikes++;
           sLikeColor.value = '#8e0000';
           if (userStore.person._iId != post._user._iId) {
-            axios.post("http://localhost:8000/api/newNotification", {
+            axios.post(userStore.baseAPIurl + "newNotification", {
               sInfo: "¡" + userStore.person._sName + " ha dado Like a tu publicación!",
               iRecipientId: post._user._iId,
               iIssuerId: userStore.person._iId,

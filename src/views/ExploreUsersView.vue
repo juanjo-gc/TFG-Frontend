@@ -38,7 +38,7 @@
                 <div class="row mt-4 mx-4 p-2 border rounded user-card" v-for="user in aUsers" @click="router.push('/profile/' + user._sUsername)">
                     <div class="row p-2">
                         <div class="col-md-1 d-flex align-items-center">
-                            <img :src="'http://localhost:8000/api/getProfileImage/' + user._iId" class="avatar" alt="">
+                            <img :src="userStore.baseAPIurl + 'getProfileImage/' + user._iId" class="avatar" alt="">
                         </div>
                         <div class="col-md-11">
                             <div class="row">
@@ -114,21 +114,21 @@ let iTotalPages = 1;
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getAllCountries")
+    axios.get(userStore.baseAPIurl + "getAllCountries")
         .then(response => aCountries.value = response.data);
     setUsers(true);
-    axios.get("http://localhost:8000/api/getFollowing/" + userStore.person._sUsername)
+    axios.get(userStore.baseAPIurl + "getFollowing/" + userStore.person._sUsername)
         .then(response => aFollowing.value = response.data);
 
-    axios.get("http://localhost:8000/api/getAllInterests")
+    axios.get(userStore.baseAPIurl + "getAllInterests")
         .then(response => aInterests.value = response.data);
 
     if (userStore.person._province != null) {
-        axios.get("http://localhost:8000/api/getCountryRegions/" + userStore.person._province._region._country._iId)
+        axios.get(userStore.baseAPIurl + "getCountryRegions/" + userStore.person._province._region._country._iId)
             .then(response => aRegions.value = response.data)
             .catch(error => console.log(error));
 
-        axios.get("http://localhost:8000/api/getRegionProvinces/" + userStore.person._province._region._iId)
+        axios.get(userStore.baseAPIurl + "getRegionProvinces/" + userStore.person._province._region._iId)
             .then(response => aProvinces.value = response.data)
             .catch(error => console.log(error));
     }
@@ -144,7 +144,7 @@ onMounted(() => {
 function setUsers(bNewFilter) {
     bNewFilter ? iPageNumber = 0 : iPageNumber++;
     aUsers.value = [];
-    axios.post("http://localhost:8000/api/filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
+    axios.post(userStore.baseAPIurl + "filterUsers/" + userStore.person._iId + "/" + iPageNumber, {
         asInterests: [],
         sCountry: sSelectedCountry.value,
         sRegion: sSelectedRegion.value,
@@ -166,7 +166,7 @@ watch(sSelectedCountry, (newsSelectedCountry, oldsSelectedCountry) => {
         sSelectedRegion.value = null;
         if (newsSelectedCountry != null) {
             const foundCountry = aCountries.value.find(country => newsSelectedCountry === country._sName);
-            axios.get("http://localhost:8000/api/getCountryRegions/" + foundCountry._iId)
+            axios.get(userStore.baseAPIurl + "getCountryRegions/" + foundCountry._iId)
                 .then(response => {
                     aRegions.value = response.data;
                 })
@@ -182,7 +182,7 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
         sSelectedProvince.value = null;
         if (newsSelectedRegion != null) {
             const foundRegion = aRegions.value.find(region => newsSelectedRegion == region._sName);
-            axios.get("http://localhost:8000/api/getRegionProvinces/" + foundRegion._iId)
+            axios.get(userStore.baseAPIurl + "getRegionProvinces/" + foundRegion._iId)
                 .then(response => {
                     aProvinces.value = response.data
                 })

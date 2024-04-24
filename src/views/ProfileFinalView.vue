@@ -6,7 +6,7 @@
             <div class="col-md-10 border border-2 mx-4 p-4">
                 <div class="row">
                     <div class="col-md-2" v-if="bIsBlockedByPerson || bIsPersonBlocked">
-                        <img src="http://localhost:8000/api/getProfileImage/0" alt="" class="img-min-circle mt-2 mb-2" />
+                        <img :src="userStore.baseAPIurl + 'getProfileImage/0'" alt="" class="img-min-circle mt-2 mb-2" />
                     </div>
                     <div class="col-md-2" v-else>
                         <img :src="sProfileImageURL
@@ -14,7 +14,7 @@
                             // setProfileImageURL
                             " alt="ProfileImg" class="img-min-circle mt-2 mb-2"
                             v-if="person._iId != 0 && sProfileImageURL" />
-                        <img v-else src="http://localhost:8000/api/getProfileImage/0" alt=""
+                        <img v-else :src="userStore.baseAPIurl + 'getProfileImage/0'" alt=""
                             class="img-min-circle mt-2 mb-2" />
                     </div>
                     <div class="col-md-6">
@@ -288,7 +288,7 @@
                             <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
                                 <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos"
                                     @click="bTriggerFullscreenImage = true; fsImage = photo">
-                                    <img class="user-image m-1" :src="'http://localhost:8000/api/getImage/' + photo._sName"
+                                    <img class="user-image m-1" :src="userstore.baseAPIurl + 'getImage/' + photo._sName"
                                         alt="" v-if="photo._tDeleteDate === null">
                                 </div>
                             </div>
@@ -332,7 +332,7 @@
                 <div class="col-md-10">
                     <div class="row">
                         <div class="img-wrapper">
-                            <img :src="'http://localhost:8000/api/getImage/' + fsImage._sName" class="fsimg" alt="">
+                            <img :src="userstore.baseAPIurl + 'getImage/' + fsImage._sName" class="fsimg" alt="">
                         </div>
                     </div>
                 </div>
@@ -398,7 +398,7 @@
             <div class="col-md-10 border border-2 mx-4 p-4">
                 <div class="row">
                     <div class="col-md-2">
-                        <img src="http://localhost:8000/api/getProfileImage/0" alt="" class="img-min-circle mt-2 mb-2" />
+                        <img :src="userStore.baseAPIurl + 'getProfileImage/0'" alt="" class="img-min-circle mt-2 mb-2" />
                     </div>
                     <div class="col-md-6">
                         <div class="row">
@@ -464,20 +464,20 @@ let reportedPost = ref(null);
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getUserFromUsername/" + route.params.username)
+    axios.get(userStore.baseAPIurl + "getUserFromUsername/" + route.params.username)
         .then((response) => {
             person.value = response.data;
             console.log(person.value._province)
             iInterests.value = person.value._setInterests.length;
             if (person.value._iId != 0) { //Usuario válido
-                axios.get("http://localhost:8000/api/checkBlock/" + userStore.person._iId + "/" + person.value._iId)
+                axios.get(userStore.baseAPIurl + "checkBlock/" + userStore.person._iId + "/" + person.value._iId)
                     .then(response => bIsPersonBlocked.value = response.data);
-                axios.get("http://localhost:8000/api/checkBlock/" + person.value._iId + "/" + userStore.person._iId)
+                axios.get(userStore.baseAPIurl + "checkBlock/" + person.value._iId + "/" + userStore.person._iId)
                     .then(response => bIsBlockedByPerson.value = response.data);
-                axios.get("http://localhost:8000/api/getImageNames/" + person.value._iId)
+                axios.get(userStore.baseAPIurl + "getImageNames/" + person.value._iId)
                     .then(response => aPhotos.value = response.data);
                 if (person.value._iId != userStore.person._iId) {  //Ahorrar petición si el usuario es el mismo
-                    axios.get("http://localhost:8000/api/checkFollow/" + userStore.person._iId + "/" + person.value._iId)
+                    axios.get(userStore.baseAPIurl + "checkFollow/" + userStore.person._iId + "/" + person.value._iId)
                         .then((response) => {
                             bFollowed.value = response.data;
                             if (!bFollowed.value && person.value._bIsPrivate) {
@@ -493,15 +493,15 @@ onMounted(() => {
                     if (userStore.person._iId === person.value._iId)    //Si el perfil es del propio usuario muestra datos
                         bShouldDisplayData.value = true;
                 }
-                axios.get("http://localhost:8000/api/getUserAnswers/" + person.value._iId)
+                axios.get(userStore.baseAPIurl + "getUserAnswers/" + person.value._iId)
                     .then(response => aAMAnswers.value = response.data);
-                axios.get("http://localhost:8000/api/getUserPosts/" + route.params.username)
+                axios.get(userStore.baseAPIurl + "getUserPosts/" + route.params.username)
                     .then(response => {
                         aPosts.value = response.data;
                         iNumPosts.value = aPosts.value.length;
                     })
                     .catch(error => console.log(error));
-                axios.get("http://localhost:8000/api/getUserEvents/" + person.value._iId)
+                axios.get(userStore.baseAPIurl + "getUserEvents/" + person.value._iId)
                     .then(response => {
                         aEvents.value = response.data.sort((e1, e2) => {
                             if (e1._tCelebratedAt < e2._tCelebratedAt)
@@ -515,16 +515,16 @@ onMounted(() => {
                         aCreatedEvents.value = aEvents.value.filter(event => event._organizer._iId === person.value._iId);
                         console.log(aCreatedEvents.value)
                     })
-                axios.get("http://localhost:8000/api/getNumFollows/" + person.value._iId)
+                axios.get(userStore.baseAPIurl + "getNumFollows/" + person.value._iId)
                     .then(response => {
                         iNumFollowing.value = response.data[0];
                         iNumFollowers.value = response.data[1];
                     })
-                axios.get("http://localhost:8000/api/getLikedPosts/" + person.value._iId)
+                axios.get(userStore.baseAPIurl + "getLikedPosts/" + person.value._iId)
                     .then(response => aLikedPosts.value = response.data);
             }
             sProfileImageURL.value =
-                "http://localhost:8000/api/getProfileImage/" + person.value._iId;
+                userStore.baseAPIurl + "getProfileImage/" + person.value._iId;
             setTimeout(() => {
                 bIsFetching.value = false;
             }, 600);
@@ -543,7 +543,7 @@ function sendUserReport() {
 }
 
 function reportPost(post) {
-      axios.post("http://localhost:8000/api/newTicket", {
+      axios.post(userStore.baseAPIurl + "newTicket", {
         sSubject: "Denuncia de publicación de @" + post._user._sUsername,
         sDescription: sReportDescription.value,
         iIssuerId: userStore.person._iId,
@@ -588,7 +588,7 @@ function setFollow() {
     if (person.value._bIsPrivate && !bFollowed.value) {
         bPendingFollow.value = !bPendingFollow.value;
         if (!bPendingFollow.value)  // Si bPendingFollow es falso, significa que ha cancelado la solicitud de seguimiento
-            axios.patch("http://localhost:8000/api/deleteNotification/" + userStore.person._iId + "/" + person.value._iId + "/FollowRequest")
+            axios.patch(userStore.baseAPIurl + "deleteNotification/" + userStore.person._iId + "/" + person.value._iId + "/FollowRequest")
     }
     if (!person.value._bIsPrivate) {
         bFollowed.value = !bFollowed.value;
@@ -630,7 +630,7 @@ function proccessDescription(sDescription) {
 }
 
 function blockUnblockUser() {
-    axios.patch("http://localhost:8000/api/blockUnblockUser/" + userStore.person._iId + "/" + person.value._iId)
+    axios.patch(userStore.baseAPIurl + "blockUnblockUser/" + userStore.person._iId + "/" + person.value._iId)
         .then(response => {
             bIsPersonBlocked.value = response.data;
         })

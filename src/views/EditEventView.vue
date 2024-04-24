@@ -162,7 +162,7 @@ let bIsOnline = ref(false);
 let sLocationName = ref("");
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
+    axios.get(userStore.baseAPIurl + "getEvent/" + route.params.eventId)
     .then(response => {
         event.value = response.data;
         if(event.value._organizer._iId != userStore.person._iId)
@@ -228,11 +228,11 @@ function submitEvent() {
         bIsOnline: bIsOnline.value
     }
     if((selectedLocation.value != null && !bIsOnline.value) || (bIsOnline.value)) {
-        axios.post("http://localhost:8000/api/updateEvent/" + event.value._iId, eventDTO)
+        axios.post(userStore.baseAPIurl + "updateEvent/" + event.value._iId, eventDTO)
         .then(response => {
             formData.append('id', response.data);
             if(formData.get('file') != null) {
-                axios.post("http://localhost:8000/api/uploadEventHeaderImage", formData, {
+                axios.post(userStore.baseAPIurl + "uploadEventHeaderImage", formData, {
                     'content-type': 'form-data'
                 })
                 .then(response => {})

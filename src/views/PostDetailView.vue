@@ -97,10 +97,10 @@ import GenericReportPopup from "@/components/GenericReportPopup.vue";
 
 const userStore = useUserStore();
 const route = useRoute();
-let post = ref(axios.get("http://localhost:8000/api/getPost/" + route.params.id));
+let post = ref(axios.get(userStore.baseAPIurl + "getPost/" + route.params.id));
 let aReplies = ref([]);
 let aLikes = ref(null);
-let sLink = "http://localhost:8000/api/getPost/" + route.params.id;
+let sLink = userStore.baseAPIurl + "getPost/" + route.params.id;
 let bIsFetching = ref(true);
 let sReplyText = ref("");
 let bError = ref(false);
@@ -114,11 +114,11 @@ let bTriggerReportSentPopup = ref(false);
 
 
 onMounted(() => {
-  axios.get("http://localhost:8000/api/getPost/" + route.params.id)
+  axios.get(userStore.baseAPIurl + "getPost/" + route.params.id)
     .then(response => {
       post.value = response.data;
       if (post.value._iId != 0) {   // la publicación es válida
-        axios.get("http://localhost:8000/api/getLikes/" + post.value._iId)
+        axios.get(userStore.baseAPIurl + "getLikes/" + post.value._iId)
           .then(response => {
             aLikes.value = response.data;
           })
@@ -140,7 +140,7 @@ function resetErrors() {
 
 function reportPost(post) {
   console.log(sReportDescription._rawValue)
-  axios.post("http://localhost:8000/api/newTicket", {
+  axios.post(userStore.baseAPIurl + "newTicket", {
     sSubject: "Denuncia de publicación de @" + post._user._sUsername,
     sDescription: sReportDescription._rawValue,
     iIssuerId: userStore.person._iId,
@@ -158,7 +158,7 @@ function reportPost(post) {
 
 
 function setLike(postId) {
-  axios.post("http://localhost:8000/api/setLike/" + postId + "/" + userStore.person._iId)
+  axios.post(userStore.baseAPIurl + "setLike/" + postId + "/" + userStore.person._iId)
     .then(response => {
       if (response.data === true) {
         post.value._iLikes++;
@@ -169,7 +169,7 @@ function setLike(postId) {
 }
 
 function getReplies(iPageNumber) {
-  axios.get("http://localhost:8000/api/getReplies/" + post.value._iId + "/" + iPageNumber)
+  axios.get(userStore.baseAPIurl + "getReplies/" + post.value._iId + "/" + iPageNumber)
     .then(response => {
       aReplies.value = aReplies.value.concat(response.data.content);
       iTotalPages = response.data.totalPages;
@@ -184,7 +184,7 @@ function postNewReply() {
     bError.value = true;
     sErrorMessage.value = "La respuesta no puede estar vacía."
   } else {
-    axios.post("http://localhost:8000/api/newReply/" + post.value._iId, {
+    axios.post(userStore.baseAPIurl + "newReply/" + post.value._iId, {
       sText: sReplyText.value,
       iUserId: userStore.person._iId
     })
@@ -192,7 +192,7 @@ function postNewReply() {
         let reply = response.data;
         aReplies.value.push(reply);
         if (post.value._user._iId != userStore.person._iId) {
-          axios.post("http://localhost:8000/api/newNotification", {
+          axios.post(userStore.baseAPIurl + "newNotification", {
             sInfo: "¡" + userStore.person._sName + " ha comentado tu publicación!",
             iRecipientId: post.value._user._iId,
             iIssuerId: userStore.person._iId,

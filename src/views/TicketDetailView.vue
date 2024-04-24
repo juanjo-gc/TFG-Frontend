@@ -11,7 +11,7 @@
                 <p class="fw-light mt-3 float-end">Enviado por: </p>
             </div>
             <div class="col-md-1">
-                <img class="avatar ms-4" :src="'http://localhost:8000/api/getProfileImage/' + ticket._issuer._iId" />
+                <img class="avatar ms-4" :src="userStore.baseAPIurl + 'getProfileImage/' + ticket._issuer._iId" />
             </div>
             <div class="col-md-3">
                 <p class="mt-3 float-start">@{{ ticket._issuer._sUsername }}</p>
@@ -86,7 +86,7 @@
                         @click="router.push('/admin/manage/users/' + ticket._reported._iId)">Gestionar perfil</button>
                 </div>
             </div>
-            <img :src="'http://localhost:8000/api/getTicketImage/' + ticket._iId" alt="img" class="ticket-reply-image"
+            <img :src="userStore.baseAPIurl + 'getTicketImage/' + ticket._iId" alt="img" class="ticket-reply-image"
                 v-if="ticket._imagePath != null" @click="setFsImage(true, ticket._iId)" />
             <div class="row mb-4">
                 <div class="col-md-4">
@@ -110,7 +110,7 @@
                             </div>
                         </div>
                         <p class="ms-2 fw-light">{{ reply._sText }}</p>
-                        <img :src="'http://localhost:8000/api/getReplyImage/' + reply._iId" alt="img"
+                        <img :src="userStore.baseAPIurl + 'getReplyImage/' + reply._iId" alt="img"
                             class="ticket-reply-image" v-if="reply._imagePath != null"
                             @click="setFsImage(false, reply._iId)" />
                     </div>
@@ -206,11 +206,11 @@ let fsImage = ref({
 })
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getTicket/" + route.params.ticketId)
+    axios.get(userStore.baseAPIurl + "getTicket/" + route.params.ticketId)
         .then(response => {
             ticket.value = response.data;
             if (ticket.value._iId != 0) {
-                axios.get("http://localhost:8000/api/getTicketReplies/" + ticket.value._iId)
+                axios.get(userStore.baseAPIurl + "getTicketReplies/" + ticket.value._iId)
                     .then(response => {
                         aReplies.value = response.data;
                         bIsFetching.value = false;
@@ -244,7 +244,7 @@ function deleteRestorePost(bWantToDelete) {
 
 async function sendReply() {
     if (ticket.value._bIsOpen && !isBlank(sReply.value))
-        axios.post("http://localhost:8000/api/newReply", {
+        axios.post(userStore.baseAPIurl + "newReply", {
             sText: sReply.value,
             iPersonId: userStore.person._iId,
             iTicketId: ticket.value._iId
@@ -254,7 +254,7 @@ async function sendReply() {
                 sReply.value = '';
                 if (uploadImage.value.files[0] != null) {
                     formData.append('id', response.data._iId)
-                    axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
+                    axios.post(userStore.baseAPIurl + "uploadReplyImage", formData, {
                         'content-type': 'form-data'
                     })
                     .then(response => {
@@ -274,15 +274,15 @@ async function sendReply() {
 function setFsImage(bIsTicketImage, iId) {
     if (bIsTicketImage) {
         fsImage.value.bIsTicketImage = true;
-        fsImage.value.sLink = "http://localhost:8000/api/getTicketImage/" + iId
+        fsImage.value.sLink = userStore.baseAPIurl + 'getTicketImage/' + iId
     } else {
         fsImage.value.bIsReplyImage = true;
-        fsImage.value.sLink = 'http://localhost:8000/api/getReplyImage/' + iId
+        fsImage.value.sLink = userStore.baseAPIurl + 'getReplyImage/' + iId
     }
 }
 
 function openCloseTicket() {
-    axios.patch("http://localhost:8000/api/openCloseTicket/" + ticket.value._iId)
+    axios.patch(userStore.baseAPIurl + "openCloseTicket/" + ticket.value._iId)
         .then(response => ticket.value._bIsOpen = response.data);
 }
 
@@ -296,7 +296,7 @@ function onImageUpload() {
 
 async function uploadImg(iId) {
     formData.append('id', iId)
-    let image = await axios.post("http://localhost:8000/api/uploadReplyImage", formData, {
+    let image = await axios.post(userStore.baseAPIurl + "uploadReplyImage", formData, {
         'content-type': 'form-data'
     });
     return image.data;

@@ -107,7 +107,7 @@ let sSubjectToSearch = ref('');
 let sSelectedCategory = ref('Seleccionar categoría');
 
 onMounted(() => {
-    let sLink = userStore.person._sRole === 'Admin' ? "http://localhost:8000/api/getAdminTickets/" + userStore.person._iId : "http://localhost:8000/api/getUserTickets/" + userStore.person._iId;
+    let sLink = userStore.person._sRole === 'Admin' ? userStore.baseAPIurl + "getAdminTickets/" + userStore.person._iId : userStore.baseAPIurl + "getUserTickets/" + userStore.person._iId;
     axios.get(sLink)
         .then(response => {
             response.data.forEach(ticket => {
@@ -117,12 +117,11 @@ onMounted(() => {
             aClosedTicketsBackup = aClosedTickets.value;
         });
 
-    axios.get("http://localhost:8000/api/getAllCategories")
+    axios.get(userStore.baseAPIurl + "getAllCategories")
         .then(response => {
             aCategories.value = response.data;
             aCategories.value = aCategories.value.filter(category => category._sName != "Borrada previamente")
         });
-
 
 })
 

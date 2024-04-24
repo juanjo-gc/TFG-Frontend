@@ -8,8 +8,8 @@
               <div class="row g-0">
                 <div class="card-body p-md-5 mx-md-4">
                   <div class="text-center">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/lotus.webp"
-                      style="width: 185px" alt="logo" />
+                    <img src="@/assets/img/firelight-logo.png"
+                      style="width: 100px" alt="logo" />
                     <h4 class="mt-1 mb-5 pb-1">Registrar una cuenta</h4>
                   </div>
                   <form>
@@ -107,11 +107,11 @@ let sAlertMessage = ref("");
 let bTriggerSuccessPopup = ref(false);
 
 onMounted(() => {
-  axios.get("http://localhost:8000/api/getAllCountries")
+  axios.get(userStore.baseAPIurl + "getAllCountries")
     .then(response => aCountries.value = response.data);
-  axios.get("http://localhost:8000/api/getAllRegions")
+  axios.get(userStore.baseAPIurl + "getAllRegions")
     .then(response => aRegions.value = response.data);
-  axios.get("http://localhost:8000/api/getAllProvinces")
+  axios.get(userStore.baseAPIurl + "getAllProvinces")
     .then(response => aProvinces.value = response.data);
 })
 
@@ -136,7 +136,7 @@ function selectProvince(province) {
 }
 
 async function checkEmail() {
-  axios.post("http://localhost:8000/api/checkEmail", {
+  axios.post(userStore.baseAPIurl + "checkEmail", {
     sEmail: email.value
   })
     .then(response => {
@@ -154,7 +154,7 @@ async function checkUsername() {
     bIsUsernameIncorrect.value = false;
 
   if (!bIsUsernameIncorrect.value) { //Enviar peticion si el mensaje es correcto
-    axios.post("http://localhost:8000/api/checkUser", {
+    axios.post(userStore.baseAPIurl + "checkUser", {
       sUsername: username.value
     })
       .then(response => {
@@ -179,7 +179,7 @@ async function registerUser() {
     bTriggerErrorAlert.value = true;
     sAlertMessage.value = "Debes ser mayor de edad para registrarte."
   } else {
-    axios.post("http://localhost:8000/api/register", {
+    axios.post(userStore.baseAPIurl + "register", {
       sEmail: email.value,
       sName: name.value,
       sUsername: username.value,
@@ -215,14 +215,13 @@ async function registerUser() {
 .gradient-custom {
   background: rgb(131, 58, 180);
   background: linear-gradient(90deg,
-      rgba(131, 58, 180, 1) 0%,
-      rgba(253, 29, 29, 1) 51%,
-      rgba(252, 176, 69, 1) 100%);
+      rgb(0, 0, 0) 0%,
+      rgb(255, 115, 0) 100%);
 }
 
 .backgroundPattern {
-  background: rgb(180, 142, 0);
-  background: radial-gradient(circle, rgba(180, 142, 0, 1) 0%, rgba(179, 2, 172, 1) 100%);
+  background: rgb(255, 115, 0);
+  background: radial-gradient(circle, rgba(255, 115, 0, 1) 0%, rgb(0, 0, 0) 100%);
 }
 
 

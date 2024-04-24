@@ -23,7 +23,7 @@
                                 v-if="user._iId != userStore.person._iId">
                                 <div class="col-ms-1">
                                     <img class="mr-3 avatar float-left"
-                                        :src="`http://localhost:8000/api/getProfileImage/${user._iId}`" alt="User avatar">
+                                        :src="userStore.baseAPIurl + 'getProfileImage/' + user._iId" alt="User avatar">
                                 </div>
                                 <div class="col-ms-11">
                                     <h5 class="mt-0 mb-1">
@@ -151,7 +151,7 @@
                             <div class="blackb d-flex justify-content-center clickable"
                                 @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
                                 <img class="user-image" :class="{deleted: photo._tDeleteDate != null}"
-                                :src="'http://localhost:8000/api/getImage/' + photo._sName" alt="">
+                                :src="userStore.baseAPIurl + 'getImage/' + photo._sName" alt="">
                             </div>
                         </li>
                     </ul>
@@ -166,7 +166,7 @@
                         @click="bTriggerFullscreenImage = false" />
                 </div>
                 <div class="img-wrapper">
-                    <img :src="'http://localhost:8000/api/getImage/' + fsImage._sName" class="fsimg p-2" alt="">
+                    <img :src="userStore.baseAPIurl + 'getImage/' + fsImage._sName" class="fsimg p-2" alt="">
                     <button class="btn btn-danger align-self-center del-btn" v-if="!bFsImageIsDeleted"
                         @click="softDeleteOrRestoreImage(fsImage)">
                         Borrar
@@ -214,14 +214,14 @@ let postsBox = ref(null);
 
 onMounted(() => {
     if(route.params.userId != null) {
-        axios.get("http://localhost:8000/api/getUser/" + route.params.userId)
+        axios.get(userStore.baseAPIurl + "getUser/" + route.params.userId)
         .then(response => userToDisplay.value = response.data);
     }
 })
 
 function searchUsers() {
     if (sUsernameToSearch.value.length > 3)
-        axios.get("http://localhost:8000/api/findFirst7Users/" + sUsernameToSearch.value)
+        axios.get(userStore.baseAPIurl + "findFirst7Users/" + sUsernameToSearch.value)
             .then(response => aUsers.value = response.data)
     else
         aUsers.value = [];
@@ -231,23 +231,23 @@ function loadUserData(user) {
     selectedPost.value = {};
     userToDisplay.value = {};
     aPosts.value = [];
-    axios.get("http://localhost:8000/api/getUserFromUsername/" + user._sUsername)
+    axios.get(userStore.baseAPIurl + "getUserFromUsername/" + user._sUsername)
         .then(response => {
             if (response.data._iId != 0) {
                 userToDisplay.value = response.data;
-                axios.get("http://localhost:8000/api/getUserPosts/" + user._sUsername)
+                axios.get(userStore.baseAPIurl + "getUserPosts/" + user._sUsername)
                     .then(response => {
                         aPosts.value = response.data;
                     });
-                axios.get("http://localhost:8000/api/getUserWarnings/" + user._iId)
+                axios.get(userStore.baseAPIurl + "getUserWarnings/" + user._iId)
                     .then(response => {
                         aWarnings.value = response.data;
                     })
-                axios.get("http://localhost:8000/api/getUserReports/" + user._iId)
+                axios.get(userStore.baseAPIurl + "getUserReports/" + user._iId)
                     .then(response => {
                         aReports.value = response.data;
                     })
-                axios.get("http://localhost:8000/api/getImageNames/" + user._iId)
+                axios.get(userStore.baseAPIurl + "getImageNames/" + user._iId)
                     .then(response => aUserPhotos.value = response.data)
             }
             sUsernameToSearch.value = ''
@@ -255,7 +255,7 @@ function loadUserData(user) {
 }
 
 function suspendReactivateAccount(iSuspend) {
-    axios.patch("http://localhost:8000/api/suspendReactivateAccount/" + userToDisplay.value._iId + '/' + iSuspend)
+    axios.patch(userStore.baseAPIurl + "suspendReactivateAccount/" + userToDisplay.value._iId + '/' + iSuspend)
         .then(response => userToDisplay.value._bIsSuspended = response.data)
 }
 
@@ -284,7 +284,7 @@ function softDeleteOrRestoreImage(image) {
 
 function sendWarning() {
     if (sReason.value != '') {
-        axios.post("http://localhost:8000/api/newNotification", {
+        axios.post(userStore.baseAPIurl + "newNotification", {
             sInfo: sReason.value,
             iRecipientId: userToDisplay.value._iId,
             iIssuerId: userStore.person._iId,

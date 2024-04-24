@@ -33,6 +33,9 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import moment from 'moment';
 import SidebarFinal from '@/components/SidebarFinal.vue';
+import { useUserStore } from '@/store/UserStore';
+
+const userStore = useUserStore();
 
 
 let aOperations = ref([]);
@@ -46,7 +49,7 @@ onMounted(() => {
 
 
 function getOperations() {
-    axios.get("http://localhost:8000/api/getOperations/" + iPageNumber)
+    axios.get(userStore.baseAPIurl + "getOperations/" + iPageNumber)
         .then(response => {
             aOperations.value = aOperations.value.concat(response.data.content).sort((o1, o2) => {
                 if (o1._tCelebratedAt < o2._tCelebratedAt)

@@ -93,7 +93,7 @@ async function authUser() {
 
   } else {
 
-    axios.post("http://localhost:8000/api/login", {
+    axios.post(userStore.baseAPIurl + "login", {
       sEmail: email.value,
       sPassword: password.value
     })

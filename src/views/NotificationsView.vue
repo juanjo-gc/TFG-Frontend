@@ -10,7 +10,7 @@
                         <div class="row mt-2 notification" @click="router.push(generateLink(notification))"
                         v-if="shouldBeShown(notification)" @mouseover="setSeen(key)">
                             <div class="col-sm-1 mt-3" v-if="notification._issuer._iId != 0">
-                                <img :src="'http://localhost:8000/api/getProfileImage/' + notification._issuer._iId"
+                                <img :src="userStore.baseAPIurl + 'getProfileImage/' + notification._issuer._iId"
                                     class="avatar-mini float-end">
                             </div>
                             <div class="col-sm-6 mt-2">
@@ -79,14 +79,14 @@ let aLoadedNotificationPages = [];
 
 
 function getNotificationsPage() {
-    axios.get("http://localhost:8000/api/getUserNotifications/" + userStore.person._iId + "/" + iPageNumber)
+    axios.get(userStore.baseAPIurl + "getUserNotifications/" + userStore.person._iId + "/" + iPageNumber)
         .then(response => {
             let aUnfilteredNotifications = response.data.content;
             aUnfilteredNotifications.forEach(notification => {
                 if(notification._issuer === null || notification._issuer._sRole === "Admin") {
                     aNotifications.value.push(notification);
                 } else {
-                    axios.get("http://localhost:8000/api/checkMutualBlock/" + userStore.person._iId + "/" + notification._issuer._iId)
+                    axios.get(userStore.baseAPIurl + "checkMutualBlock/" + userStore.person._iId + "/" + notification._issuer._iId)
                     .then(response => {
                         let bNeitherAreBlocked = response.data;
                         if(bNeitherAreBlocked)
@@ -96,7 +96,7 @@ function getNotificationsPage() {
             })
             aNotifications.value.forEach(notification => {
                 if (notification._type._sName === "NewFollow" || notification._type._sName === "FollowRequest") {
-                    axios.get('http://localhost:8000/api/checkFollow/' + notification._recipient._iId + '/' + notification._issuer._iId)
+                    axios.get(userStore.baseAPIurl + 'checkFollow/' + notification._recipient._iId + '/' + notification._issuer._iId)
                         .then(response => notification._bIsFollowing = response.data)
                 }
             })
@@ -129,7 +129,7 @@ function shouldBeShown(notification) {
 function setSeen(i) {
     if(aNotifications.value[i]._bSeen != true) {
         aNotifications.value[i]._bSeen = true;
-        axios.patch("http://localhost:8000/api/setSeen/" + aNotifications.value[i]._iId);
+        axios.patch(userStore.baseAPIurl + "setSeen/" + aNotifications.value[i]._iId);
     }
 }
 
@@ -167,19 +167,19 @@ function formatDate(tCreatedAt) {
 }
 
 async function acceptIgnoreFollowRequest(notification, bIsAccepted) {
-    const response = await axios.get("http://localhost:8000/api/getNotification/" + notification._iId);     //Puede que el usuario retire la solicitud justo cuando el otro va a aceptarla. Para evitar esto, se comprueba que existe
+    const response = await axios.get(userStore.baseAPIurl + "getNotification/" + notification._iId);     //Puede que el usuario retire la solicitud justo cuando el otro va a aceptarla. Para evitar esto, se comprueba que existe
     if (bIsAccepted && response.data._iId != 0) {
         
-        axios.patch("http://localhost:8000/api/setFollow/" + notification._issuer._iId + "/" + notification._recipient._iId)
+        axios.patch(userStore.baseAPIurl + "setFollow/" + notification._issuer._iId + "/" + notification._recipient._iId)
             .then(response => {
                 if (response.data) {
-                    axios.post("http://localhost:8000/api/newNotification", {
+                    axios.post(userStore.baseAPIurl + "newNotification", {
                         sInfo: userStore.person._sName + " ha aceptado tu solicitud de seguimiento",
                         iRecipientId: notification._issuer._iId,
                         sType: "FollowRequestAccepted",
                         iIssuerId: userStore.person._iId
                     })
-                    axios.post("http://localhost:8000/api/newNotification", {
+                    axios.post(userStore.baseAPIurl + "newNotification", {
                         sInfo: "¡Ahora " + notification._issuer._sName + " te está siguiendo!",
                         iRecipientId: userStore.person._iId,
                         sType: "NewFollow",
@@ -189,14 +189,14 @@ async function acceptIgnoreFollowRequest(notification, bIsAccepted) {
                 }
             })
     } else {
-        axios.patch("http://localhost:8000/api/deleteNotificationById/" + notification._iId);
+        axios.patch(userStore.baseAPIurl + "deleteNotificationById/" + notification._iId);
         aNotifications.value = aNotifications.value.filter(notif => notif._iId != notification._iId);
     }
 }
 
 
 async function checkFollow(notification) {
-    let response = await axios.get('http://localhost:8000/api/checkFollow/' + notification._issuer._iId + '/' + notification._recipient._iId);
+    let response = await axios.get(userStore.baseAPIurl + 'checkFollow/' + notification._issuer._iId + '/' + notification._recipient._iId);
     return response.data;
 }
 
@@ -204,7 +204,7 @@ function proccessFollow(notification) {
     let iNotificationIndex = aNotifications.value.findIndex(notif => notif._iId === notification._iId);
     userStore.proccessFollow(notification._issuer);
     setTimeout(() => {
-        axios.get('http://localhost:8000/api/checkFollow/' + userStore.person._iId + '/' + notification._issuer._iId)
+        axios.get(userStore.baseAPIurl + 'checkFollow/' + userStore.person._iId + '/' + notification._issuer._iId)
             .then(response => aNotifications.value[iNotificationIndex]._bIsFollowing = response.data)
     }, 150);
 }

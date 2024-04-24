@@ -33,7 +33,7 @@
                                     <router-link :to="'/profile/' + event._organizer._sUsername"
                                         style="text-decoration: none; color: inherit;">
                                         <img class="avatar ms-4"
-                                            :src="'http://localhost:8000/api/getProfileImage/' + event._organizer._iId" />
+                                            :src="userStore.baseAPIurl + 'getProfileImage/' + event._organizer._iId" />
                                     </router-link>
                                 </div>
                                 <div class="col-md-8 mt-2">
@@ -87,7 +87,7 @@
                 <div class="row mt-4">
                     <div class="col-md-7">
                         <img class="event-img" v-if="event._headerPhoto != null"
-                            :src="'http://localhost:8000/api/getEventHeaderImage/' + event._iId" alt="">
+                            :src="userStore.baseAPIurl + 'getEventHeaderImage/' + event._iId" alt="">
                         <div class="p-3 bg-contrast mt-4">
                             <h5 class="fw-formal">Descripción</h5>
                             <div class="hline"></div>
@@ -146,7 +146,7 @@
                                         <div class="row mt-1"
                                             v-if="comment._tDeleteDate === null || userStore.person._sRole === 'Admin'">
                                             <div class="col-sm-1">
-                                                <img :src="'http://localhost:8000/api/getProfileImage/' + comment._user._iId"
+                                                <img :src="userStore.baseAPIurl + 'getProfileImage/' + comment._user._iId"
                                                     @click="router.push('/profile/' + comment._user._sUsername)"
                                                     class="avatar-mini clickable">
                                             </div>
@@ -208,7 +208,7 @@
                                         v-if="photo._tDeleteDate === null || userStore.person._sRole === 'Admin'"
                                         @click="bTriggerFullscreenImage = true; fsImage = photo; bFsImageIsDeleted = fsImage._tDeleteDate === null ? false : true">
                                         <img class="event-image" :class="{deleted: photo._tDeleteDate != null}"
-                                            :src="'http://localhost:8000/api/getEventImage/' + photo._sName" alt="">
+                                            :src="userStore.baseAPIurl + 'getEventImage/' + photo._sName" alt="">
                                     </div>
                                 </li>
                             </ul>
@@ -227,7 +227,7 @@
                 <div class="row mt-2">
                     <div class="d-flex justify-content-center" v-if="userStore.person._sRole === 'Admin'">
                         <div class="img-wrapper">
-                            <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2"
+                            <img :src="userStore.baseAPIurl + '/getEventImage/' + fsImage._sName" class="fsimg p-2"
                                 alt="">
                             <button class="btn btn-danger align-self-center del-btn" v-if="!bFsImageIsDeleted"
                                 @click="softDeleteOrRestoreImage(fsImage)">
@@ -240,7 +240,7 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-center" v-else>
-                        <img :src="'http://localhost:8000/api/getEventImage/' + fsImage._sName" class="fsimg p-2" alt="">
+                        <img :src="userStore.baseAPIurl + 'getEventImage/' + fsImage._sName" class="fsimg p-2" alt="">
                     </div>
                 </div>
             </Popup>
@@ -307,27 +307,27 @@ let commentsBox = ref(null);
 
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/getEvent/" + route.params.eventId)
+    axios.get(userStore.baseAPIurl + "getEvent/" + route.params.eventId)
         .then(response => {
             event.value = response.data;
             if (moment(event.value._tCelebratedAt).isBefore(moment(Date.now()))) {
                 bIsFinished = true;
             }
             bIsFetching.value = false;
-            axios.get("http://localhost:8000/api/getEventAssistantIds/" + event.value._iId)
+            axios.get(userStore.baseAPIurl + "getEventAssistantIds/" + event.value._iId)
                 .then(response => {
                     aAssistantIds.value = response.data.slice(0, 5); // 5 primeros usuarios
-                    aAssistantIds.value.forEach(iId => aAssistantProfileImages.value.push("http://localhost:8000/api/getProfileImage/" + iId));
+                    aAssistantIds.value.forEach(iId => aAssistantProfileImages.value.push(userStore.baseAPIurl + "getProfileImage/" + iId));
                     if (response.data.some((iId) => iId === userStore.person._iId))
                         bIsAssistant.value = true;
                 })
             // Si el evento ha finalizado
             if (bIsFinished) {
-                axios.get("http://localhost:8000/api/getEventPhotos/" + event.value._iId)
+                axios.get(userStore.baseAPIurl + "getEventPhotos/" + event.value._iId)
                     .then(response => {
                         aEventPhotos.value = response.data;
                     })
-                axios.get("http://localhost:8000/api/getEventComments/" + event.value._iId)
+                axios.get(userStore.baseAPIurl + "getEventComments/" + event.value._iId)
                     .then(response => {
                         aComments.value = response.data;
                         setTimeout(() => {
@@ -340,7 +340,7 @@ onMounted(() => {
 })
 
 function reportEvent() {
-    axios.post("http://localhost:8000/api/newTicket", {
+    axios.post(userStore.baseAPIurl + "newTicket", {
         sSubject: "Denuncia de evento con título " + event.value._sTitle,
         sDescription: sReportDescription.value,
         iIssuerId: userStore.person._iId,
@@ -357,15 +357,15 @@ function reportEvent() {
 }
 
 function softDeleteEvent() {
-    axios.patch("http://localhost:8000/api/softDeleteOrRestoreEvent/" + event.value._iId)
+    axios.patch(userStore.baseAPIurl + "softDeleteOrRestoreEvent/" + event.value._iId)
         .then(response => {
             if (response.data) {     // true, existe fecha borrado => evento borrado
-                axios.post("http://localhost:8000/api/newOperation", {
+                axios.post(userStore.baseAPIurl + "newOperation", {
                     sInformation: "Se ha eliminado un evento del usuario @" + event.value._organizer._sUsername + ". ID del evento: " +
                         event.value._iId,
                     iAdminId: userStore.person._iId
                 })
-                axios.post("http://localhost:8000/api/newNotification", {
+                axios.post(userStore.baseAPIurl + "newNotification", {
                     sInfo: "Uno de los eventos que has creado ha sido eliminado por no cumplir con nuestras normas de comportamiento.",
                     iRecipientId: event.value._organizer._iId,
                     iIssuerId: userStore.person._iId,
@@ -375,12 +375,12 @@ function softDeleteEvent() {
                 })
 
             } else {
-                axios.post("http://localhost:8000/api/newOperation", {
+                axios.post(userStore.baseAPIurl + "newOperation", {
                     sInformation: "Se ha restaurado un evento del usuario @" + comment._user._sUsername + ". ID del evento: " +
                         event.value._iId,
                     iAdminId: userStore.person._iId
                 })
-                axios.post("http://localhost:8000/api/newNotification", {
+                axios.post(userStore.baseAPIurl + "newNotification", {
                     sInfo: "Uno de tus eventos que había sido eliminado ha sido restaurado. Disculpa las molestias.",
                     iRecipientId: event.value._organizer._iId,
                     iIssuerId: userStore.person._iId,
@@ -393,15 +393,15 @@ function softDeleteEvent() {
 }
 
 function softDeleteComment(comment) {
-    axios.patch("http://localhost:8000/api/softDeleteOrRestoreComment/" + comment._iId)
+    axios.patch(userStore.baseAPIurl + "softDeleteOrRestoreComment/" + comment._iId)
         .then(response => {
             if (response.data) {     // true, existe fecha borrado => comentario borrado
-                axios.post("http://localhost:8000/api/newOperation", {
+                axios.post(userStore.baseAPIurl + "newOperation", {
                     sInformation: "Se ha eliminado un comentario del usuario @" + comment._user._sUsername + ", publicado en el evento con ID " +
                         event.value._iId + ". Texto del comentario: " + comment._sText,
                     iAdminId: userStore.person._iId
                 })
-                axios.post("http://localhost:8000/api/newNotification", {
+                axios.post(userStore.baseAPIurl + "newNotification", {
                     sInfo: "Uno de tus comentarios publicado en un evento ha sido eliminado por no cumplir con nuestras normas de comportamiento.",
                     iRecipientId: comment._user._iId,
                     iIssuerId: userStore.person._iId,
@@ -413,12 +413,12 @@ function softDeleteComment(comment) {
                 aComments.value[iIndexToModify]._tDeleteDate = moment(Date.now());
 
             } else {
-                axios.post("http://localhost:8000/api/newOperation", {
+                axios.post(userStore.baseAPIurl + "newOperation", {
                     sInformation: "Se ha restaurado un comentario del usuario @" + comment._user._sUsername + ", publicado en el evento con ID " +
                         event.value._iId + ". Texto del comentario: " + comment._sText,
                     iAdminId: userStore.person._iId
                 })
-                axios.post("http://localhost:8000/api/newNotification", {
+                axios.post(userStore.baseAPIurl + "newNotification", {
                     sInfo: "Uno de tus comentarios que había sido eliminado ha sido restaurado. Disculpa las molestias.",
                     iRecipientId: comment._user._iId,
                     iIssuerId: userStore.person._iId,
@@ -434,7 +434,7 @@ function softDeleteComment(comment) {
 
 function softDeleteOrRestoreImage(image) {
     let bIsDeleted = null;
-    axios.get("http://localhost:8000/api/getUploader/" + image._iId)
+    axios.get(userStore.baseAPIurl + "getUploader/" + image._iId)
         .then(response => {
             if (response.data._iId != 0) {
                 let iIndex = aEventPhotos.value.findIndex(item => image._iId === item._iId);
@@ -452,15 +452,15 @@ function softDeleteOrRestoreImage(image) {
 }
 
 function setAssist() {
-    axios.patch("http://localhost:8000/api/setAssist/" + event.value._iId + "/" + userStore.person._iId)
+    axios.patch(userStore.baseAPIurl + "setAssist/" + event.value._iId + "/" + userStore.person._iId)
         .then(response => {
             bIsAssistant.value = response.data;
             if (bIsAssistant.value == false) {
-                let iIndex = aAssistantProfileImages.value.indexOf("http://localhost:8000/api/getProfileImage/" + userStore.person._iId);
+                let iIndex = aAssistantProfileImages.value.indexOf(userStore.baseAPIurl + "getProfileImage/" + userStore.person._iId);
                 aAssistantProfileImages.value.splice(iIndex, 1);
             } else {
-                aAssistantProfileImages.value.push("http://localhost:8000/api/getProfileImage/" + userStore.person._iId);
-                axios.post("http://localhost:8000/api/newNotification", {
+                aAssistantProfileImages.value.push(userStore.baseAPIurl + "getProfileImage/" + userStore.person._iId);
+                axios.post(userStore.baseAPIurl + "newNotification", {
                     sInfo: "¡" + userStore.person._sName + " se ha apuntado para participar en tu evento!",
                     iRecipientId: event.value._organizer._iId,
                     iIssuerId: userStore.person._iId,
@@ -484,17 +484,17 @@ function onImageUpload() {
 
 async function uploadImg() {
     formData.append('id', event.value._iId);
-    axios.post("http://localhost:8000/api/uploadEventImages", formData, {
+    axios.post(userStore.baseAPIurl + "uploadEventImages", formData, {
         'content-type': 'form-data'
     })
         .then(response => {
-            axios.get("http://localhost:8000/api/getEventPhotos/" + event.value._iId)
+            axios.get(userStore.baseAPIurl + "getEventPhotos/" + event.value._iId)
                 .then(response => {
                     aEventPhotos.value = response.data;
                 })
             aAssistantIds.value.forEach(iId => {
                 if (iId != userStore.person._iId) {
-                    axios.post("http://localhost:8000/api/newNotification", {
+                    axios.post(userStore.baseAPIurl + "newNotification", {
                         sInfo: "¡" + userStore.person._sName + " ha compartido una o varias fotos en un evento en el que has participado!",
                         iRecipientId: iId,
                         iIssuerId: userStore.person._iId,
@@ -507,7 +507,7 @@ async function uploadImg() {
 }
 function submitNewComment() {
     if (sComment.value != "" && bIsFinished) {
-        axios.post("http://localhost:8000/api/newComment", {
+        axios.post(userStore.baseAPIurl + "newComment", {
             iUserId: userStore.person._iId,
             iEventId: event.value._iId,
             sText: sComment.value
@@ -521,7 +521,7 @@ function submitNewComment() {
                 }, 150);
                 aAssistantIds.value.forEach(iId => {
                     if (iId != userStore.person._iId) {
-                        axios.post("http://localhost:8000/api/newNotification", {
+                        axios.post(userStore.baseAPIurl + "newNotification", {
                             sInfo: "¡" + userStore.person._sName + " ha publicado un comentario en un evento en el que has participado!",
                             iRecipientId: event.value._organizer._iId,
                             iIssuerId: userStore.person._iId,

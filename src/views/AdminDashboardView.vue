@@ -98,8 +98,9 @@ import SidebarFinal from '@/components/SidebarFinal.vue'
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import moment from 'moment';
+import { useUserStore } from '@/store/UserStore';
 
-
+const userStore = useUserStore();
 const router = useRouter();
 const aActions = [  {action: "Gestionar tickets", route: "/admin/tickets"},
                     {action: "Gestionar usuarios", route: "/admin/manage/users"},
@@ -113,14 +114,14 @@ let lPosts = 0;
 let bIsFetching = ref(true);
 
 onMounted(() => {
-    axios.get("http://localhost:8000/api/countUsers").then(response => lUsers = response.data);
-    axios.get("http://localhost:8000/api/countEvents").then(response => lEvents = response.data);
-    axios.get("http://localhost:8000/api/countMessages").then(response => lMessages = response.data);
-    axios.get("http://localhost:8000/api/countPosts").then(response => {
+    axios.get(userStore.baseAPIurl + "countUsers").then(response => lUsers = response.data);
+    axios.get(userStore.baseAPIurl + "countEvents").then(response => lEvents = response.data);
+    axios.get(userStore.baseAPIurl + "countMessages").then(response => lMessages = response.data);
+    axios.get(userStore.baseAPIurl + "countPosts").then(response => {
         lPosts = response.data
         bIsFetching.value = false;
     });
-    axios.get("http://localhost:8000/api/getOperations/0")
+    axios.get(userStore.baseAPIurl + "getOperations/0")
     .then(response => aLastOperations.value = response.data.content.slice(0,7))
 
 })
