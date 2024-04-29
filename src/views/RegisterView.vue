@@ -51,7 +51,7 @@
                         Regístrate
                       </button>
                       <br />
-                      <router-link to="/login" class="text-muted">¿Tienes ya una cuenta? Inicia sesión</router-link>
+                      <router-link to="/" class="text-muted">¿Tienes ya una cuenta? Inicia sesión</router-link>
                     </div>
                   </form>
                 </div>

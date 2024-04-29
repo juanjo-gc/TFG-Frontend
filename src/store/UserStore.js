@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-const hostname = import.meta.VUE_APP_BACKEND_HOSTNAME;
+const host = import.meta.VUE_APP_HOST_IP;
 
 export const useUserStore = defineStore({
     id: 'user',
@@ -19,7 +19,7 @@ export const useUserStore = defineStore({
             aiShownUserIds: [],
             tUpdatedUsersToShow: null,
             router: useRouter(),
-            baseAPIurl: "http://" + hostname + ":8000/api/"
+            baseAPIurl: "http://" + host + ":8000/api/"
         };
       },
     persist: true,
