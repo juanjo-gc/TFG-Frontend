@@ -73,17 +73,6 @@ const routes = [
     }
   },
   {
-    path: "/photos/:username",
-    name: "photos",
-    component: () =>
-      import(/* webpackChunkName "register" */ "@/views/UserPhotosView.vue"),
-    meta: {
-      requiresAuth: true,
-      adminAuth: false,
-      userAuth: true,
-    }
-  },
-  {
     path: "/timeline",
     name: "timeline",
     component: () =>

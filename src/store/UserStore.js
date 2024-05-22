@@ -3,16 +3,10 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-const host = import.meta.VUE_APP_HOST_IP;
-
+//const host = import.meta.VUE_APP_HOST_IP;
+const host = "localhost";
 export const useUserStore = defineStore({
     id: 'user',
-    // state: () => ({
-    //     authenticated: false,
-    //     email: '',
-    //     password: '',
-    //     person: reactive({})
-    // }),
     state: () => {
         return {
             person: {},

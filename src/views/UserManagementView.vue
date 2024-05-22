@@ -74,16 +74,16 @@
                     </div>
                     <div class="col-md-6 mt-4">
                         <div class="info-box p-2" style="background-color: rgb(255, 181, 42);">
-                            <p class="mt-2 text-white fs-4 d-flex justify-content-center">{{ aWarnings.length }}</p>
+                            <p class="mt-2 text-white fs-4 d-flex justify-content-center">{{ iWarnings }}</p>
                             <p class="mt-2 text-white fs-4 d-flex justify-content-center">Avisos</p>
                         </div>
                     </div>
                     <div class="col-md-6"></div>
                     <div class="col-md-6">
                         <button type="button" class="btn btn-danger mt-4 float-end" v-if="!userToDisplay._bIsSuspended"
-                            @click="suspendReactivateAccount(1)">Suspender cuenta</button>
+                            @click="bTriggerBanAccountPopup = true">Suspender cuenta</button>
                             <button type="button" class="btn btn-primary mt-4 float-end" v-else
-                            @click="suspendReactivateAccount(0)">Reactivar cuenta</button>
+                            @click="bTriggerReactivateAccountPopup = true">Reactivar cuenta</button>
                     </div>
                 </div>
                 <div class="row mt-2" v-if="userToDisplay != null && !userToDisplay._bIsSuspended">
@@ -178,6 +178,30 @@
                 </div>
             </div>
         </Popup>
+        <Popup v-if="bTriggerBanAccountPopup || bTriggerReactivateAccountPopup">
+            <div class="row" v-if="bTriggerBanAccountPopup">
+                <p class="fw-bold fs-5 text-center">Estás a punto de suspender la cuenta del usuario.</p>
+                <p class="fw-light text-center">Esto provocará que el usuario no pueda utilizar la plataforma a no ser que reviertas la operación.</p>
+            </div>
+            <div class="row" v-else>
+                <p class="fw-bold fs-5 text-center">Estás a punto de reactivar la cuenta del usuario.</p>
+                <p class="fw-light text-center">Asegúrate que el usuario merece que se le vuelva a otorgar acceso a su cuenta.</p>
+            </div>
+            <div class="row">
+                <div class="col-md-5"></div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-secondary" @click="bTriggerBanAccountPopup = false; bTriggerReactivateAccountPopup = false">Cancelar</button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger" v-if="bTriggerBanAccountPopup" @click="suspendReactivateAccount(1)">Continuar</button>
+                    <button type="button" class="btn btn-primary" v-else @click="suspendReactivateAccount(0)">Continuar</button>
+                </div>
+            </div>
+        </Popup>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="bTriggerWarningSentAlert">
+        El aviso se ha enviado correctamente.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="bTriggerWarningSentAlert = false"></button>
     </div>
 </template>
     
@@ -204,11 +228,15 @@ let aWarnings = ref([]);
 let aReports = ref([]);
 let selectedPost = ref({ _iId: -1 });
 let aUserPhotos = ref([]);
-let aRows = ref([]);
+let iWarnings = ref(0);
 let bShowPosts = ref(true);
 let bTriggerFullscreenImage = ref(false);
 let fsImage = ref(null);
 let bFsImageIsDeleted = ref(false);
+let bTriggerBanAccountPopup = ref(false);
+let bTriggerReactivateAccountPopup = ref(false);
+let bTriggerWarningSentAlert = ref(false);
+
 
 let postsBox = ref(null);
 
@@ -242,6 +270,7 @@ function loadUserData(user) {
                 axios.get(userStore.baseAPIurl + "getUserWarnings/" + user._iId)
                     .then(response => {
                         aWarnings.value = response.data;
+                        iWarnings.value = aWarnings.value.length;
                     })
                 axios.get(userStore.baseAPIurl + "getUserReports/" + user._iId)
                     .then(response => {
@@ -255,13 +284,21 @@ function loadUserData(user) {
 }
 
 function suspendReactivateAccount(iSuspend) {
+    bTriggerBanAccountPopup.value = false;
+    bTriggerReactivateAccountPopup.value = false;
     axios.patch(userStore.baseAPIurl + "suspendReactivateAccount/" + userToDisplay.value._iId + '/' + iSuspend)
         .then(response => userToDisplay.value._bIsSuspended = response.data)
 }
 
 function deleteOrRestorePost() {
+    
     userStore.softDeleteRestorePost(selectedPost.value._iId, userToDisplay.value._iId, userToDisplay.value._sUsername,
-        selectedPost.value._sText, selectedPost.value._tDeleteDate != null);
+    selectedPost.value._sText, selectedPost.value._tDeleteDate != null);
+    if(selectedPost.value._tDeleteDate === null){
+        iWarnings.value += 1;
+    } else {
+        iWarnings.value -= 1;
+    }
     aPosts.value.map(post => {
         if (post._iId === selectedPost.value._iId)
             post._tDeleteDate = post._tDeleteDate === null ? moment(Date.now()) : null;
@@ -275,8 +312,10 @@ function softDeleteOrRestoreImage(image) {
     let bIsDeleted = image._tDeleteDate === null ? true : false;
     if (bIsDeleted) {
         aUserPhotos.value[iIndex]._tDeleteDate = moment(Date.now());
+        iWarnings.value += 1;
     } else {
         aUserPhotos.value[iIndex]._tDeleteDate = null;
+        iWarnings.value -= 1;
     }
     bFsImageIsDeleted.value = bIsDeleted;
 }
@@ -294,6 +333,7 @@ function sendWarning() {
         })
             .then(response => aWarnings.value.push(response.data))
         sReason.value = "";
+        bTriggerWarningSentAlert.value = true;
     }
 }
 

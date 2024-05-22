@@ -35,7 +35,7 @@
                 <font-awesome-icon icon="fa-solid fa-right-from-bracket" size="xl" :color="logoutColor"
                     style="justify-self: center;" />
             </div>
-            <div class="row">
+            <div id="logoutButton" class="row">
                 <p class="text-center ms-2">Cerrar sesión</p>
             </div>
         </div>

@@ -65,7 +65,7 @@
                     <div class="col-sm-1"></div>
                     <div class="col-sm-10">
                         <div class="text-center">
-                            <img src="https://img.freepik.com/premium-vector/sad-dog_161669-74.jpg?w=2000"
+                            <img src="@/assets/img/nothing-found.png"
                                 class="user-img img-fluid rounded m-3" alt="">
                         </div>
                     </div>
@@ -196,8 +196,8 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
     
 <style scoped>
 .user-img {
-    max-height: 400px;
-    min-height: 400px;
+    max-height: 600px;
+    min-height: 600px;
     width: auto;
     height: 100%;
     object-fit: contain;

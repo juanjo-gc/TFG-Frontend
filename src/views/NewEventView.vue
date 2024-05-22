@@ -5,7 +5,7 @@
             <h3 class="fw-bold ">Conviértete en el anfitrión de un evento para reunir personas con tus mismos gustos.</h3>
             <div class="hline mt-2"></div>
         </div>
-        <form @submit.prevent="submitEvent">
+        <form id="eventform" @submit.prevent="submitEvent">
             <div class="row mt-4">
                 <div class="col-md-6">
                 <h6 class="mt-2 fw-bold">Título del evento*</h6>
@@ -170,8 +170,8 @@ function selectLocation(location) {
     sProvinceName = null;
     axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.lat +"&lon=" + location.lon)
     .then(response => {
-    sProvinceName = response.data.address.state_district;
-    if(sProvinceName === null) {
+    sProvinceName = response.data.address.province;
+    if(sProvinceName === null || sProvinceName === undefined) {
         sErrorMessage.value = "No se ha podido seleccionar la ubicación correctamente. Por favor, vuelva a intentarlo, y si el error persiste, seleccione otra ubicación."
     }
 })

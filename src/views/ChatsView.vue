@@ -156,7 +156,6 @@
 
 <script setup>
 import SidebarFinal from '@/components/SidebarFinal.vue';
-import NavigationComponent from '@/components/NavigationComponent.vue';
 import Popup from '@/components/Popup.vue';
 import { useUserStore } from '@/store/UserStore';
 import axios from 'axios';

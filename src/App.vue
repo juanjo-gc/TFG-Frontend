@@ -1,7 +1,6 @@
 <script setup>
   import { ref } from 'vue';
   import { useRoute } from 'vue-router';
-  import HeaderComponent from './components/HeaderComponent.vue';
 
   let route = useRoute();
   let auth = ref(false)

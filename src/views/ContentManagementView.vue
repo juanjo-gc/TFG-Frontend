@@ -904,6 +904,7 @@ function deleteEntity(sEntityType, entityToDelete) {
         case 'category':
             axios.delete(userStore.baseAPIurl + "deleteCategory/" + entityToDelete._iId)
                 .then(response => {
+                    console.log("Ahora se debe enviar la operacion")
                     axios.post(userStore.baseAPIurl + "newOperation", {
                         sInformation: "Se ha eliminado la categoría con nombre " + entityToDelete._sName,
                         iAdminId: userStore.person._iId

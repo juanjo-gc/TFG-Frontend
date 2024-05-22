@@ -8,10 +8,12 @@
             <div class="col-md-7 mt-4">
                 <div class="row">
                     <div class="col-md-8">
-                        <p class="fw-light mt-2 text-end">¿No encuentras ningún evento que te interese? ¡Crea tú uno mismo!</p>
+                        <p class="fw-light mt-2 text-end">¿No encuentras ningún evento que te interese? ¡Crea tú uno
+                            mismo!</p>
                     </div>
                     <div class="col-md-4">
-                        <button type="button" class="btn btn-outline-primary" @click="router.push('/newEvent')">Crear evento</button>
+                        <button type="button" class="btn btn-outline-primary" @click="router.push('/newEvent')">Crear
+                            evento</button>
                     </div>
                 </div>
             </div>
@@ -50,7 +52,8 @@
                         <p class="mt-3 fw-bold">Provincia</p>
                         <select class="form-select w-75" v-model="sSelectedProvince">
                             <option :value="null">Cualquiera</option>
-                            <option v-for="province in aProvinces" :value="province._sName">{{ province._sName }}</option>
+                            <option v-for="province in aProvinces" :value="province._sName">{{ province._sName }}
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -61,31 +64,34 @@
                     <div class="col-md-8">
                         <p class="fw-bold">Buscar por título:</p>
                         <!-- <label for="title" class="form-label">Título del evento</label> -->
-                        <input type="text" class="mb-3 form-control" id="title" v-model="sEventTitle" @keyup="filterByName">
+                        <input type="text" class="mb-3 form-control" id="title" v-model="sEventTitle"
+                            @keyup="filterByName">
                     </div>
                 </div>
                 <div class="row mt-3">
                     <h5 class="fw-formal">Resultados de la búsqueda:</h5>
                     <ul class="list-unstyled" v-if="aEvents.length != 0">
                         <li v-for="event in aEvents">
-                            <div class="row mt-2 p-2 grey-border clickable" @click="router.push('/events/' + event._iId)"
-                                v-if="event._tDeleteDate === null">
+                            <div class="row mt-2 p-2 grey-border clickable"
+                                @click="router.push('/events/' + event._iId)" v-if="event._tDeleteDate === null">
                                 <div class="row">
                                     <div class="col-md-7">
                                         <h6 class="ms-2 fw-bold">{{ event._sTitle }}</h6>
                                         <p class="ms-2 small"><strong>Organizado por:</strong> {{
-                                            event._organizer._sUsername }}</p>
+                            event._organizer._sUsername }}</p>
                                     </div>
                                     <div class="col-md-4">
                                         <p class="text-muted" v-if="event._location != null">
                                             <strong>Celebrado en: </strong>{{ event._location._province._sName }}, {{
-                                                event._location._province._region._sName }}, {{event._location._province._region._country._sName }}
+                            event._location._province._region._sName }},
+                                            {{ event._location._province._region._country._sName }}
                                         </p>
                                         <p class="text-muted float-end" v-else><strong>Evento online</strong></p>
                                     </div>
                                 </div>
                                 <p class="ms-2 mt-1">{{ event._sDescription }}</p>
-                                <p class="mt-2 fw-bold" v-if="event._setInterest.length != 0">Intereses relacionados:</p>
+                                <p class="mt-2 fw-bold" v-if="event._setInterest.length != 0">Intereses relacionados:
+                                </p>
                                 <ul class="list-group list-group-horizontal">
                                     <li v-for="interest in event._setInterest">
                                         <p class="interest-item ms-3">{{ interest._sName }}</p>
@@ -94,7 +100,18 @@
                             </div>
                         </li>
                     </ul>
-                    <p class="fw-light" v-else>No hay eventos disponibles con estas opciones de filtrado.</p>
+                    <div class="col-md-8 border rounded m-4" v-else>
+                        <h4 class="text-center mt-5">No hay eventos disponibles para mostrar :&#40;</h4>
+                        <div class="row">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-10">
+                                <div class="text-center">
+                                    <img src="@/assets/img/nothing-found.png" class="event-img img-fluid rounded m-3"
+                                        alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -135,12 +152,12 @@ onMounted(() => {
     axios.get(userStore.baseAPIurl + "getAllCountries")
         .then(response => aCountries.value = response.data)
 
-    if(userStore.person._province != null) {
+    if (userStore.person._province != null) {
         axios.get(userStore.baseAPIurl + "getCountryRegions/" + userStore.person._province._region._country._iId)
-        .then(response => aRegions.value = response.data)
-        
+            .then(response => aRegions.value = response.data)
+
         axios.get(userStore.baseAPIurl + "getRegionProvinces/" + userStore.person._province._region._iId)
-        .then(response => aProvinces.value = response.data)
+            .then(response => aProvinces.value = response.data)
     }
     axios.post(userStore.baseAPIurl + "getFilteredEvents/" + iPageNumber, {
         sTitle: "",
@@ -257,6 +274,14 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
 
 <style scoped>
 
+.event-img {
+    max-height: 400px;
+    min-height: 400px;
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+}
+
 .interest-item {
     padding: 5px;
     border: solid 1px black;
@@ -279,6 +304,7 @@ watch(sSelectedRegion, (newsSelectedRegion, oldsSelectedRegion) => {
 .blackb {
     border: solid 1px black;
 }
+
 /*
 input[type=text] {
     border: 0;

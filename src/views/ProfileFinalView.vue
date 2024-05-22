@@ -158,14 +158,11 @@
                                 <div class="col-md-12 mt-2">
                                     <ul class="list-unstyled">
                                         <li v-for="event in aEvents" v-if="bEventSelector">
-                                            <div class="media event-card m-2" v-if="event._tDeleteDate === null">
+                                            <div class="media event-card m-2" v-if="event._tDeleteDate === null" @click="router.push('/events/' + event._iId)">
                                                 <div class="row">
                                                     <div class="col-md-7">
                                                         <h5 class="mt-0 mb-1">
-                                                            <router-link :to="`/events/${event._iId}`"
-                                                                style="text-decoration: none; color: inherit;">
-                                                                {{ event._sTitle }}
-                                                            </router-link>
+                                                            {{ event._sTitle }}
                                                         </h5>
                                                         <h6>
                                                             <p class="text-muted">Organizado por: @{{
@@ -173,7 +170,7 @@
                                                         </h6>
                                                     </div>
                                                     <div class="col-md-4">
-                                                        <p class="text-muted" v-if="event._location != null">
+                                                        <!-- <p class="text-muted" v-if="event._location != null">
                                                             <strong>Celebrado en: </strong>{{
                                                                 event._location._province._sName }},
                                                             {{ event._location._province._region._sName }}, {{
@@ -181,7 +178,7 @@
                                                         </p>
                                                         <p class="text-muted float-end" v-else><strong>Evento
                                                                 online</strong>
-                                                        </p>
+                                                        </p> -->
                                                     </div>
                                                 </div>
                                                 <div class="media-body">
@@ -288,7 +285,7 @@
                             <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
                                 <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos"
                                     @click="bTriggerFullscreenImage = true; fsImage = photo">
-                                    <img class="user-image m-1" :src="userstore.baseAPIurl + 'getImage/' + photo._sName"
+                                    <img class="user-image m-1" :src="userStore.baseAPIurl + 'getImage/' + photo._sName"
                                         alt="" v-if="photo._tDeleteDate === null">
                                 </div>
                             </div>

@@ -271,7 +271,6 @@
 
 <script setup>
 
-import HeaderComponent from '@/components/HeaderComponent.vue';
 import Popup from '@/components/Popup.vue';
 import SidebarFinal from '@/components/SidebarFinal.vue';
 import { useUserStore } from '@/store/UserStore';
