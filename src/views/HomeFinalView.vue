@@ -1,5 +1,5 @@
 <template>
-    <div id="main" class="main">
+    <div id="main" class="main" style="background-color: black;" >
         <div id="login" class="bg-main">
             <div class="row">
                 <div class="col-md-7 d-flex justify-content-center align-items-center">
@@ -55,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <div id="showmore" class="row position-sticky bottom-0 mt-4">
+        <div id="showmore" class="row position-sticky bottom-0 mt-4" style="background-color: black;">
             <div class="col-md-5"></div>
             <div class="col-md-2 mt-4">
                 <p class="text-white text-center show-more fw-bold" @click="scrollDown()">Ver más</p>
