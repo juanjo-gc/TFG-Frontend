@@ -61,16 +61,36 @@
         </div>
       </div>
     </section>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="bTriggerErrorAlert">
+    <!-- <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="bTriggerErrorAlert">
       <strong>Error. </strong>{{ sAlertMessage }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
         @click="bTriggerErrorAlert = false;"></button>
-    </div>
+    </div> -->
+    <Popup v-if="bTriggerErrorAlert">
+      <div class="row">
+        <div class="col-md-11">
+          <p class="fw-bold fs-4">Se han producido los siguientes errores:</p>
+        </div>
+        <div class="col-md-1 clickable">
+          <font-awesome-icon icon="fa-solid fa-xmark" @click="bTriggerErrorAlert = false;" />
+        </div>
+      </div>
+      <div class="row">
+        <ul class="ms-4">
+          <li v-for="error in sAlertMessage">
+            <p class="fw-light">{{ error }}</p>
+          </li>
+        </ul>
+      </div>
+      <div class="row">
+        <p class=" ms-2">Por favor, revisa y corrige los campos pertinentes para poder registrarte en el sistema.</p>
+      </div>
+    </Popup>
     <Popup v-if="bTriggerSuccessPopup">
       <div class="row">
         <h4 class="mt-4">¡Felicidades! Te has registrado.</h4>
       </div>
-      <p class="mt-4 fw-light">Te estamos redirigiendo para que inicies sesión.</p>
+      <p class="mt-4 fw-light">Te estamos redirigiendo para que inicies sesión. Por favor espera unos segundos.</p>
     </Popup>
   </div>
 </template>
@@ -103,7 +123,7 @@ let sCountry = ref("País");
 let aFilteredRegions = ref([]);
 let aFilteredProvinces = ref([]);
 let bTriggerErrorAlert = ref(false);
-let sAlertMessage = ref("");
+let sAlertMessage = ref([]);
 let bTriggerSuccessPopup = ref(false);
 
 onMounted(() => {
@@ -166,19 +186,24 @@ async function checkUsername() {
 
 
 async function registerUser() {
+  sAlertMessage.value = [];
   if (isUsernameTaken.value || bIsUsernameIncorrect.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value = isUsernameTaken.value ? "El nombre de usuario ya se encuentra en uso." : "Escribe un nombre de usuario correcto de acuerdo a las indicaciones";
-  } else if (isEmailTaken.value) {
+    sAlertMessage.value.push(isUsernameTaken.value ? "El nombre de usuario ya se encuentra en uso." : "Escribe un nombre de usuario correcto de acuerdo a las indicaciones");
+  }
+  if (isEmailTaken.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value = "La dirección de correo ya se encuentra en uso."
-  } else if (password.value != confirmPassword.value) {
+    sAlertMessage.value.push("La dirección de correo ya se encuentra en uso.");
+  }
+  if (password.value != confirmPassword.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value = "Las contraseñas deben coincidir.";
-  } else if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now()))) {
+    sAlertMessage.value.push("Las contraseñas deben coincidir.");
+  }
+  if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now()))) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value = "Debes ser mayor de edad para registrarte."
-  } else {
+    sAlertMessage.value.push("Debes ser mayor de edad para registrarte.");
+  }
+  if(!bTriggerErrorAlert.value) {
     axios.post(userStore.baseAPIurl + "register", {
       sEmail: email.value,
       sName: name.value,
@@ -210,6 +235,10 @@ async function registerUser() {
 .btnLogin:hover {
   border: none;
   opacity: 1;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .gradient-custom {

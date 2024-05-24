@@ -24,12 +24,9 @@
                                 </div>
                             </div>
                             <div class="col-sm-2 mt-2" v-if="notification._type._sName === 'NewFollow'">
-                                <button type="button" class="btn btn-outline-primary" @click="proccessFollow(notification)"
-                                    v-if="!notification._bIsFollowing">
-                                    Seguir
+                                <button type="button" class="btn btn-outline-primary" @click="router.push('/profile/' + notification._issuer._iId)">
+                                    Ver perfil
                                 </button>
-                                <button type="button" class="btn btn-primary" @click="proccessFollow(notification)"
-                                    v-else>Siguiendo</button>
                             </div>
                             <div class="col-sm-2" v-else-if="notification._type._sName === 'FollowRequest'">
                                 <div class="row mt-2" v-if="aNotifications.some(receivedNotification => receivedNotification._type === 'NewFollow' && receivedNotification._issuer._iId === Notification._issuer._iId)">
@@ -107,7 +104,9 @@ function getNotificationsPage() {
 }
 
 onMounted(() => {
+    moment.locale('es');
     getNotificationsPage();
+    
 })
 
 function shouldBeShown(notification) {
@@ -140,31 +139,37 @@ function shortenText(sText) {
     return sText;
 }
 
-function formatDate(tCreatedAt) {
-    const fTimeDifferenceInSeconds = tToday.diff(moment(tCreatedAt)) / 1000;
+// function formatDate(tCreatedAt) {
+//     const fTimeDifferenceInSeconds = tToday.diff(moment(tCreatedAt)) / 1000;
 
-    if (fTimeDifferenceInSeconds < 2592000) {      // Dentro del mismo mes, formatos específicos
-        if (fTimeDifferenceInSeconds > 86400) {    //Distinto día
-            let res = Math.round(fTimeDifferenceInSeconds / 86400);
-            return res === 1 ? "Hace " + res + " día" : "Hace " + res + " días";
-        } else {   //Mismo día
-            if (fTimeDifferenceInSeconds > 3600) { //Distinto hora
-                let res = Math.round(fTimeDifferenceInSeconds / 3600);
-                return res === 1 ? "Hace " + res + " hora" : "Hace " + res + " horas";
-            } else {    //Misma hora
-                if (fTimeDifferenceInSeconds > 60) {     //Distinto minuto
-                    let res = Math.round(fTimeDifferenceInSeconds / 60);
-                    return res === 1 ? "Hace " + res + " minuto" : "Hace " + res + " minutos";
-                } else {    //Mismo minuto
-                    let res = Math.round(fTimeDifferenceInSeconds);
-                    return "Hace " + res + " segundos";
-                }
-            }
-        }
-    } else {    //Formato general
-        return moment(tCreatedAt).format('DD/MM/YYYY');
-    }
+//     if (fTimeDifferenceInSeconds < 2592000) {      // Dentro del mismo mes, formatos específicos
+//         if (fTimeDifferenceInSeconds > 86400) {    //Distinto día
+//             let res = Math.round(fTimeDifferenceInSeconds / 86400);
+//             return res === 1 ? "Hace " + res + " día" : "Hace " + res + " días";
+//         } else {   //Mismo día
+//             if (fTimeDifferenceInSeconds > 3600) { //Distinto hora
+//                 let res = Math.round(fTimeDifferenceInSeconds / 3600);
+//                 return res === 1 ? "Hace " + res + " hora" : "Hace " + res + " horas";
+//             } else {    //Misma hora
+//                 if (fTimeDifferenceInSeconds > 60) {     //Distinto minuto
+//                     let res = Math.round(fTimeDifferenceInSeconds / 60);
+//                     return res === 1 ? "Hace " + res + " minuto" : "Hace " + res + " minutos";
+//                 } else {    //Mismo minuto
+//                     let res = Math.round(fTimeDifferenceInSeconds);
+//                     return "Hace " + res + " segundos";
+//                 }
+//             }
+//         }
+//     } else {    //Formato general
+//         return moment(tCreatedAt).format('DD/MM/YYYY');
+//     }
+// }
+
+function formatDate(tCreatedAt) {
+        return "Hace " + moment(tCreatedAt).toNow(true);
 }
+
+
 
 async function acceptIgnoreFollowRequest(notification, bIsAccepted) {
     const response = await axios.get(userStore.baseAPIurl + "getNotification/" + notification._iId);     //Puede que el usuario retire la solicitud justo cuando el otro va a aceptarla. Para evitar esto, se comprueba que existe

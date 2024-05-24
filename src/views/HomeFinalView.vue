@@ -122,12 +122,13 @@
     </div>
 º   <Popup v-if="bFormError">
         <div class="row">
-            <div class="col-md-11">
-                <p class="text-center">Ha ocurrido un error al iniciar sesión. Por favor vuelve a introducir tus credenciales</p>
+            <div class="col-md-11"></div>
+            <div class="col-md-1 clickable">
+                <font-awesome-icon icon="fa-solid fa-xmark" @click="bFormError = false;" />
             </div>
-            <div class="col-md-1">
-                <font-awesome-icon icon="fa-solid fa-xmark" />
-            </div>
+        </div>
+        <div class="row">
+            <p class="text-center fs-5">Ha ocurrido un error al iniciar sesión. Por favor vuelve a introducir tus credenciales</p>
         </div>
     </Popup>
 </template>
@@ -218,6 +219,10 @@ async function authUser() {
     margin-top: 10%;
     margin-left: 5%;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+.clickable {
+    cursor: pointer;
 }
 
 .options-card {

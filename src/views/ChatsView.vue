@@ -22,7 +22,7 @@
                             <li v-for="message in aLastMessages">
                                 <!-- Al hacer click se carga el chat con el usuario -->
                                 <div class="row message-preview border" :class="{ newmessage: !message._bIsSeen }"
-                                    @click="loadChat(message._issuer._iId === userStore.person._iId ? message._recipient : message._issuer)"    
+                                    @click="loadChat(message._issuer._iId === userStore.person._iId ? message._recipient : message._issuer)"
                                     v-if="!message._issuer._bIsSuspended && !message._recipient._bIsSuspended">
                                     <div class="col-sm-2">
                                         <img v-if="message._issuer._iId != userStore.person._iId"
@@ -34,10 +34,15 @@
                                             alt="User avatar">
                                     </div>
                                     <div class="col-sm-6">
-                                        <h6 v-if="message._issuer._iId != userStore.person._iId">{{ message._issuer._sName}}</h6>
+                                        <h6 v-if="message._issuer._iId != userStore.person._iId">{{
+                    message._issuer._sName }}</h6>
                                         <h6 v-else>{{ message._recipient._sName }}</h6>
-                                        <p class="small text-muted" v-if="message._issuer._iId === userStore.person._iId">{{ message._sText }}</p>
-                                        <p class="small" :class="{'fw-bold': !message._bSeen, 'text-muted': message._bSeen}" v-else>{{ message._sText }}</p>
+                                        <p class="small text-muted"
+                                            v-if="message._issuer._iId === userStore.person._iId">{{ message._sText }}
+                                        </p>
+                                        <p class="small"
+                                            :class="{ 'fw-bold': !message._bSeen, 'text-muted': message._bSeen }" v-else>
+                                            {{ message._sText }}</p>
                                     </div>
                                     <div class="col-sm-4  align-self-center">
                                         <div v-if="message._issuer._iId != userStore.person._iId && !message._bSeen"
@@ -51,7 +56,8 @@
             </div>
             <div class="col-md-8 private-chat" v-if="currentUserChat != null">
                 <div class="row header-chat">
-                    <div class="col-md-2" style="cursor: pointer;" @click="router.push('/profile/' + currentUserChat._sUsername)">
+                    <div class="col-md-2" style="cursor: pointer;"
+                        @click="router.push('/profile/' + currentUserChat._sUsername)">
                         <img class="mr-3 mt-4 avatar"
                             :src="userStore.baseAPIurl + 'getProfileImage/' + currentUserChat._iId" alt="User avatar">
                     </div>
@@ -60,8 +66,10 @@
                         <h5 class="mt-2 text-muted">@{{ currentUserChat._sUsername }}</h5>
                     </div>
                     <div class="bg-dark pt-2" v-if="bIsBlockedByPerson || bIsPersonBlocked">
-                        <p class="text-light text-center" v-if="bIsBlockedByPerson">No puedes enviar mensajes a este usuario porque te ha bloqueado</p>
-                        <p class="text-light text-center" v-else>No puedes enviar mensajes a este usuario porque lo has bloqueado</p>
+                        <p class="text-light text-center" v-if="bIsBlockedByPerson">No puedes enviar mensajes a este
+                            usuario porque te ha bloqueado</p>
+                        <p class="text-light text-center" v-else>No puedes enviar mensajes a este usuario porque lo has
+                            bloqueado</p>
 
                     </div>
                 </div>
@@ -75,12 +83,14 @@
                                         alt="User avatar">
                                 </div>
                                 <div class="col-sm-10 ">
-                                    <p class="float-start mt-4"><span class="recipient-message">{{ message._sText }}</span></p>
+                                    <p class="float-start mt-4"><span class="recipient-message">{{ message._sText
+                                            }}</span></p>
                                 </div>
                             </div>
                             <div class="row" v-else>
                                 <div class="col-sm-10 ">
-                                    <p class="float-end mt-4"><span class="issuer-message">{{ message._sText }}</span></p>
+                                    <p class="float-end mt-4"><span class="issuer-message">{{ message._sText }}</span>
+                                    </p>
                                 </div>
                                 <div class="col-sm-1">
                                     <img class="mr-3 avatar float-end"
@@ -113,43 +123,44 @@
             </div>
         </div>
         <Popup v-if="bShowNewMessage">
-        <div class="row" >
-            <div class="col-md-6">
-                <h4 class="mt-2">Nuevo mensaje</h4>
-            </div>
-            <div class="col-md-6">
-                <font-awesome-icon icon="fa-solid fa-xmark" size="l" class="float-end clickable" @click="bShowNewMessage = false" />
-            </div>
-                    <div class="form-group field">
-                        <div class="row ms-3">
-                            <input type="input" class="form-field" placeholder="Buscar usuario" name="name" id='name'
-                                v-model="sUsernameToMessage" @keyup="getUsersFromUsername" />
-                            <label for="name" class="form-label">Buscar usuario</label>
-                        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4 class="mt-2">Nuevo mensaje</h4>
+                </div>
+                <div class="col-md-6">
+                    <font-awesome-icon icon="fa-solid fa-xmark" size="l" class="float-end clickable"
+                        @click="bShowNewMessage = false" />
+                </div>
+                <div class="form-group field">
+                    <div class="row ms-3">
+                        <input type="input" class="form-field" placeholder="Buscar usuario" name="name" id='name'
+                            v-model="sUsernameToMessage" @keyup="getUsersFromUsername" />
+                        <label for="name" class="form-label">Buscar usuario</label>
                     </div>
-                    <p class="small align-self-center mt-2">Escribe el nombre del usuario y selecciona a quien quieras
-                        enviar el mensaje.</p>
                 </div>
-                <div v-if="aUsers.length != 0">
-                    <ul class="list-unstyled user-list">
-                        <li v-for="user in aUsers" @click="loadChat(user)">
-                            <div class="row user-data" v-if="user._iId != userStore.person._iId && !user._bIsSuspended">
-                                <div class="col-ms-1">
-                                    <img class="mr-3 avatar float-left"
-                                        :src="userStore.baseAPIurl + 'getProfileImage/' + user._iId" alt="User avatar">
-                                </div>
-                                <div class="col-ms-11">
-                                    <h5 class="mt-0 mb-1">
-                                        {{ user._sName }}
-                                    </h5>
-                                    <h6>
-                                        <p class="text-muted">@{{ user._sUsername }}</p>
-                                    </h6>
-                                </div>
+                <p class="small align-self-center mt-2">Escribe el nombre del usuario y selecciona a quien quieras
+                    enviar el mensaje.</p>
+            </div>
+            <div v-if="aUsers.length != 0">
+                <ul class="list-unstyled user-list">
+                    <li v-for="user in aUsers" @click="loadChat(user)">
+                        <div class="row user-data" v-if="user._iId != userStore.person._iId && !user._bIsSuspended">
+                            <div class="col-ms-1">
+                                <img class="mr-3 avatar float-left"
+                                    :src="userStore.baseAPIurl + 'getProfileImage/' + user._iId" alt="User avatar">
                             </div>
-                        </li>
-                    </ul>
-                </div>
+                            <div class="col-ms-11">
+                                <h5 class="mt-0 mb-1">
+                                    {{ user._sName }}
+                                </h5>
+                                <h6>
+                                    <p class="text-muted">@{{ user._sUsername }}</p>
+                                </h6>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </Popup>
     </div>
 </template>
@@ -185,9 +196,9 @@ let chatContainer = ref(null);
 
 onMounted(() => {
     axios.get(userStore.baseAPIurl + "getBlockedByUsers/" + userStore.person._iId)
-    .then(response => aBlockedBy.value = response.data);
+        .then(response => aBlockedBy.value = response.data);
     axios.get(userStore.baseAPIurl + "getFollowers/" + userStore.person._sUsername)
-    .then(response => aFollowers.value = response.data);
+        .then(response => aFollowers.value = response.data);
     axios.get(userStore.baseAPIurl + "getLastMessages/" + userStore.person._iId)
         .then(response => {
             aLastMessages.value = response.data;
@@ -206,18 +217,24 @@ onMounted(() => {
     const pusher = new Pusher('56c83b0b9e4a25060b44', {
         cluster: 'eu'
     })
+    pusher.bind("newMessage", data => {
+        aMessages.value.push(data.message);
+        setTimeout(() => {
+            chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+        }, 25);
+    })
     const channel = pusher.subscribe('rt-chat');
 
 })
 
 function getUsersFromUsername() {
     if (sUsernameToMessage.value.length > 3) {
-            let regex = new RegExp("^" + sUsernameToMessage.value + ".*$")
-            aUsers.value = aFollowers.value.filter(follower => follower._sUsername.match(regex));
-            aUsers.value = aUsers.value.filter(user => {
-                if(!aBlockedBy.value.some(blockedBy => blockedBy._iId === user._iId))
+        let regex = new RegExp("^" + sUsernameToMessage.value + ".*$")
+        aUsers.value = aFollowers.value.filter(follower => follower._sUsername.match(regex));
+        aUsers.value = aUsers.value.filter(user => {
+            if (!aBlockedBy.value.some(blockedBy => blockedBy._iId === user._iId))
                 return user;
-           })
+        })
     } else {
         aUsers.value = [];
     }
@@ -225,9 +242,9 @@ function getUsersFromUsername() {
 
 function loadChat(user) {
     currentUserChat.value = user;
-    let i = aLastMessages.value.findIndex(message => (message._issuer._iId === userStore.person._iId && message._recipient._iId === currentUserChat.value._iId) || 
-                                                    (message._issuer._iId === currentUserChat.value._iId && message._recipient._iId === userStore.person._iId)) ;
-    aLastMessages.value[i]._bSeen = true;                                                
+    let i = aLastMessages.value.findIndex(message => (message._issuer._iId === userStore.person._iId && message._recipient._iId === currentUserChat.value._iId) ||
+        (message._issuer._iId === currentUserChat.value._iId && message._recipient._iId === userStore.person._iId));
+    aLastMessages.value[i]._bSeen = true;
     axios.get(userStore.baseAPIurl + "checkBlock/" + userStore.person._iId + "/" + currentUserChat.value._iId)
         .then(response => bIsPersonBlocked.value = response.data);
     axios.get(userStore.baseAPIurl + "checkBlock/" + currentUserChat.value._iId + "/" + userStore.person._iId)
@@ -243,7 +260,7 @@ function loadChat(user) {
                 }
             });
             axios.patch(userStore.baseAPIurl + "setSeenMessages/" + userStore.person._iId + "/" + user._iId)
-            .then(response => aMessages.value.forEach(message => message._bSeen = true))
+                .then(response => aMessages.value.forEach(message => message._bSeen = true))
 
             setTimeout(() => {
                 chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
@@ -254,8 +271,8 @@ function loadChat(user) {
 function isBlank(sString) {
     let bIsBlank = true;
     let i = 0;
-    while(bIsBlank && i < sString.length) {
-        if(sString[i] != ' ')
+    while (bIsBlank && i < sString.length) {
+        if (sString[i] != ' ')
             bIsBlank = false;
         i++;
     }
@@ -263,35 +280,30 @@ function isBlank(sString) {
 }
 
 function submitMessage() {
-    if(sMessage.value != '' && !isBlank(sMessage.value)) {
+    if (sMessage.value != '' && !isBlank(sMessage.value)) {
         sMessage.value = sMessage.value.slice(0, sMessage.value.length - 1)
         axios.post(userStore.baseAPIurl + "newMessage", {
-        iIssuerId: userStore.person._iId,
-        iRecipientId:currentUserChat.value._iId,
-        sText: sMessage.value
+            iIssuerId: userStore.person._iId,
+            iRecipientId: currentUserChat.value._iId,
+            sText: sMessage.value
         })
-    .then(response => {
-            sMessage.value = "";
-            aMessages.value.push({
-                _sText: response.data._sText,
-                _iIssuerId: response.data._issuer._iId,
-                _iRecipientId: response.data._recipient._iId
+            .then(response => {
+                sMessage.value = "";
+                if (!aiRecentMessagedUsers.value.find(iId => iId === currentUserChat.value._iId)) {
+                    aLastMessages.value.unshift(response.data)
+                    aiRecentMessagedUsers.value.push(response.data._recipient._iId)
+                } else {
+                    let messageToReplace = response.data;
+                    messageToReplace._bIsSeen = true;
+                    aLastMessages.value = aLastMessages.value.filter(message => {
+                        if (!(message._issuer._iId === messageToReplace._issuer._iId && message._recipient._iId === messageToReplace._recipient._iId) &&
+                            !(message._issuer._iId === messageToReplace._recipient._iId && message._recipient._iId === messageToReplace._issuer._iId))
+                            return message;
+                    })
+                    aLastMessages.value.unshift(messageToReplace);
+                }
             })
-            if(!aiRecentMessagedUsers.value.find(iId => iId === currentUserChat.value._iId)) {
-                aLastMessages.value.unshift(response.data)
-                aiRecentMessagedUsers.value.push(response.data._recipient._iId)
-            } else {
-                let messageToReplace = response.data;
-                messageToReplace._bIsSeen = true;
-                aLastMessages.value = aLastMessages.value.filter(message => {
-                    if(!(message._issuer._iId === messageToReplace._issuer._iId && message._recipient._iId === messageToReplace._recipient._iId) &&
-                    !(message._issuer._iId === messageToReplace._recipient._iId && message._recipient._iId === messageToReplace._issuer._iId))
-                        return message;
-                })
-                aLastMessages.value.unshift(messageToReplace);
-            }
-        })
-        .catch(error => console.log(error));
+            .catch(error => console.log(error));
     }
     sMessage.value = '';
 }
@@ -348,10 +360,8 @@ function submitMessage() {
     font-weight: bold;
 }
 
-.recents-col {
-    /* border-left: solid 2px #777;
-    border-right: solid 2px #777;
-    height: 100vh; */
+.clickable {
+    cursor: pointer;
 }
 
 .circle {
@@ -482,6 +492,7 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
 .btn-send {
     height: 86px;
     width: 86px;

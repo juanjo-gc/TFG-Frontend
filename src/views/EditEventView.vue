@@ -203,7 +203,7 @@ function selectLocation(location) {
     sLocationName = selectedLocation.value.display_name;
     axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.lat +"&lon=" + location.lon)
     .then(response => {
-    sProvinceName = response.data.address.state_district;
+    sProvinceName = response.data.address.province;
     if(sProvinceName === null) {
         sErrorMessage.value = "No se ha podido seleccionar la ubicación correctamente. Por favor, vuelva a intentarlo, y si el error persiste, seleccione otra ubicación."
     }
@@ -237,6 +237,7 @@ function submitEvent() {
                 })
                 .then(response => {})
             }
+            router.push('/events/' + event.value._iId);
         })
     } else {
         sErrorMessage.value = "Error. Seleccione una localización para el evento.";

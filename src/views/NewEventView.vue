@@ -171,6 +171,7 @@ function selectLocation(location) {
     axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + location.lat +"&lon=" + location.lon)
     .then(response => {
     sProvinceName = response.data.address.province;
+    console.log(response.data);
     if(sProvinceName === null || sProvinceName === undefined) {
         sErrorMessage.value = "No se ha podido seleccionar la ubicación correctamente. Por favor, vuelva a intentarlo, y si el error persiste, seleccione otra ubicación."
     }

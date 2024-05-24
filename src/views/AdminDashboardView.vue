@@ -69,7 +69,7 @@
     <div class="row mt-4">
         <div class="row">
             <div class="col-md-2"><p class="fw-bold">Administrador</p></div>
-            <div class="col-md-2"><p class="fw-bold">Fecha</p></div>
+            <div class="col-md-2"><p class="fw-bold">Fecha y hora</p></div>
             <div class="col-md-8"><p class="fw-bold">Operación</p></div>
         </div>
         <ul class="list-unstyled">
@@ -79,7 +79,7 @@
                         {{ operation._admin._sUsername }}
                     </div>
                     <div class="col-md-2 d-flex">
-                        {{ moment(operation._tTimestamp).format("DD/MM/YYYY") }}
+                        {{ moment(operation._tTimestamp).format("DD/MM/YYYY, h:mm:ss") }}
                     </div>
                     <div class="col-md-8">
                         {{ truncateText(operation._sInformation) }}

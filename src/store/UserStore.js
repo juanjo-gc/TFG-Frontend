@@ -22,7 +22,7 @@ export const useUserStore = defineStore({
     //   },
     actions: {
         getProfileImage() {
-            axios.get("http://localhost:8000/api/getProfileImage")
+            axios.get(this.baseAPIurl + "getProfileImage")
             .then(response => {
                 this.profileImage = response.data;
             })
@@ -33,7 +33,7 @@ export const useUserStore = defineStore({
             location.reload();
         },
         setFollow(user) {
-            axios.patch("http://localhost:8000/api/setFollow/" + this.person._iId + "/" + user._iId)
+            axios.patch(this.baseAPIurl + "setFollow/" + this.person._iId + "/" + user._iId)
             .then(response => {
                 let bFollowed = response.data;
                 if(bFollowed) {
@@ -43,7 +43,7 @@ export const useUserStore = defineStore({
                         sType: "NewFollow",
                         iIssuerId: this.person._iId
                     }
-                    axios.post("http://localhost:8000/api/newNotification", notificationParams)
+                    axios.post(this.baseAPIurl + "newNotification", notificationParams)
                     .then(response => console.log(response.data))
                 }
             })
@@ -59,25 +59,25 @@ export const useUserStore = defineStore({
                         sType: "FollowRequest",
                         iIssuerId: this.person._iId
                     }
-                    axios.post("http://localhost:8000/api/newNotification", notificationParams)
+                    axios.post(this.baseAPIurl + "newNotification", notificationParams)
                     .then(response => console.log(response.data))
                 }
             } else {
-                axios.patch("http://localhost:8000/api/setFollow/" + this.person._iId + "/" + user._iId)
+                axios.patch(this.baseAPIurl + "setFollow/" + this.person._iId + "/" + user._iId)
                 .then(response => {
                     if(!response.data) {    //Siempre debe ser falso, es una comprobación por seguridad
                         //Borrar notificaciones
-                        axios.patch("http://localhost:8000/api/deleteNotification/" + this.person._iId + "/" + user._iId + "/NewFollow")
+                        axios.patch(this.baseAPIurl + "deleteNotification/" + this.person._iId + "/" + user._iId + "/NewFollow")
                         if(user._bIsPrivate) {
-                            axios.patch("http://localhost:8000/api/deleteNotification/" + this.person._iId + "/" + user._iId + "/FollowRequest")
-                            axios.patch("http://localhost:8000/api/deleteNotification/" +  user._iId + "/" + this.person._iId +  "/FollowRequestAccepted")
+                            axios.patch(this.baseAPIurl + "deleteNotification/" + this.person._iId + "/" + user._iId + "/FollowRequest")
+                            axios.patch(this.baseAPIurl + "deleteNotification/" +  user._iId + "/" + this.person._iId +  "/FollowRequestAccepted")
                         }
                     }
                 })
             }
         },
         reportUser(iReportedId, sUsername, sDescription) {
-            axios.post("http://localhost:8000/api/newTicket", {
+            axios.post(this.baseAPIurl + "newTicket", {
                 sSubject: "Denuncia de usuario con nombre " + sUsername,
                 sDescription,
                 iIssuerId: this.person._iId,
@@ -90,7 +90,7 @@ export const useUserStore = defineStore({
         },
         softDeleteRestorePost(iPostId, iUserId, sUsername, sPost, bIsCurrentlyDeleted) {
             let bIsDeleted = !bIsCurrentlyDeleted;
-            axios.patch("http://localhost:8000/api/softDeleteOrRestorePost/" + iPostId) 
+            axios.patch(this.baseAPIurl + "softDeleteOrRestorePost/" + iPostId) 
             .then(response => {
                 bIsDeleted = response.data;
                 console.log(response.data)
@@ -100,11 +100,11 @@ export const useUserStore = defineStore({
                 "Tu publicación con texto '" + sPost + "' ha sido eliminada por no cumplir con los términos de la plataforma."
                 let sType = bIsCurrentlyDeleted ? 'Announcement' : 'BehaviorWarning';
                 console.log(sInformation)
-                axios.post("http://localhost:8000/api/newOperation", {
+                axios.post(this.baseAPIurl + "newOperation", {
                     sInformation,
                     iAdminId: this.person._iId
                 })
-                axios.post("http://localhost:8000/api/newNotification", {
+                axios.post(this.baseAPIurl + "newNotification", {
                     sInfo,
                     iRecipientId: iUserId,
                     iIssuerId: this.person._iId,
@@ -118,7 +118,7 @@ export const useUserStore = defineStore({
         softDeleteOrRestoreImage(iImageId, iUserId, sUsername, bPhotoFromProfile, iEventId) {
             let bIsDeleted = false;
             
-            axios.patch("http://localhost:8000/api/softDeleteOrRestoreImage/" + iImageId)
+            axios.patch(this.baseAPIurl + "softDeleteOrRestoreImage/" + iImageId)
             .then(response => {
                 console.log("Se ejecuta en US")
                 bIsDeleted = response.data; // return != null => true si esta borrado, false si no
@@ -135,11 +135,11 @@ export const useUserStore = defineStore({
                     sInformation = "Se ha restaurado la foto con ID " + iImageId + " que había subido el usuario @" + sUsername + ".";
                     sInfo = "Una de tus fotos que había sido borrada ha sido restaurada. Disculpa las molestias.";
                 }
-                axios.post("http://localhost:8000/api/newOperation", {
+                axios.post(this.baseAPIurl + "newOperation", {
                     sInformation,
                     iAdminId: this.person._iId
                 })
-                axios.post("http://localhost:8000/api/newNotification", {
+                axios.post(this.baseAPIurl + "newNotification", {
                     sInfo,
                     iRecipientId: iUserId,
                     iIssuerId: this.person._iId,
@@ -150,7 +150,7 @@ export const useUserStore = defineStore({
             })
         },
         async checkPendingFollow(iId) {
-            const bIsPending = await axios.get("http://localhost:8000/api/checkPendingFollow/" + this.person._iId + "/" + iId);
+            const bIsPending = await axios.get(this.baseAPIurl + "checkPendingFollow/" + this.person._iId + "/" + iId);
             return bIsPending.data;
         }
     },

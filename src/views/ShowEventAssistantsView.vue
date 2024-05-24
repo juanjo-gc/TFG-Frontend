@@ -25,7 +25,7 @@
                         <div class="row mt-2 clickable" @click="router.push('/profile/' + assistant._sUsername)" v-if="!assistant._bIsSuspended">
                             <div class="col-sm-1">
                                 <img class="mr-3 avatar float-left"
-                                    :src="`http://tfgbackend:8000/api/getProfileImage/${assistant._iId}`" alt="User avatar">
+                                    :src="userStore.baseAPIurl + `getProfileImage/${assistant._iId}`" alt="User avatar">
                             </div>
                             <div class="col-sm-11 mt-1">
                                 <h5 class="mt-0 mb-1">

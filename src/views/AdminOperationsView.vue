@@ -7,7 +7,7 @@
                 <p class="fw-bold mt-2">Administrador</p>
             </div>
             <div class="col-md-2">
-                <p class="fw-bold mt-2">Fecha</p>
+                <p class="fw-bold mt-2">Fecha y hora</p>
             </div>
             <div class="col-md-8">
                 <p class="fw-bold mt-2">Operación</p>
@@ -18,7 +18,7 @@
                 <p class="fw-light">{{ operation._admin._sUsername }}</p>
             </div>
             <div class="col-md-2">
-                <p class="fw-light">{{ moment(operation._tTimestamp).format("DD/MM/YYYY") }}</p>
+                <p class="fw-light">{{ moment(operation._tTimestamp).format("DD/MM/YYYY, h:mm:ss") }}</p>
             </div>
             <div class="col-md-8">
                 <p class="fw-light">{{ operation._sInformation }}</p>
