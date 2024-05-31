@@ -1,8 +1,8 @@
 <template>
     <SidebarFinal></SidebarFinal>
-    <div class="container border chats-box mt-2">
+    <div id="main" class="container border chats-box mt-2 mb-4">
         <div class="row">
-            <div class="col-md-4 recents-col">
+            <div class="col-md-4">
                 <h3 class="mt-4 text-center mb-2">Chats recientes</h3>
                 <div class="row mt-4 p-2 option" @click="bShowNewMessage = !bShowNewMessage">
                     <div class="col-md-1">
@@ -38,7 +38,7 @@
                     message._issuer._sName }}</h6>
                                         <h6 v-else>{{ message._recipient._sName }}</h6>
                                         <p class="small text-muted"
-                                            v-if="message._issuer._iId === userStore.person._iId">{{ message._sText }}
+                                            v-if="message._issuer._iId === userStore.person._iId">{{ message._sText.substring(0,25) }}
                                         </p>
                                         <p class="small"
                                             :class="{ 'fw-bold': !message._bSeen, 'text-muted': message._bSeen }" v-else>
@@ -54,8 +54,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-8 private-chat" v-if="currentUserChat != null">
-                <div class="row header-chat">
+            <div class="col-md-8" v-if="currentUserChat != null">
+                <div class="row">
                     <div class="col-md-2" style="cursor: pointer;"
                         @click="router.push('/profile/' + currentUserChat._sUsername)">
                         <img class="mr-3 mt-4 avatar"
@@ -78,18 +78,18 @@
                         <li v-for="message in aMessages">
                             <div class="row" v-if="message._iIssuerId === currentUserChat._iId">
                                 <div class="col-sm-1 ">
-                                    <img class="mr-3 avatar"
+                                    <img class="mr-3 avatar ms-2 mt-2"
                                         :src="userStore.baseAPIurl + 'getProfileImage/' + currentUserChat._iId"
                                         alt="User avatar">
                                 </div>
                                 <div class="col-sm-10 ">
-                                    <p class="float-start mt-4"><span class="recipient-message">{{ message._sText
+                                    <p class="float-start me-2 mt-4"><span class="recipient-message">{{ message._sText
                                             }}</span></p>
                                 </div>
                             </div>
                             <div class="row" v-else>
                                 <div class="col-sm-10 ">
-                                    <p class="float-end mt-4"><span class="issuer-message">{{ message._sText }}</span>
+                                    <p class="float-end ms-4 mt-4"><span class="issuer-message">{{ message._sText }}</span>
                                     </p>
                                 </div>
                                 <div class="col-sm-1">
@@ -101,7 +101,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="row border" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
+                <div class="row border message-row" v-if="!bIsBlockedByPerson && !bIsPersonBlocked">
                     <div class="col-md-10">
                         <div class="message-wrapper">
                             <textarea class="mt-3" v-model="sMessage" @keyup.enter="submitMessage"></textarea>
@@ -139,7 +139,7 @@
                     </div>
                 </div>
                 <p class="small align-self-center mt-2">Escribe el nombre del usuario y selecciona a quien quieras
-                    enviar el mensaje.</p>
+                    enviar el mensaje. Recuerda que ese usuario deberá seguirte previamente para que puedas iniciar la conversación.</p>
             </div>
             <div v-if="aUsers.length != 0">
                 <ul class="list-unstyled user-list">
@@ -225,6 +225,7 @@ onMounted(() => {
     })
     const channel = pusher.subscribe('rt-chat');
 
+    console.log(document.getElementById('main').scrollHeight);
 })
 
 function getUsersFromUsername() {
@@ -241,6 +242,8 @@ function getUsersFromUsername() {
 }
 
 function loadChat(user) {
+    console.log(document.getElementById('main').scrollHeight);
+
     currentUserChat.value = user;
     let i = aLastMessages.value.findIndex(message => (message._issuer._iId === userStore.person._iId && message._recipient._iId === currentUserChat.value._iId) ||
         (message._issuer._iId === currentUserChat.value._iId && message._recipient._iId === userStore.person._iId));
@@ -311,6 +314,7 @@ function submitMessage() {
 </script>
 
 <style scoped>
+
 .hline {
     border-bottom: solid 1px black;
 }
@@ -343,8 +347,8 @@ function submitMessage() {
 }
 
 .scroller {
-    max-height: 70vh;
-    min-height: 50vh;
+    max-height: 60vh;
+    /* min-height: 50vh; */
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
@@ -352,7 +356,8 @@ function submitMessage() {
 }
 
 .chats-box {
-    height: 93vh;
+    height: 85vh;
+    /* min-height: auto; */
     overflow-y: hidden;
 }
 
@@ -447,7 +452,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     font-size: 1.5rem;
     background-color: #222222;
 }
@@ -491,6 +496,11 @@ body {
     margin-left: 20px;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+.message-row {
+    max-height: 20%;
+    min-height: 20%;
 }
 
 .btn-send {

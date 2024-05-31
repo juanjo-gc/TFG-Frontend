@@ -61,7 +61,6 @@ let sUsernamesToSearch = ref("");
 let aUsers = ref([]);
 //let aAssistantProfileImages = ref([]);
 
-
 onMounted(() => {
     axios.get(userStore.baseAPIurl + "getEvent/" + route.params.eventId)
         .then(response => {

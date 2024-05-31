@@ -2,9 +2,9 @@ import axios from "axios";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { host } from "../../config"
 
-//const host = import.meta.VUE_APP_HOST_IP;
-const host = "localhost";
+
 export const useUserStore = defineStore({
     id: 'user',
     state: () => {

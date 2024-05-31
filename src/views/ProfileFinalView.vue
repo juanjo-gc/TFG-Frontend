@@ -283,7 +283,7 @@
                             </div>
                             <h5 class="mt-2 fs-light">Fotos de {{ person._sName }}</h5>
                             <div class="d-flex justify-content-center mt-4 photos-box" v-if="aPhotos.length > 0">
-                                <div class="d-flex justify-content-center clickable" v-for="photo in aPhotos"
+                                <div class="d-flex justify-content-center clickable" v-for="photo in userStore.person._setImagePath"
                                     @click="bTriggerFullscreenImage = true; fsImage = photo">
                                     <img class="user-image m-1" :src="userStore.baseAPIurl + 'getImage/' + photo._sName"
                                         alt="" v-if="photo._tDeleteDate === null">
@@ -329,7 +329,7 @@
                 <div class="col-md-10">
                     <div class="row">
                         <div class="img-wrapper">
-                            <img :src="userstore.baseAPIurl + 'getImage/' + fsImage._sName" class="fsimg" alt="">
+                            <img :src="userStore.baseAPIurl + 'getImage/' + fsImage._sName" class="fsimg" alt="">
                         </div>
                     </div>
                 </div>
@@ -471,8 +471,8 @@ onMounted(() => {
                     .then(response => bIsPersonBlocked.value = response.data);
                 axios.get(userStore.baseAPIurl + "checkBlock/" + person.value._iId + "/" + userStore.person._iId)
                     .then(response => bIsBlockedByPerson.value = response.data);
-                axios.get(userStore.baseAPIurl + "getImageNames/" + person.value._iId)
-                    .then(response => aPhotos.value = response.data);
+                if(userStore.person._setImagePath != null)
+                    aPhotos.value = userStore.person._setImagePath;
                 if (person.value._iId != userStore.person._iId) {  //Ahorrar petición si el usuario es el mismo
                     axios.get(userStore.baseAPIurl + "checkFollow/" + userStore.person._iId + "/" + person.value._iId)
                         .then((response) => {
@@ -594,15 +594,20 @@ function setFollow() {
 }
 
 function chooseAdjacentPhoto(bNextPhoto) {
-    let iCurrentIndex = person.value._setImagePath.findIndex(photo => photo._iId === fsImage.value._iId);
+    let iCurrentIndex = aPhotos.value.findIndex(photo => photo._iId === fsImage.value._iId);
     if (bNextPhoto) {        //Siguiente foto
-        iCurrentIndex++;
-        fsImage.value = person.value._setImagePath[iCurrentIndex % aPhotos.value.length]
+        do {
+            iCurrentIndex = (iCurrentIndex + 1) % aPhotos.value.length;
+            fsImage.value = aPhotos.value[iCurrentIndex];  
+        } while(fsImage.value._tDeleteDate != null)
+        
     } else {
-        iCurrentIndex--;
-        if (iCurrentIndex < 0)
-            iCurrentIndex = person.value._setImagePath.length - 1;
-        fsImage.value = person.value._setImagePath[iCurrentIndex];
+        do {
+            iCurrentIndex--;
+            if (iCurrentIndex < 0)
+                iCurrentIndex = aPhotos.value.length - 1;
+            fsImage.value = aPhotos.value[iCurrentIndex];
+        } while(fsImage.value._tDeleteDate != null)
     }
 }
 

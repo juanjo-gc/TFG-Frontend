@@ -209,12 +209,12 @@
         <Popup v-if="bTriggerPopup">
             <p class="mt-4 fs-5 fw-light text-center">¿Estás seguro de que quieres borrar la imagen?</p>
             <div class="row mt-2">
-                <div class="col-md-8"></div>
-                <div class="col-md-2">
-                    <button type="button" class="btn btn-danger" @click="deleteImage">Borrar</button>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-5"></div>
+                <div class="col-md-1">
                     <button type="button" class="btn btn-secondary" @click="bTriggerPopup = false">Volver</button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger" @click="deleteImage">Borrar</button>
                 </div>
             </div>
         </Popup>
@@ -330,6 +330,7 @@ onMounted(() => {
     setTimeout(() => {
         bIsFetching.value = false;
     }, 250);
+    console.log(userStore.person._setImagePath)
 })
 
 
@@ -475,17 +476,22 @@ function onProfileImageUpload() {
     formData.append("file", profileImg.value.files[0]);
 }
 
-function onImageUpload() {
-    formData = new FormData();
+function countUserCurrentImages() {
     let iCurrentUploadedImages = 0;
     userStore.person._setImagePath.forEach(image => {
         if (image._tDeleteDate === null)
             iCurrentUploadedImages++;
     })
+    return iCurrentUploadedImages;
+}
+
+function onImageUpload() {
+    formData = new FormData();
+    let iCurrentUploadedImages = countUserCurrentImages();
+    console.log(iCurrentUploadedImages)
     if (uploadImage.value.files.length > 6 || (uploadImage.value.files.length + iCurrentUploadedImages) > 6) {
         bTriggerErrorAlert.value = true;
         sAlertMessage.value = "No se pueden subir más de 6 fotos por usuario. Sube menos fotos o borra alguna para poder subir las imágenes."
-        uploadImage.value.files = [];
     } else {
         for (let i = 0; i < uploadImage.value.files.length; i++) {
             let file = uploadImage.value.files[i];
@@ -515,7 +521,7 @@ async function uploadImg() {
 }
 
 function sendImages() {
-    if (uploadImage.value.files.length > 0) {
+    if (uploadImage.value.files.length > 0 && countUserCurrentImages() < 6) {
         for (let i = 0; i < uploadImage.value.files.length; i++) {
             let currentFormData = new FormData();
             currentFormData.append('userId', userStore.person._iId);
@@ -557,6 +563,9 @@ function sendImages() {
                 }
             }
         }
+    } else {
+        bTriggerErrorAlert.value = true;
+        sAlertMessage.value = "No se pueden subir más de 6 fotos por usuario. Sube menos fotos o borra alguna para poder subir las imágenes."
     }
 }
 
@@ -566,6 +575,7 @@ function setDeleteImagePopup(image) {
 }
 
 function deleteImage() {
+    console.log("Imagen a borrar: " + iImageIdToDelete.value)
     axios.patch(userStore.baseAPIurl + "softDeleteOrRestoreImage/" + iImageIdToDelete.value)
         .then(response => {
             if (response.data === true) {

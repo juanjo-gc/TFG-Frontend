@@ -62,7 +62,7 @@
       </div>
     </section>
     <!-- <div class="alert alert-danger alert-dismissible fade show" role="alert" v-if="bTriggerErrorAlert">
-      <strong>Error. </strong>{{ sAlertMessage }}
+      <strong>Error. </strong>{{ asPopupMessages }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"
         @click="bTriggerErrorAlert = false;"></button>
     </div> -->
@@ -77,7 +77,7 @@
       </div>
       <div class="row">
         <ul class="ms-4">
-          <li v-for="error in sAlertMessage">
+          <li v-for="error in asPopupMessages">
             <p class="fw-light">{{ error }}</p>
           </li>
         </ul>
@@ -123,7 +123,7 @@ let sCountry = ref("País");
 let aFilteredRegions = ref([]);
 let aFilteredProvinces = ref([]);
 let bTriggerErrorAlert = ref(false);
-let sAlertMessage = ref([]);
+let asPopupMessages = ref([]);
 let bTriggerSuccessPopup = ref(false);
 
 onMounted(() => {
@@ -186,22 +186,22 @@ async function checkUsername() {
 
 
 async function registerUser() {
-  sAlertMessage.value = [];
+  asPopupMessages.value = [];
   if (isUsernameTaken.value || bIsUsernameIncorrect.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value.push(isUsernameTaken.value ? "El nombre de usuario ya se encuentra en uso." : "Escribe un nombre de usuario correcto de acuerdo a las indicaciones");
+    asPopupMessages.value.push(isUsernameTaken.value ? "El nombre de usuario ya se encuentra en uso." : "Escribe un nombre de usuario correcto de acuerdo a las indicaciones");
   }
   if (isEmailTaken.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value.push("La dirección de correo ya se encuentra en uso.");
+    asPopupMessages.value.push("La dirección de correo ya se encuentra en uso.");
   }
   if (password.value != confirmPassword.value) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value.push("Las contraseñas deben coincidir.");
+    asPopupMessages.value.push("Las contraseñas deben coincidir.");
   }
   if (moment(birthDate.value).add(18, 'years').isAfter(moment(Date.now()))) {
     bTriggerErrorAlert.value = true;
-    sAlertMessage.value.push("Debes ser mayor de edad para registrarte.");
+    asPopupMessages.value.push("Debes ser mayor de edad para registrarte.");
   }
   if(!bTriggerErrorAlert.value) {
     axios.post(userStore.baseAPIurl + "register", {
