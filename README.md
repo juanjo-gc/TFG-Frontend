@@ -1,24 +1,2 @@
-# frontend
-
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+<h1>Firelight front-end</h1>
+<p>Se incluye todo lo referente al front-end de mi TFG, consistente en la creación de una red social destinada a que personas con gustos afines se conozcan mediante un sistema de interacción basado en publicaciones y creaciones de eventos. Se ha utilizado <strong>Vue.js</strong> y <strong>Bootstrap</strong> para implementar las interfaces de usuario y la lógica de comunicación con el servidor.<p/>
